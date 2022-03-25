@@ -7,7 +7,7 @@ export function combineURLs(baseURL: string, relativeURL: string) {
         : baseURL;
 }
 
-const registryLookup=async({
+export const registryLookup=async({
     subscriber_id, unique_key_id, type, domain
 }:{
     subscriber_id?: string, unique_key_id?: string, type?: string, domain?: string

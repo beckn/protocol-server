@@ -115,13 +115,13 @@ export async function verifyHeader (header: string, req: Request) {
     }
 }
 
-export const createHeaderConfig = async (request: any) => {
+export const createAuthHeaderConfig = async (request: any) => {
     const header = await createAuthorizationHeader(request);
     const axios_config = {
         headers: {
             Authorization: header,
         },
-        // timeout: 3000
+        timeout: 3000
     }
     return axios_config;
 }
