@@ -6,7 +6,7 @@ app:
   privateKey: kWch03PpIuEI2VmDROjWfwQEbsCokuK73YCXn2RibmEi97zTpGEmHpA2C8hJ+jaG5hwYEgN4oFhInT0nrzkv7g==
   publicKey: Ive806RhJh6QNgvISfo2huYcGBIDeKBYSJ09J685L+4=
   protocolId: wonderla.stayahalo.in
-  protocolUri: "https://ayush.free.beeceptor.com/"
+  protocolUri: "https://beckn.free.beeceptor.com/"
   uniqueKey: "134"
   city: "Kochi"
   country: "IND"
@@ -14,5 +14,5 @@ app:
   registryUrl: https://demo8386642.mockable.io
   auth: true
   callback:
-    successUrl: "https://ayush.free.beeceptor.com/success"
-    failureUrl: "https://ayush.free.beeceptor.com/failure"
+    successUrl: "https://beckn.free.beeceptor.com/success"
+    failureUrl: "https://beckn.free.beeceptor.com/failure"
