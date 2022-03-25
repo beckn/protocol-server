@@ -10,6 +10,8 @@ const loadConfigs : Function = () : void => {
         const publicKey = config.get("app.publicKey");
         const protocolId = config.get("app.protocolId");
         const uniqueKey = config.get("app.uniqueKey");
+        const successUrl = config.get("app.callback.successUrl");
+        const failureUrl = config.get("app.callback.failureUrl");
         process.env = {
             ...process.env,
             dbString,
@@ -19,7 +21,9 @@ const loadConfigs : Function = () : void => {
             privateKey,
             publicKey,
             protocolId,
-            uniqueKey
+            uniqueKey,
+            successUrl,
+            failureUrl
         }
     } catch (err) {
         throw err
