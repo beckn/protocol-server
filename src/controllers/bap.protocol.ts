@@ -1,16 +1,18 @@
 import axios from "axios";
 import { NextFunction, Request, Response } from "express";
+import { successCallback } from "../utils/callbacks";
 
 export async function bapProtocolHandler(req: Request, res: Response, next : NextFunction) {
     try {
-        axios.post(process.env.successUrl!, req.body)
         res.status(202).json({
             message: {
                 ack: {
-                    status: "success",
+                    status: "ACK",
                 }
             }
-        })
+        });
+
+        successCallback(req.body);
     } catch (error) {
         next(error)
     }

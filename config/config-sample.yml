@@ -1,18 +1,26 @@
 db:
   url: mongodb://root:password@192.168.0.15:27017/protocolServer?authSource=admin
 app:
-  mode: bpp
-  api: search
-  privateKey: kWch03PpIuEI2VmDROjWfwQEbsCokuK73YCXn2RibmEi97zTpGEmHpA2C8hJ+jaG5hwYEgN4oFhInT0nrzkv7g==
-  publicKey: Ive806RhJh6QNgvISfo2huYcGBIDeKBYSJ09J685L+4=
-  protocolId: wonderla.stayahalo.in
+  mode: bap
+  action: search
+
+  privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
+  publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
+  
+  protocolId: "cabs.dev.bap.stayhalo.in"
   protocolUri: "https://beckn.free.beeceptor.com/"
+  
+  registryUrl: https://demo8386642.mockable.io
+  auth: true
   uniqueKey: "134"
+  
   city: "Kochi"
   country: "IND"
   ttl: "P1M"
-  registryUrl: https://demo8386642.mockable.io
-  auth: true
+
+  httpTimeout: 3000
+  httpRetryCount: 2
+  
   callback:
     successUrl: "https://beckn.free.beeceptor.com/success"
     failureUrl: "https://beckn.free.beeceptor.com/failure"

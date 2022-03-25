@@ -1,27 +1,29 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
-import { makeBecknRequest, makeRequest_toBG } from "../utils/becknRequester";
-import { buildContextForBAP } from "../utils/context";
-import { registryLookup, registryLookupForBG } from "../utils/lookup";
+import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
+import { failureCallback } from "../utils/callbacks";
+import { buildContext } from "../utils/context";
+import { registryLookup } from "../utils/lookup";
 
-export async function triggerHandler(req: Request, res: Response) {
+export async function triggerHandler(req: Request, res: Response, next: NextFunction) {
     try {
-        // Context Building.
-        const context=buildContextForBAP(req.body.context);
 
-        const requestBody={
-            context,
-            message: req.body.message
-        }
+        const context=req.body.context;
+        const requestBody=req.body;
 
-        // Validator.
-
-        // Send Response.
+        res.status(202).json({
+            context: context,
+            message: {
+                ack: {
+                    status: "ACK",
+                }
+            }
+        });
 
         // Auth Creation.
-        const axios_config=createAuthHeaderConfig(requestBody)
-             
+        const axios_config=await createAuthHeaderConfig(requestBody)
+        
         let response: BecknResponse|undefined;
         
         const bpp_id: string | undefined=context.bpp_id;
@@ -29,7 +31,18 @@ export async function triggerHandler(req: Request, res: Response) {
 
         // In case bpp_id and bpp_uri is present.
         if((bpp_id && bpp_uri) && (bpp_id!=='' && bpp_uri!=='')){
-            response=await makeBecknRequest(bpp_uri, requestBody, axios_config);
+            
+            const subscribers=await registryLookup({
+                type: 'BPP',
+                domain: requestBody.context.domain,
+                subscriber_id: bpp_id
+            });
+
+            for(let i=0; i<subscribers.length; i++){
+                subscribers[i].subscriber_url=bpp_uri;
+            }
+            
+            response=await callNetwork(subscribers, requestBody, axios_config);
         }
         else{
             const subscribers=await registryLookup({
@@ -37,7 +50,9 @@ export async function triggerHandler(req: Request, res: Response) {
                 domain: requestBody.context.domain
             });
 
-            response=await makeRequest_toBG(subscribers, requestBody, axios_config);
+            console.log(subscribers.length);
+
+            response=await callNetwork(subscribers, requestBody, axios_config);
         }
 
         if((response.status==200)||(response.status==202)||(response.status==206)){
@@ -46,8 +61,19 @@ export async function triggerHandler(req: Request, res: Response) {
         }
 
         // Network Calls Failed.
-        // Make call to fail callback url.
+        await failureCallback({
+            context,
+            message: {
+                ack: {
+                    status: "NACK",
+                },
+            },
+            error: {
+                message: response.data   
+            }
+        });
+
     } catch (error) {
-        
+        next(error);
     }
 }

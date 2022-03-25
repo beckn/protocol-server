@@ -5,11 +5,9 @@ import { SubscriberDetail } from "../schemas/subscriberDetails.schema";
 import logger from "./logger";
 import { combineURLs } from "./lookup";
 
-export const makeBecknRequest = async (subscriberUrl: string, body: any, axios_config: any): Promise<BecknResponse> => {
+export const makeBecknRequest = async (subscriberUrl: string, body: any, axios_config: any, retry_count: number): Promise<BecknResponse> => {
     try {
-        // TODO: uncommet this.
-        const requestURL = combineURLs(subscriberUrl, `/${process.env.api}`);
-        console.log('Request URL :', requestURL);
+        const requestURL = combineURLs(subscriberUrl, `/${process.env.action}`);
 
         const response = await axios.post(requestURL, body, axios_config);
 
@@ -18,37 +16,45 @@ export const makeBecknRequest = async (subscriberUrl: string, body: any, axios_c
             status: response.status
         }
     } catch (error) {
+        let response: BecknResponse | undefined;
         if (axios.isAxiosError(error)) {
-            return {
+            response= {
                 data: JSON.stringify(error.response?.data),
                 status: (error.response?.status) ? error.response?.status : 500
             }
         }
-
-        return {
-            data: "No Response",
-            status: 500
+        else{
+            response= {
+                data: "No Response",
+                status: 500
+            }
         }
+
+        if(retry_count==0){
+            return response;
+        }
+
+        return await makeBecknRequest(subscriberUrl, body, axios_config, retry_count-1);
     }
 }
 
-export async function makeRequest_toBG(subscribers: SubscriberDetail[], body: any, axios_config: any): Promise<BecknResponse> {
+export async function callNetwork(subscribers: SubscriberDetail[], body: any, axios_config: any): Promise<BecknResponse> {
     if(subscribers.length==0){
         return {
-            data: "No BG found",
+            data: "No Subscribers found",
             status: 500
         }
     }
     
     for (let i = 0; i < subscribers.length; i++) {
-        logger.info(`Attempt Number: ${i + 1} \nAPI : ${process.env.api}`);
+        logger.info(`Attempt Number: ${i + 1} \nAPI : ${process.env.action}`);
 
-        const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config);
+        const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config, parseInt(process.env.httpRetryCount || "0"));
         if (response.status == 200) {
             logger.info(`Result : Request Successful \nStatus: ${response.status} \nData : ${response.data}`);
             return response;
         }
-        // Console the status in case failed.
+
         logger.error(`Result : Failed call to BG \nStatus: ${response.status}, \nData: ${response.data}`);
     }
 

@@ -121,7 +121,7 @@ export const createAuthHeaderConfig = async (request: any) => {
         headers: {
             Authorization: header,
         },
-        timeout: 3000
+        timeout: parseInt(process.env.httpTimeout || "3000"),
     }
     return axios_config;
 }
