@@ -1,6 +1,5 @@
 import {v4 as uuid_v4} from 'uuid';
 
-// Use open API context schema created.
 export function buildContext (context: any)  {
     const timestamp = new Date().toISOString();
     const message_id=uuid_v4();

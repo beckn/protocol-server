@@ -1,5 +1,5 @@
 db:
-  url: mongodb://root:password@192.168.0.15:27017/protocolServer?authSource=admin
+  url: mongodb://root:password@localhost:27017/protocolServer?authSource=admin
 app:
   mode: bap
   action: search
@@ -7,12 +7,12 @@ app:
   privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
   publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
   
-  protocolId: "cabs.dev.bap.stayhalo.in"
-  protocolUri: "https://beckn.free.beeceptor.com/"
+  protocolId: "dev.bap.protocol-server.com"
+  protocolUri: "https://ayush.free.beeceptor.com/"
   
-  registryUrl: https://demo8386642.mockable.io
+  registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
-  uniqueKey: "134"
+  uniqueKey: "dev.bap.protocol-server.key"
   
   city: "Kochi"
   country: "IND"

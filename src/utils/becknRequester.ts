@@ -47,7 +47,7 @@ export async function callNetwork(subscribers: SubscriberDetail[], body: any, ax
     }
     
     for (let i = 0; i < subscribers.length; i++) {
-        logger.info(`Attempt Number: ${i + 1} \nAPI : ${process.env.action}`);
+        logger.info(`Attempt Number: ${i + 1} \nAction : ${process.env.action}`);
 
         const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config, parseInt(process.env.httpRetryCount || "0"));
         if (response.status == 200) {
