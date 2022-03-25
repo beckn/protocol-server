@@ -24,6 +24,7 @@
     "@types/jsonwebtoken": "^8.5.8",
     "@types/libsodium-wrappers": "^0.7.9",
     "amqplib": "^0.8.0",
+    "axios": "^0.26.1",
     "config": "^3.3.7",
     "express": "^4.17.3",
     "express-openapi-validator": "^4.13.6",
@@ -31,6 +32,7 @@
     "libsodium-wrappers": "^0.7.9",
     "mongodb": "^4.4.1",
     "winston": "^3.6.0",
-    "winston-daily-rotate-file": "^4.6.1"
+    "winston-daily-rotate-file": "^4.6.1",
+    "zod": "^3.14.2"
   }
 }
