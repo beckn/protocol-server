@@ -49,9 +49,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 type: 'BG',
                 domain: requestBody.context.domain
             });
-
-            console.log(subscribers.length);
-
+            
             response=await callNetwork(subscribers, requestBody, axios_config);
         }
 
