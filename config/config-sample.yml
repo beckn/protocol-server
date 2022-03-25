@@ -1,0 +1,11 @@
+db:
+  url: mongodb://root:password@192.168.0.15:27017/protocolServer?authSource=admin
+mq:
+  url: amqp://root:password@192.168.0.15:5672/
+app:
+  mode: bpp
+  api: search
+  privateKey: kWch03PpIuEI2VmDROjWfwQEbsCokuK73YCXn2RibmEi97zTpGEmHpA2C8hJ+jaG5hwYEgN4oFhInT0nrzkv7g==
+  publicKey: Ive806RhJh6QNgvISfo2huYcGBIDeKBYSJ09J685L+4=
+  protocolId: wonderla.stayahalo.in
+  uniqueKey: 25
