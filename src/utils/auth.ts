@@ -1,7 +1,7 @@
 import _sodium, { base64_variants } from "libsodium-wrappers"
 import { writeFile } from "fs/promises"
 import logger from "./logger"
-import { Request } from "express"
+import { Request, Response } from "express"
 import { getSubscriberDetails } from "./lookup"
 
 export const createKeyPair = async () : Promise<void> => {
@@ -90,7 +90,7 @@ const split_auth_header_space = (auth_header: string) => {
     return parts;
 }
 
-export async function verifyHeader (header: string, req: Request) {
+export async function verifyHeader (header: string, req: Request, res: Response) {
     try {
         const parts = split_auth_header(header);
         if (!parts || Object.keys(parts).length === 0) {
@@ -106,7 +106,7 @@ export async function verifyHeader (header: string, req: Request) {
         // const { signingString } = await createSigningString(req.rawBody, parts['created'], parts['expires']);
         
         // New Code:
-        const { signing_string } = await createSigningString(req.body);
+        const { signing_string } = await createSigningString(res.locals.rawBody, parts['created'], parts['expires']);
         const verified = await verifyMessage(parts['signature'], signing_string, public_key);
         return verified;
     } catch (error) {

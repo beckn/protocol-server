@@ -10,7 +10,13 @@ import { createKeyPair } from "./utils/auth"
 
 const initializeExpress=async()=>{
     const app = Express()
-    app.use(Express.json())
+    app.use(Express.json({
+        verify: (req: Request, res: Response, buf: Buffer) => {
+            res.locals={
+                rawBody: buf.toString()
+            }
+        }    
+    }))
 
     app.use('/', router)
 
