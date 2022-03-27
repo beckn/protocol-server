@@ -102,10 +102,6 @@ export async function verifyHeader (header: string, req: Request, res: Response)
         const subscriber_details = await getSubscriberDetails(subscriber_id, unique_key_id);
         console.log(req.body?.context?.transaction_id, subscriber_details);
         const public_key = subscriber_details.signing_public_key;
-        // // OLd Code:
-        // const { signingString } = await createSigningString(req.rawBody, parts['created'], parts['expires']);
-        
-        // New Code:
         const { signing_string } = await createSigningString(res.locals.rawBody, parts['created'], parts['expires']);
         const verified = await verifyMessage(parts['signature'], signing_string, public_key);
         return verified;
