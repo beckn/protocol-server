@@ -22,7 +22,7 @@ const initializeExpress=async()=>{
     })
 
     app.listen(process.env.PORT, () => {
-        logger.info('Server started on port 3000');
+        logger.info('Server started on port '+process.env.PORT);
     })
 }
 
