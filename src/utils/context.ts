@@ -7,6 +7,7 @@ export function buildContext (context: any)  {
     
     const bapContext={
         ...context,
+        action: process.env.action,
         message_id: message_id,
         transaction_id,
         country: process.env.country,
