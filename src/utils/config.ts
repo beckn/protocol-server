@@ -2,6 +2,7 @@ const config = require("config");
 
 const loadConfigs : Function = () : void => {
     try {
+        const PORT = config.get("port");
         const dbString = config.get("db.url");
         // const mqUrl = config.get("mq.url");
         const mode = config.get("app.mode");
@@ -28,6 +29,7 @@ const loadConfigs : Function = () : void => {
         
         process.env = {
             ...process.env,
+            PORT,
             dbString,
             // mqUrl,
             mode,
