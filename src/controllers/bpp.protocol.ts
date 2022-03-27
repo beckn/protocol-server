@@ -25,10 +25,19 @@ export async function publishResults(req : Request, res : Response, next : NextF
         const context=req.body.context;
         const requestBody=req.body;
         const axios_config=await createAuthHeaderConfig(requestBody)
+        
+        res.status(202).json({
+            message: {
+                ack: {
+                    status: "ACK",
+                }
+            }
+        });
+
         const subscribers=await registryLookup({
-                type: 'BG',
-                domain: requestBody.context.domain
-            });
+            type: 'BG',
+            domain: requestBody.context.domain
+        });
         let response = await callNetwork(subscribers, requestBody, axios_config);
         if(response.status === 200 || response.status === 202 || response.status === 206){
             return;
@@ -37,18 +46,11 @@ export async function publishResults(req : Request, res : Response, next : NextF
                 context: context,
                 message: {
                     ack: {
-                        status: "ACK",
+                        status: "NACK",
                     }
                 }
             });
         }
-        res.status(202).json({
-            message: {
-                ack: {
-                    status: "ACK",
-                }
-            }
-        });
     } catch (error) {
         next(error)
     }
