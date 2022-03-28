@@ -11,6 +11,24 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
 
         const context=req.body.context;
         const requestBody=req.body;
+        
+        const bpp_id: string | undefined=context.bpp_id;
+        const bpp_uri: string | undefined=context.bpp_uri;
+
+        if((process.env.action!='search')&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
+            res.status(400).json({
+                context: context,
+                message: {
+                    ack: {
+                        status: "NACK",
+                    }
+                },
+                error: {
+                    message: 'All triggers other than searchs requires bpp_id and bpp_uri. \nMissing bpp_id or bpp_uri'
+                }
+            });    
+            return;
+        }
 
         res.status(202).json({
             context: context,
@@ -25,9 +43,6 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         const axios_config=await createAuthHeaderConfig(requestBody)
         
         let response: BecknResponse|undefined;
-        
-        const bpp_id: string | undefined=context.bpp_id;
-        const bpp_uri: string | undefined=context.bpp_uri;
 
         // In case bpp_id and bpp_uri is present.
         if((bpp_id && bpp_uri) && (bpp_id!=='' && bpp_uri!=='')){

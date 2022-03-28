@@ -3,7 +3,7 @@ import { createAuthHeaderConfig } from "../utils/auth";
 import { callNetwork } from "../utils/becknRequester";
 import { failureCallback, successCallback } from "../utils/callbacks";
 import { registryLookup } from "../utils/lookup";
-import { triggerHandler } from "./trigger";
+import { triggerHandler } from "./bap.trigger";
 
 export async function bppProtocolHandler(req: Request, res: Response, next : NextFunction) {
     try {
@@ -24,7 +24,6 @@ export async function publishResults(req : Request, res : Response, next : NextF
     try {
         const context=req.body.context;
         const requestBody=req.body;
-        const axios_config=await createAuthHeaderConfig(requestBody)
         
         res.status(202).json({
             message: {
@@ -33,12 +32,16 @@ export async function publishResults(req : Request, res : Response, next : NextF
                 }
             }
         });
+        
+        const axios_config=await createAuthHeaderConfig(requestBody)
 
-        const subscribers=await registryLookup({
-            type: 'BG',
-            domain: requestBody.context.domain
-        });
-        let response = await callNetwork(subscribers, requestBody, axios_config);
+        let response = await callNetwork([{
+            subscriber_id: req.body.context.bap_id,
+            subscriber_url: req.body.context.bap_uri,
+            type: 'BAP',
+            signing_public_key: ''
+        }], requestBody, axios_config);
+
         if(response.status === 200 || response.status === 202 || response.status === 206){
             return;
         } else {
