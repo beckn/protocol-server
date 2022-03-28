@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { bapProtocolHandler } from "../controllers/bap.protocol";
 import { bppProtocolHandler, publishResults } from "../controllers/bpp.protocol";
-import { triggerHandler } from "../controllers/trigger";
+import { triggerHandler } from "../controllers/bap.trigger";
 import { auth } from "../middlewares/auth";
 import { contextMiddleware } from "../middlewares/context";
 import validator from "../middlewares/validator";
