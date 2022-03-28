@@ -34,7 +34,6 @@ export const registryLookup=async({
     }
 }
 
-
 export async function getSubscriberDetails(subscriber_id: string, unique_key_id: string) {
     try {
         const subsribers=await registryLookup({

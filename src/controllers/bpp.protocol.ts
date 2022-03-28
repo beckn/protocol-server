@@ -24,7 +24,6 @@ export async function publishResults(req : Request, res : Response, next : NextF
     try {
         const context=req.body.context;
         const requestBody=req.body;
-        const axios_config=await createAuthHeaderConfig(requestBody)
         
         res.status(202).json({
             message: {
@@ -33,7 +32,10 @@ export async function publishResults(req : Request, res : Response, next : NextF
                 }
             }
         });
+        
+        const axios_config=await createAuthHeaderConfig(requestBody)
 
+        // Make calls to BAP.
         const subscribers=await registryLookup({
             type: 'BG',
             domain: requestBody.context.domain
