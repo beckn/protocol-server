@@ -81,7 +81,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                     status: "NACK",
                 },
             },
-            error: {
+            error: { 
                 message: response.data   
             }
         });

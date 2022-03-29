@@ -1,3 +1,4 @@
+import moment from "moment";
 import { Db } from "mongodb";
 import { getDb } from "../utils/db";
 
@@ -46,7 +47,7 @@ export class ResponseCache{
         const expireDate=new Date(Date.now()+(1000*60*60*24*generalExpiryDays));
         const result=await collection.insertOne({
             expiresAt: expireDate,
-            transaction_id: requestBody.transaction_id,
+            transaction_id: requestBody.context.transaction_id,
             request: requestBody
         });
 
@@ -60,22 +61,30 @@ export class ResponseCache{
         await this.createExpireIndex();
         
         const requestData=await collecton.findOne({
-            transaction_id: responseBody.transaction_id
+            transaction_id: responseBody.context.transaction_id
         });
 
         if(!requestData){
             return;
         }
 
-        const expireDate=new Date(Date.now()+(1000*60*60*24*generalExpiryDays));
+        const ttlTime=moment.duration(responseBody.context.ttl).asMilliseconds();
+        const expireDate=new Date(Date.now()+ttlTime);
         
         // TODO: insert the respnonseBody inside the responses array.
         // TODO: set the expiration time as per the tll.
-        // const result=await collecton.updateOne({
-        //     transaction_id: responseBody.transaction_id,
-        // }, {
-        //     // $addToSet:
-        // })
+        const result=await collecton.updateOne({
+            transaction_id: responseBody.transaction_id,
+        }, {
+            $addToSet:{
+                responses: responseBody
+            },
+            $set:{
+                expiresAt: expireDate
+            }
+        })
+
+        return result.upsertedId.toString();
     }
 
     public async check(requestBody: any){
