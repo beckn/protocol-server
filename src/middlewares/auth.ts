@@ -15,8 +15,8 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
         
         const isAuthRequired=config.get('app.auth');
         if (isAuthRequired) {
-            var verified = await verifyHeader(auth_header, req);
-            var verified_proxy = proxy_header ? await verifyHeader(proxy_header, req) : true;
+            var verified = await verifyHeader(auth_header, req, res);
+            var verified_proxy = proxy_header ? await verifyHeader(proxy_header, req, res) : true;
             console.log(req.body?.context?.transaction_id, "Verification status:", verified, "Proxy verification:", verified_proxy);
             if (!verified || !verified_proxy) {
                 throw Error("Header verification failed");
