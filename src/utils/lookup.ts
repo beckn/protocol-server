@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { LookupCache } from '../models/lookup.cache';
+import { LookupParameter } from '../schemas/lookupParameter.schema';
 import { SubscriberDetail, subscriberDetailsSchema } from '../schemas/subscriberDetails.schema';
 
 export function combineURLs(baseURL: string, relativeURL: string) {
@@ -7,16 +9,16 @@ export function combineURLs(baseURL: string, relativeURL: string) {
         : baseURL;
 }
 
-export const registryLookup=async({
-    subscriber_id, unique_key_id, type, domain
-}:{
-    subscriber_id?: string, unique_key_id?: string, type?: string, domain?: string
-})=>{
+export const registryLookup=async(lookupParameter:LookupParameter)=>{
     try {
-        console.log("Looking Up in registry...!")
-        const response=await axios.post(combineURLs(process.env.registryUrl!, '/lookup'), { 
-            subscriber_id, unique_key_id, type, domain
-         });
+        const lookupCache=LookupCache.getInstance();
+        const cachedResponse=await lookupCache.get(lookupParameter);
+        if(cachedResponse){
+            return cachedResponse;
+        }
+
+        console.log("\nLooking Up in registry...!\n")
+        const response=await axios.post(combineURLs(process.env.registryUrl!, '/lookup'), lookupParameter);
         const subscribers:Array<SubscriberDetail>=[];
         response.data.forEach((data:object) => {
             try {
@@ -28,6 +30,7 @@ export const registryLookup=async({
             }
         });
 
+        lookupCache.set(lookupParameter, subscribers);
         return subscribers;
     } catch (error) {
         throw error;

@@ -19,8 +19,10 @@ const loadConfigs : Function = () : void => {
         
         const city = config.get("app.city");
         const country= config.get("app.country");
-        const ttl=config.get("app.ttl");
         
+        const ttl=config.get("app.ttl");
+        const lookupCacheTTL=config.get("app.lookupCacheTTL");
+
         const httpTimeout=config.get("app.httpTimeout");
         const httpRetryCount=config.get("app.httpRetryCount");
 
@@ -43,6 +45,7 @@ const loadConfigs : Function = () : void => {
             city,
             country,
             ttl,
+            lookupCacheTTL,
             httpTimeout,
             httpRetryCount,
             successUrl,
