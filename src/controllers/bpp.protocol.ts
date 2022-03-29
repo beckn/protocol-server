@@ -23,6 +23,10 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
 export async function publishResults(req : Request, res : Response, next : NextFunction) {
     try {
         const context=req.body.context;
+        context.bpp_id=process.env.protocolId;
+        context.bpp_uri=process.env.protocolUri;
+        context.ttl=process.env.ttl;
+
         const requestBody=req.body;
         
         res.status(202).json({
@@ -40,7 +44,11 @@ export async function publishResults(req : Request, res : Response, next : NextF
             subscriber_url: req.body.context.bap_uri,
             type: 'BAP',
             signing_public_key: ''
-        }], requestBody, axios_config);
+        }], {
+            context: context,
+            message: requestBody.message,
+            error: requestBody.error
+        }, axios_config);
 
         if(response.status === 200 || response.status === 202 || response.status === 206){
             return;
