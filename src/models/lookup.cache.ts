@@ -2,10 +2,11 @@ import { Db } from "mongodb";
 import { LookupParameter } from "../schemas/lookupParameter.schema";
 import { SubscriberDetail, subscriberDetailsSchema } from "../schemas/subscriberDetails.schema";
 import { getDb } from "../utils/db";
+import Moment from 'moment'
 
 const lookupCacheCollectionName = 'lookupCache';
 const emptyPlaceHolder='N/A';
-const lookupCacheTTL=60;
+const lookupCacheTTL=Moment.duration((process.env.lookupCacheTTL) ? process.env.lookupCacheTTL : 'PT10M').asSeconds();
 
 export class LookupCache{
     public static getInstance():LookupCache{
@@ -17,8 +18,25 @@ export class LookupCache{
 
     private static instance:LookupCache;
     
+    private async createExpireIndex(){
+        // Creating Expire Index.
+        const db: Db=getDb();
+        const collection=db.collection(lookupCacheCollectionName);
+
+        try {
+            const createResult=await collection.createIndex({
+                createdAt: 1
+            }, {
+                expireAfterSeconds: lookupCacheTTL
+            });
+
+            // console.log(createResult);
+        } catch (error) {
+            // console.log("Index is already Set...");
+        }
+    }
     private constructor(){
-        
+    
     }
 
     private createQuery(parameters:LookupParameter): LookupParameter{
@@ -33,22 +51,13 @@ export class LookupCache{
     public async set(parameters: LookupParameter, subscribers: any):Promise<string>{
         const db: Db=getDb();
         const collection=db.collection(lookupCacheCollectionName);
-
-        // TODO: Check whether its expiring or not.
-        try {
-            await collection.createIndex({
-                createdAt: 1
-            }, {
-                expireAfterSeconds: lookupCacheTTL
-            });
-        } catch (error) {
-            console.log("Index is already Set...");
-        }
         
+        await this.createExpireIndex();
+
         const result=await collection.insertOne({
             parameters: this.createQuery(parameters),
             subscribers:subscribers,
-            createdAt: Date.now()
+            createdAt: new Date()
         });
 
         return result.insertedId.toString();

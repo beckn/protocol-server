@@ -30,6 +30,7 @@
     "express-openapi-validator": "^4.13.6",
     "js-yaml": "^4.1.0",
     "libsodium-wrappers": "^0.7.9",
+    "moment": "^2.29.1",
     "mongodb": "^4.4.1",
     "uuid": "^8.3.2",
     "winston": "^3.6.0",

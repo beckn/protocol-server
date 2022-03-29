@@ -17,7 +17,9 @@ app:
   
   city: "Kochi"
   country: "IND"
+
   ttl: "P1M"
+  lookupCacheTTL: "PT10S"
 
   httpTimeout: 3000
   httpRetryCount: 2
