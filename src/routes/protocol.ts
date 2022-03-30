@@ -11,8 +11,9 @@ const router = Router()
 
 if(process.env.mode=='bap'){
     // BAP Trigger
-    router.post(`/${process.env.action}`, contextMiddleware, /*validator, */ triggerHandler);
+    router.post(`/${process.env.action}`, contextMiddleware, triggerHandler);
     
+    // TODO: add auth to it.
     router.post(`/on_${process.env.action}`, validator, auth, bapProtocolHandler);
 }
 

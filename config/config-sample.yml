@@ -1,13 +1,18 @@
+# Keep caps
 port: 5000
 db:
   url: mongodb://root:password@localhost:27017/protocolServer?authSource=admin
 app:
   mode: bap
+
+  # Allow multiple actions
+  # Create handlers for all not mentioned.
   action: search
 
   privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
   publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
   
+  # Make Subscriber ID .
   protocolId: "dev.bap.protocol-server.com"
   protocolUri: "https://ayush.free.beeceptor.com/"
   
@@ -15,7 +20,7 @@ app:
   auth: true
   uniqueKey: "dev.bap.protocol-server.key"
   
-  city: "Kochi"
+  city: "std:080"
   country: "IND"
 
   ttl: "P1M"
@@ -24,6 +29,5 @@ app:
   httpTimeout: 3000
   httpRetryCount: 2
   
-  callback:
-    successUrl: "https://beckn.free.beeceptor.com/success"
-    failureUrl: "https://beckn.free.beeceptor.com/failure"
+  # Create the callback function.
+  clientUrl: "https://beckn.free.beeceptor.com/clientURL"
