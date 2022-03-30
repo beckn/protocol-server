@@ -13,8 +13,8 @@ app:
   publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
   
   # Make Subscriber ID .
-  protocolId: "dev.bap.protocol-server.com"
-  protocolUri: "https://ayush.free.beeceptor.com/"
+  subscriberId: "dev.bap.protocol-server.com"
+  subscriberUri: "https://ayush.free.beeceptor.com/"
   
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
@@ -29,5 +29,4 @@ app:
   httpTimeout: 3000
   httpRetryCount: 2
   
-  # Create the callback function.
   clientUrl: "https://beckn.free.beeceptor.com/clientURL"

@@ -11,8 +11,8 @@ export function buildContext (context: any)  {
         message_id: message_id,
         transaction_id,
         country: process.env.country,
-        bap_id: process.env.protocolId,
-        bap_uri: process.env.protocolUri,
+        bap_id: process.env.subscriberId,
+        bap_uri: process.env.subscriberUri,
         city: process.env.city,
         timestamp: timestamp,
         ttl: process.env.ttl

@@ -3,7 +3,7 @@ import { ResponseCache } from "../models/response.cache";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
-import { failureCallback, successCallback } from "../utils/callbacks";
+import { clientCallback } from "../utils/callbacks";
 import { buildContext } from "../utils/context";
 import { registryLookup } from "../utils/lookup";
 
@@ -42,13 +42,14 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             }
         });
 
+        // Check the json for caching flag.
         if(process.env.action=='search'){
             const cachedResponses=await responseCache.check(requestBody);
             if(cachedResponses){
-                cachedResponses.forEach((responseData)=>{
+                cachedResponses.forEach(async (responseData)=>{
                     responseData.context.message_id=context.message_id;
                     responseData.context.transaction_id=context.transaction_id;
-                    successCallback(responseData);
+                    await clientCallback(responseData, false);
                 });
                 return;
             }
@@ -92,7 +93,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         }
 
         // Network Calls Failed.
-        await failureCallback({
+        await clientCallback({
             context,
             message: {
                 ack: {
@@ -102,7 +103,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             error: { 
                 message: response.data   
             }
-        });
+        }, true);
 
     } catch (error) {
         next(error);

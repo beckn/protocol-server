@@ -45,7 +45,7 @@ export class ResponseCache{
                 country: requestBody.context.country,
                 city: requestBody.context.city,
                 action: requestBody.context.action,
-                core_versions: requestBody.context.core_versions
+                core_version: requestBody.context.core_version
             },
             message:requestBody.message
         }

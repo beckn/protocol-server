@@ -4,15 +4,15 @@ const loadConfigs : Function = () : void => {
     try {
         const PORT = config.get("port");
         const dbString = config.get("db.url");
-        // const mqUrl = config.get("mq.url");
+        
         const mode = config.get("app.mode");
         const action = config.get("app.action");
         
         const privateKey = config.get("app.privateKey");
         const publicKey = config.get("app.publicKey");
         
-        const protocolId = config.get("app.protocolId");
-        const protocolUri = config.get("app.protocolUri");
+        const subscriberId = config.get("app.subscriberId");
+        const subscriberUri = config.get("app.subscriberUri");
         
         const registryUrl=config.get("app.registryUrl");
         const uniqueKey = config.get("app.uniqueKey");
@@ -26,20 +26,18 @@ const loadConfigs : Function = () : void => {
         const httpTimeout=config.get("app.httpTimeout");
         const httpRetryCount=config.get("app.httpRetryCount");
 
-        const successUrl = config.get("app.callback.successUrl");
-        const failureUrl = config.get("app.callback.failureUrl");
+        const clientUrl=config.get("app.clientUrl");
         
         process.env = {
             ...process.env,
             PORT,
             dbString,
-            // mqUrl,
             mode,
             action,
             privateKey,
             publicKey,
-            protocolId,
-            protocolUri,
+            subscriberId,
+            subscriberUri,
             registryUrl,
             uniqueKey,
             city,
@@ -48,8 +46,7 @@ const loadConfigs : Function = () : void => {
             lookupCacheTTL,
             httpTimeout,
             httpRetryCount,
-            successUrl,
-            failureUrl
+            clientUrl,
         }
     } catch (err) {
         throw err

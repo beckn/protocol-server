@@ -23,4 +23,6 @@ if(process.env.mode=='bpp'){
     router.post(`/on_${process.env.action}`,validator, auth, publishResults)
 }
 
+// Create api for cache clearing for both.
+
 export default router

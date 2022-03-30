@@ -1,16 +1,12 @@
 import axios from "axios";
 
-export async function successCallback(requestBody: any) {
+export async function clientCallback(requestBody: any, isError: boolean) {
     try {
-        await axios.post(process.env.successUrl!, requestBody);
-    } catch (error) {
-        throw error;
-    }
-}
+        if((isError)&&(requestBody.error==null)){
+            throw new Error('Error object is missing.');
+        }
 
-export async function failureCallback(requestBody: any) {
-    try {
-        await axios.post(process.env.failureUrl!, requestBody)
+        await axios.post(process.env.clientUrl!, requestBody);
     } catch (error) {
         throw error;
     }
