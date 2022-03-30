@@ -38,6 +38,21 @@ export class ResponseCache{
 
     }
 
+    private createParameters(requestBody: any){
+        const params={
+            context:{
+                domain: requestBody.context.domain,
+                country: requestBody.context.country,
+                city: requestBody.context.city,
+                action: requestBody.context.action,
+                core_versions: requestBody.context.core_versions
+            },
+            message:requestBody.message
+        }
+
+        return params;
+    }
+
     public async cacheRequest(requestBody: any) {
         const db: Db=getDb();
         const collection=db.collection(responseCacheCollection);
@@ -48,7 +63,8 @@ export class ResponseCache{
         const result=await collection.insertOne({
             expiresAt: expireDate,
             transaction_id: requestBody.context.transaction_id,
-            request: requestBody
+            request: requestBody,
+            parameters: this.createParameters(requestBody)
         });
 
         return result.insertedId.toString();
@@ -68,13 +84,11 @@ export class ResponseCache{
             return;
         }
 
-        const ttlTime=moment.duration(responseBody.context.ttl).asMilliseconds();
+        const ttlTime=moment.duration(responseBody.context.ttl ?  responseBody.context.ttl : "PT0S").asMilliseconds();
         const expireDate=new Date(Date.now()+ttlTime);
         
-        // TODO: insert the respnonseBody inside the responses array.
-        // TODO: set the expiration time as per the tll.
         const result=await collecton.updateOne({
-            transaction_id: responseBody.transaction_id,
+            transaction_id: responseBody.context.transaction_id,
         }, {
             $addToSet:{
                 responses: responseBody
@@ -83,11 +97,23 @@ export class ResponseCache{
                 expiresAt: expireDate
             }
         })
-
-        return result.upsertedId.toString();
     }
 
-    public async check(requestBody: any){
+    public async check(requestBody: any): Promise<Array<any> | null>{
+        const db:Db=getDb();
+        const collection=db.collection(responseCacheCollection);
 
+        const requestCursor=await collection.find({
+            parameters: this.createParameters(requestBody),
+        });
+
+        const requestsData=await requestCursor.toArray();
+        for(let i=0; i<requestsData.length; i++){
+            if(requestsData[i].responses.length>0){
+                return requestsData[i].responses;
+            }
+        }
+
+        return null;
     }
 }

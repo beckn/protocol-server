@@ -1,10 +1,13 @@
 import { NextFunction, Request, Response } from "express";
+import { ResponseCache } from "../models/response.cache";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
-import { failureCallback } from "../utils/callbacks";
+import { failureCallback, successCallback } from "../utils/callbacks";
 import { buildContext } from "../utils/context";
 import { registryLookup } from "../utils/lookup";
+
+const responseCache=ResponseCache.getInstance();
 
 export async function triggerHandler(req: Request, res: Response, next: NextFunction) {
     try {
@@ -38,6 +41,21 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 }
             }
         });
+
+        if(process.env.action=='search'){
+            const cachedResponses=await responseCache.check(requestBody);
+            if(cachedResponses){
+                cachedResponses.forEach((responseData)=>{
+                    responseData.context.message_id=context.message_id;
+                    responseData.context.transaction_id=context.transaction_id;
+                    successCallback(responseData);
+                });
+                return;
+            }
+            else{
+                await responseCache.cacheRequest(requestBody);
+            }
+        }
 
         // Auth Creation.
         const axios_config=await createAuthHeaderConfig(requestBody)

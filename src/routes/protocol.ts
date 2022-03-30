@@ -13,7 +13,8 @@ if(process.env.mode=='bap'){
     // BAP Trigger
     router.post(`/${process.env.action}`, contextMiddleware, triggerHandler);
     
-    router.post(`/on_${process.env.action}`, validator, auth, bapProtocolHandler);
+    // TODO: add auth to it.
+    router.post(`/on_${process.env.action}`, validator, /*auth,*/ bapProtocolHandler);
 }
 
 if(process.env.mode=='bpp'){    
