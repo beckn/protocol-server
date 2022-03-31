@@ -9,9 +9,6 @@ const loadConfigs: Function = (): void => {
 
         const mode = config.get("app.mode");
 
-        // TODO: remove this.
-        const action = config.get("app.action");
-
         providedActions = config.get("app.actions");
 
         const privateKey = config.get("app.privateKey");
@@ -21,6 +18,7 @@ const loadConfigs: Function = (): void => {
         const subscriberUri = config.get("app.subscriberUri");
 
         const registryUrl = config.get("app.registryUrl");
+        const auth=config.get("app.auth");
         const uniqueKey = config.get("app.uniqueKey");
 
         const city = config.get("app.city");
@@ -40,13 +38,12 @@ const loadConfigs: Function = (): void => {
             dbString,
             mode,
 
-            // TODO: remove action.
-            action,
             privateKey,
             publicKey,
             subscriberId,
             subscriberUri,
             registryUrl,
+            auth,
             uniqueKey,
             city,
             country,

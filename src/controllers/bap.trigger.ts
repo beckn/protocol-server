@@ -4,7 +4,9 @@ import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
 import { clientCallback } from "../utils/callbacks";
+import { ActionTypes } from "../utils/config";
 import { buildContext } from "../utils/context";
+import logger from "../utils/logger";
 import { registryLookup } from "../utils/lookup";
 
 const responseCache=ResponseCache.getInstance();
@@ -18,7 +20,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         const bpp_id: string | undefined=context.bpp_id;
         const bpp_uri: string | undefined=context.bpp_uri;
 
-        if((action!='search')&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
+        if((action!=ActionTypes.search)&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
             res.status(400).json({
                 context: context,
                 message: {
@@ -42,8 +44,8 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             }
         });
 
-        // Check the json for caching flag.
-        if(action=='search'){
+        // TODO: Check the json for caching flag.
+        if(action==ActionTypes.search){
             const cachedResponses=await responseCache.check(requestBody);
             if(cachedResponses){
                 cachedResponses.forEach(async (responseData)=>{
@@ -106,6 +108,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         }, true);
 
     } catch (error) {
+        logger.error(error);
         next(error);
     }
 }

@@ -109,7 +109,7 @@ export class ResponseCache{
 
         const requestsData=await requestCursor.toArray();
         for(let i=0; i<requestsData.length; i++){
-            if(requestsData[i].responses.length>0){
+            if(requestsData[i]?.responses?.length>0){
                 return requestsData[i].responses;
             }
         }
