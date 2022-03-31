@@ -45,7 +45,7 @@ export class ResponseCache{
                 country: requestBody.context.country,
                 city: requestBody.context.city,
                 action: requestBody.context.action,
-                core_versions: requestBody.context.core_versions
+                core_version: requestBody.context.core_version
             },
             message:requestBody.message
         }
@@ -109,11 +109,17 @@ export class ResponseCache{
 
         const requestsData=await requestCursor.toArray();
         for(let i=0; i<requestsData.length; i++){
-            if(requestsData[i].responses.length>0){
+            if(requestsData[i]?.responses?.length>0){
                 return requestsData[i].responses;
             }
         }
 
         return null;
+    }
+
+    public async clear(){
+        const db:Db=getDb();
+        const collection=db.collection(responseCacheCollection);
+        await collection.deleteMany({});
     }
 }

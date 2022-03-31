@@ -3,13 +3,15 @@ import { ResponseCache } from "../models/response.cache";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
-import { failureCallback, successCallback } from "../utils/callbacks";
+import { clientCallback } from "../utils/callbacks";
+import { ActionTypes } from "../utils/config";
 import { buildContext } from "../utils/context";
+import logger from "../utils/logger";
 import { registryLookup } from "../utils/lookup";
 
 const responseCache=ResponseCache.getInstance();
 
-export async function triggerHandler(req: Request, res: Response, next: NextFunction) {
+export async function triggerHandler(req: Request, res: Response, next: NextFunction, action: string) {
     try {
 
         const context=req.body.context;
@@ -18,7 +20,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         const bpp_id: string | undefined=context.bpp_id;
         const bpp_uri: string | undefined=context.bpp_uri;
 
-        if((process.env.action!='search')&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
+        if((action!=ActionTypes.search)&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
             res.status(400).json({
                 context: context,
                 message: {
@@ -42,19 +44,33 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             }
         });
 
-        if(process.env.action=='search'){
-            const cachedResponses=await responseCache.check(requestBody);
-            if(cachedResponses){
-                cachedResponses.forEach((responseData)=>{
-                    responseData.context.message_id=context.message_id;
-                    responseData.context.transaction_id=context.transaction_id;
-                    successCallback(responseData);
-                });
+        if(action==ActionTypes.search){
+            if(requestBody.context.useCache){
+                const cachedResponses=await responseCache.check(requestBody);
+                if(cachedResponses){
+                    cachedResponses.forEach(async (responseData)=>{
+                        responseData.context.message_id=context.message_id;
+                        responseData.context.transaction_id=context.transaction_id;
+                        await clientCallback(responseData, false);
+                    });
+                }   
+                else{
+                    await clientCallback({
+                        context: context,
+                        message: {
+                            ack: {
+                                status: "NACK",
+                            },
+                        },
+                        error: { 
+                            message: 'No cached responses found'   
+                        } 
+                    }, true);
+                } 
                 return;
             }
-            else{
-                await responseCache.cacheRequest(requestBody);
-            }
+
+            await responseCache.cacheRequest(requestBody);
         }
 
         // Auth Creation.
@@ -75,7 +91,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 subscribers[i].subscriber_url=bpp_uri;
             }
             
-            response=await callNetwork(subscribers, requestBody, axios_config);
+            response=await callNetwork(subscribers, requestBody, axios_config, action);
         }
         else{
             const subscribers=await registryLookup({
@@ -83,7 +99,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 domain: requestBody.context.domain
             });
             
-            response=await callNetwork(subscribers, requestBody, axios_config);
+            response=await callNetwork(subscribers, requestBody, axios_config, action);
         }
 
         if((response.status==200)||(response.status==202)||(response.status==206)){
@@ -92,7 +108,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         }
 
         // Network Calls Failed.
-        await failureCallback({
+        await clientCallback({
             context,
             message: {
                 ack: {
@@ -102,9 +118,10 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             error: { 
                 message: response.data   
             }
-        });
+        }, true);
 
     } catch (error) {
+        logger.error(error);
         next(error);
     }
 }

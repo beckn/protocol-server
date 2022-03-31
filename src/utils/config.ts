@@ -1,46 +1,49 @@
 const config = require("config");
 
-const loadConfigs : Function = () : void => {
+let providedActions: Array<String> = [];
+
+const loadConfigs: Function = (): void => {
     try {
         const PORT = config.get("port");
         const dbString = config.get("db.url");
-        // const mqUrl = config.get("mq.url");
+
         const mode = config.get("app.mode");
-        const action = config.get("app.action");
-        
+
+        providedActions = config.get("app.actions");
+
         const privateKey = config.get("app.privateKey");
         const publicKey = config.get("app.publicKey");
-        
-        const protocolId = config.get("app.protocolId");
-        const protocolUri = config.get("app.protocolUri");
-        
-        const registryUrl=config.get("app.registryUrl");
+
+        const subscriberId = config.get("app.subscriberId");
+        const subscriberUri = config.get("app.subscriberUri");
+
+        const registryUrl = config.get("app.registryUrl");
+        const auth=config.get("app.auth");
         const uniqueKey = config.get("app.uniqueKey");
-        
+
         const city = config.get("app.city");
-        const country= config.get("app.country");
-        
-        const ttl=config.get("app.ttl");
-        const lookupCacheTTL=config.get("app.lookupCacheTTL");
+        const country = config.get("app.country");
 
-        const httpTimeout=config.get("app.httpTimeout");
-        const httpRetryCount=config.get("app.httpRetryCount");
+        const ttl = config.get("app.ttl");
+        const lookupCacheTTL = config.get("app.lookupCacheTTL");
 
-        const successUrl = config.get("app.callback.successUrl");
-        const failureUrl = config.get("app.callback.failureUrl");
-        
+        const httpTimeout = config.get("app.httpTimeout");
+        const httpRetryCount = config.get("app.httpRetryCount");
+
+        const clientUrl = config.get("app.clientUrl");
+
         process.env = {
             ...process.env,
             PORT,
             dbString,
-            // mqUrl,
             mode,
-            action,
+
             privateKey,
             publicKey,
-            protocolId,
-            protocolUri,
+            subscriberId,
+            subscriberUri,
             registryUrl,
+            auth,
             uniqueKey,
             city,
             country,
@@ -48,12 +51,28 @@ const loadConfigs : Function = () : void => {
             lookupCacheTTL,
             httpTimeout,
             httpRetryCount,
-            successUrl,
-            failureUrl
+            clientUrl,
         }
     } catch (err) {
         throw err
     }
+}
+
+export function getProvidedActions(): Array<String> {
+    return providedActions;
+}
+
+export const ActionTypes = {
+    search: "search",
+    select: "select",
+    init: "init",
+    confirm: "confirm",
+    update: "update",
+    status: "status",
+    track: "track",
+    cancel: "cancel",
+    rating: "rating",
+    support: "support",
 }
 
 export default loadConfigs;

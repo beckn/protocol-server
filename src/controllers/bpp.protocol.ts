@@ -1,13 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { callNetwork } from "../utils/becknRequester";
-import { failureCallback, successCallback } from "../utils/callbacks";
-import { registryLookup } from "../utils/lookup";
-import { triggerHandler } from "./bap.trigger";
+import { clientCallback } from "../utils/callbacks";
 
-export async function bppProtocolHandler(req: Request, res: Response, next : NextFunction) {
+export async function bppProtocolHandler(req: Request, res: Response, next : NextFunction, action: string) {
     try {
-        successCallback(req.body);
+        clientCallback(req.body, false);
         res.status(202).json({
             message: {
                 ack: {
@@ -20,11 +18,11 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
     }
 }
 
-export async function publishResults(req : Request, res : Response, next : NextFunction) {
+export async function publishResults(req : Request, res : Response, next : NextFunction, action: string) {
     try {
         const context=req.body.context;
-        context.bpp_id=process.env.protocolId;
-        context.bpp_uri=process.env.protocolUri;
+        context.bpp_id=process.env.subscriberId;
+        context.bpp_uri=process.env.subscriberUri;
         context.ttl=process.env.ttl;
 
         const requestBody=req.body;
@@ -43,24 +41,28 @@ export async function publishResults(req : Request, res : Response, next : NextF
             subscriber_id: req.body.context.bap_id,
             subscriber_url: req.body.context.bap_uri,
             type: 'BAP',
-            signing_public_key: ''
+            signing_public_key: '',
+            valid_until: (new Date()).toISOString()
         }], {
             context: context,
             message: requestBody.message,
             error: requestBody.error
-        }, axios_config);
+        }, axios_config, action);
 
         if(response.status === 200 || response.status === 202 || response.status === 206){
             return;
         } else {
-            await failureCallback({
+            await clientCallback({
                 context: context,
                 message: {
                     ack: {
                         status: "NACK",
                     }
+                },
+                error: {
+                    message: 'Error publishing results to BAP.'
                 }
-            });
+            }, true);
         }
     } catch (error) {
         next(error)

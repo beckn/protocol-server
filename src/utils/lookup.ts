@@ -12,7 +12,7 @@ export function combineURLs(baseURL: string, relativeURL: string) {
 export const registryLookup=async(lookupParameter:LookupParameter)=>{
     try {
         const lookupCache=LookupCache.getInstance();
-        const cachedResponse=await lookupCache.get(lookupParameter);
+        const cachedResponse=await lookupCache.check(lookupParameter);
         if(cachedResponse){
             return cachedResponse;
         }
@@ -30,7 +30,7 @@ export const registryLookup=async(lookupParameter:LookupParameter)=>{
             }
         });
 
-        lookupCache.set(lookupParameter, subscribers);
+        lookupCache.cache(lookupParameter, subscribers);
         return subscribers;
     } catch (error) {
         throw error;
