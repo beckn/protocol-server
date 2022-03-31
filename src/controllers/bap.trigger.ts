@@ -53,7 +53,6 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                         responseData.context.transaction_id=context.transaction_id;
                         await clientCallback(responseData, false);
                     });
-                    return;
                 }   
                 else{
                     await clientCallback({
@@ -67,8 +66,8 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                             message: 'No cached responses found'   
                         } 
                     }, true);
-                    return;
                 } 
+                return;
             }
 
             await responseCache.cacheRequest(requestBody);
