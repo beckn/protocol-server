@@ -116,4 +116,10 @@ export class ResponseCache{
 
         return null;
     }
+
+    public async clear(){
+        const db:Db=getDb();
+        const collection=db.collection(responseCacheCollection);
+        await collection.drop();
+    }
 }

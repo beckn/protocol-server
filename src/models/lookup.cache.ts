@@ -88,4 +88,10 @@ export class LookupCache{
 
         return null;
     }
+
+    public async clear(){
+        const db:Db=getDb();
+        const collection=db.collection(lookupCacheCollectionName);
+        await collection.drop();
+    }
 }

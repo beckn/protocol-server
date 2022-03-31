@@ -8,6 +8,8 @@ import validator from "../middlewares/validator";
 import { ActionTypes, getProvidedActions, } from "../utils/config";
 import { unConfigureActionHandler } from "../controllers/actionHandler";
 import { jsonConverter } from "../middlewares/jsonConverter";
+import { LookupCache } from "../models/lookup.cache";
+import { ResponseCache } from "../models/response.cache";
 
 const router = Router()
 
@@ -55,5 +57,22 @@ Object.keys(ActionTypes).forEach((action)=>{
 })
 
 // TODO: Create api for cache clearing for both.
+
+router.delete('/lookupCacbe', async (req: Request, res: Response, next: NextFunction) => {
+    const lookupCache=LookupCache.getInstance();
+    await lookupCache.clear();
+    res.status(200).json({
+        result:"Success",
+        message: "Lookup Cache Cleared"
+    });
+});
+router.delete('/responseCacbe', async (req: Request, res: Response, next: NextFunction) => {
+    const responseCache=ResponseCache.getInstance();
+    await responseCache.clear();
+    res.status(200).json({
+        result:"Success",
+        message: "Response Cache Cleared"
+    });
+});
 
 export default router
