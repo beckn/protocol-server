@@ -57,20 +57,28 @@ Object.keys(ActionTypes).forEach((action)=>{
 })
 
 router.delete('/lookupCacbe', async (req: Request, res: Response, next: NextFunction) => {
-    const lookupCache=LookupCache.getInstance();
-    await lookupCache.clear();
-    res.status(200).json({
-        result:"Success",
-        message: "Lookup Cache Cleared"
-    });
+    try {
+        const lookupCache=LookupCache.getInstance();
+        await lookupCache.clear();
+        res.status(200).json({
+            result:"Success",
+            message: "Lookup Cache Cleared"
+        });
+    } catch (error) {
+        next(error)
+    }
 });
 router.delete('/responseCacbe', async (req: Request, res: Response, next: NextFunction) => {
-    const responseCache=ResponseCache.getInstance();
-    await responseCache.clear();
-    res.status(200).json({
-        result:"Success",
-        message: "Response Cache Cleared"
-    });
+    try {
+        const responseCache=ResponseCache.getInstance();
+        await responseCache.clear();
+        res.status(200).json({
+            result:"Success",
+            message: "Response Cache Cleared"
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
 export default router

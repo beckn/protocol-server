@@ -92,6 +92,6 @@ export class LookupCache{
     public async clear(){
         const db:Db=getDb();
         const collection=db.collection(lookupCacheCollectionName);
-        await collection.drop();
+        await collection.deleteMany({});
     }
 }

@@ -54,7 +54,21 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                         await clientCallback(responseData, false);
                     });
                     return;
-                }    
+                }   
+                else{
+                    await clientCallback({
+                        context: context,
+                        message: {
+                            ack: {
+                                status: "NACK",
+                            },
+                        },
+                        error: { 
+                            message: 'No cached responses found'   
+                        } 
+                    }, true);
+                    return;
+                } 
             }
 
             await responseCache.cacheRequest(requestBody);
