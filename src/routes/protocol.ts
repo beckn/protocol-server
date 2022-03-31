@@ -56,8 +56,6 @@ Object.keys(ActionTypes).forEach((action)=>{
     }
 })
 
-// TODO: Create api for cache clearing for both.
-
 router.delete('/lookupCacbe', async (req: Request, res: Response, next: NextFunction) => {
     const lookupCache=LookupCache.getInstance();
     await lookupCache.clear();
