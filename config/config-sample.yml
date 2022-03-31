@@ -5,10 +5,6 @@ db:
 app:
   mode: bap
 
-  # Allow multiple actions
-  # Create handlers for all not mentioned.
-  action: search
-
   actions:
     - search
     - init
