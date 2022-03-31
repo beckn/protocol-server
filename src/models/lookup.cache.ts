@@ -25,9 +25,9 @@ export class LookupCache{
 
         try {
             const createResult=await collection.createIndex({
-                createdAt: 1
+                expiresAt: 1
             }, {
-                expireAfterSeconds: lookupCacheTTL
+                expireAfterSeconds: 0
             });
 
             // console.log(createResult);
@@ -48,23 +48,31 @@ export class LookupCache{
         }
     }
 
-    public async set(parameters: LookupParameter, subscribers: any):Promise<string>{
+    public async cache(parameters: LookupParameter, subscribers: Array<SubscriberDetail>):Promise<string>{
         const db: Db=getDb();
         const collection=db.collection(lookupCacheCollectionName);
         
         await this.createExpireIndex();
 
-        // TODO: Cache should expire before validUntill
+        // TODO: Cache should expire before validUntil
+        let expireDate=(Date.now()+lookupCacheTTL*1000);
+        subscribers.forEach((subscriber)=>{
+            const validUntillDate=Date.parse(subscriber.valid_until);
+            if(validUntillDate<expireDate){
+                expireDate=validUntillDate;
+            }
+        });
+
         const result=await collection.insertOne({
             parameters: this.createQuery(parameters),
             subscribers:subscribers,
-            createdAt: new Date()
+            expiresAt: new Date(expireDate)
         });
 
         return result.insertedId.toString();
     }
     
-    public async get(parameters: LookupParameter):Promise<Array<SubscriberDetail> | null>{
+    public async check(parameters: LookupParameter):Promise<Array<SubscriberDetail> | null>{
         const db:Db=getDb();
         const collection=db.collection(lookupCacheCollectionName);
         const result=await collection.findOne({

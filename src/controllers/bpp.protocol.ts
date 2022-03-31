@@ -41,7 +41,8 @@ export async function publishResults(req : Request, res : Response, next : NextF
             subscriber_id: req.body.context.bap_id,
             subscriber_url: req.body.context.bap_uri,
             type: 'BAP',
-            signing_public_key: ''
+            signing_public_key: '',
+            valid_until: (new Date()).toISOString()
         }], {
             context: context,
             message: requestBody.message,
