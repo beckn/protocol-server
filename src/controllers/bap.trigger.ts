@@ -44,20 +44,20 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             }
         });
 
-        // TODO: Check the json for caching flag.
         if(action==ActionTypes.search){
-            const cachedResponses=await responseCache.check(requestBody);
-            if(cachedResponses){
-                cachedResponses.forEach(async (responseData)=>{
-                    responseData.context.message_id=context.message_id;
-                    responseData.context.transaction_id=context.transaction_id;
-                    await clientCallback(responseData, false);
-                });
-                return;
+            if(requestBody.context.useCache){
+                const cachedResponses=await responseCache.check(requestBody);
+                if(cachedResponses){
+                    cachedResponses.forEach(async (responseData)=>{
+                        responseData.context.message_id=context.message_id;
+                        responseData.context.transaction_id=context.transaction_id;
+                        await clientCallback(responseData, false);
+                    });
+                    return;
+                }    
             }
-            else{
-                await responseCache.cacheRequest(requestBody);
-            }
+
+            await responseCache.cacheRequest(requestBody);
         }
 
         // Auth Creation.

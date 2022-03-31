@@ -24,7 +24,8 @@ export function buildContext(context: any, action: string) {
         transaction_id: transaction_id,
         message_id: message_id,
         ttl: process.env.ttl,
-        timestamp: timestamp
+        timestamp: timestamp,
+        useCache: (context.useCache==true)
     }
 
     return bapContext;
