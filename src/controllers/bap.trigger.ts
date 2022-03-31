@@ -9,7 +9,7 @@ import { registryLookup } from "../utils/lookup";
 
 const responseCache=ResponseCache.getInstance();
 
-export async function triggerHandler(req: Request, res: Response, next: NextFunction) {
+export async function triggerHandler(req: Request, res: Response, next: NextFunction, action: string) {
     try {
 
         const context=req.body.context;
@@ -18,7 +18,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         const bpp_id: string | undefined=context.bpp_id;
         const bpp_uri: string | undefined=context.bpp_uri;
 
-        if((process.env.action!='search')&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
+        if((action!='search')&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
             res.status(400).json({
                 context: context,
                 message: {
@@ -43,7 +43,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
         });
 
         // Check the json for caching flag.
-        if(process.env.action=='search'){
+        if(action=='search'){
             const cachedResponses=await responseCache.check(requestBody);
             if(cachedResponses){
                 cachedResponses.forEach(async (responseData)=>{
@@ -76,7 +76,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 subscribers[i].subscriber_url=bpp_uri;
             }
             
-            response=await callNetwork(subscribers, requestBody, axios_config);
+            response=await callNetwork(subscribers, requestBody, axios_config, action);
         }
         else{
             const subscribers=await registryLookup({
@@ -84,7 +84,7 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 domain: requestBody.context.domain
             });
             
-            response=await callNetwork(subscribers, requestBody, axios_config);
+            response=await callNetwork(subscribers, requestBody, axios_config, action);
         }
 
         if((response.status==200)||(response.status==202)||(response.status==206)){

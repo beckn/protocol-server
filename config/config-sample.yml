@@ -9,6 +9,10 @@ app:
   # Create handlers for all not mentioned.
   action: search
 
+  actions:
+    - search
+    - init
+
   privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
   publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
   

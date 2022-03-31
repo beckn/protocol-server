@@ -1,38 +1,46 @@
 const config = require("config");
 
-const loadConfigs : Function = () : void => {
+let providedActions: Array<String> = [];
+
+const loadConfigs: Function = (): void => {
     try {
         const PORT = config.get("port");
         const dbString = config.get("db.url");
-        
+
         const mode = config.get("app.mode");
+
+        // TODO: remove this.
         const action = config.get("app.action");
-        
+
+        providedActions = config.get("app.actions");
+
         const privateKey = config.get("app.privateKey");
         const publicKey = config.get("app.publicKey");
-        
+
         const subscriberId = config.get("app.subscriberId");
         const subscriberUri = config.get("app.subscriberUri");
-        
-        const registryUrl=config.get("app.registryUrl");
+
+        const registryUrl = config.get("app.registryUrl");
         const uniqueKey = config.get("app.uniqueKey");
-        
+
         const city = config.get("app.city");
-        const country= config.get("app.country");
-        
-        const ttl=config.get("app.ttl");
-        const lookupCacheTTL=config.get("app.lookupCacheTTL");
+        const country = config.get("app.country");
 
-        const httpTimeout=config.get("app.httpTimeout");
-        const httpRetryCount=config.get("app.httpRetryCount");
+        const ttl = config.get("app.ttl");
+        const lookupCacheTTL = config.get("app.lookupCacheTTL");
 
-        const clientUrl=config.get("app.clientUrl");
-        
+        const httpTimeout = config.get("app.httpTimeout");
+        const httpRetryCount = config.get("app.httpRetryCount");
+
+        const clientUrl = config.get("app.clientUrl");
+
         process.env = {
             ...process.env,
             PORT,
             dbString,
             mode,
+
+            // TODO: remove action.
             action,
             privateKey,
             publicKey,
@@ -51,6 +59,23 @@ const loadConfigs : Function = () : void => {
     } catch (err) {
         throw err
     }
+}
+
+export function getProvidedActions(): Array<String> {
+    return providedActions;
+}
+
+export const ActionTypes = {
+    search: "search",
+    select: "select",
+    init: "init",
+    confirm: "confirm",
+    update: "update",
+    status: "status",
+    track: "track",
+    cancel: "cancel",
+    rating: "rating",
+    support: "support",
 }
 
 export default loadConfigs;
