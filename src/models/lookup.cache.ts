@@ -54,7 +54,6 @@ export class LookupCache{
         
         await this.createExpireIndex();
 
-        // TODO: Cache should expire before validUntil
         let expireDate=(Date.now()+lookupCacheTTL*1000);
         subscribers.forEach((subscriber)=>{
             const validUntillDate=Date.parse(subscriber.valid_until);
