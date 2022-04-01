@@ -13,7 +13,6 @@ const responseCache=ResponseCache.getInstance();
 
 export async function triggerHandler(req: Request, res: Response, next: NextFunction, action: string) {
     try {
-
         const context=req.body.context;
         const requestBody=req.body;
         
