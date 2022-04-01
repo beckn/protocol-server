@@ -37,6 +37,7 @@ export async function publishResults(req : Request, res : Response, next : NextF
         
         const axios_config=await createAuthHeaderConfig(requestBody)
 
+        // TODO: Make calls to the BAP or BG.
         let response = await callNetwork([{
             subscriber_id: req.body.context.bap_id,
             subscriber_url: req.body.context.bap_uri,
