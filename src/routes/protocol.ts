@@ -41,7 +41,7 @@ Object.keys(ActionTypes).forEach((action)=>{
             })
         
             router.post(`/on_${action}`, jsonConverter,validator, auth, async (req: Request, res: Response, next: NextFunction) => {
-                await publishResults(req, res, next, action);
+                await publishResults(req, res, next, `on_${action}`);
             })
         }
     }
