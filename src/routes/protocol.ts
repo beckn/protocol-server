@@ -25,7 +25,6 @@ Object.keys(ActionTypes).forEach((action)=>{
     if(isActionConfigured){
         if(process.env.mode=='bap'){
             // BAP Trigger
-            // TODO: add auth creator middleware.
             router.post(`/${action}`, jsonConverter, async (req: Request, res: Response, next: NextFunction) => {
                 await contextMiddleware(req, res, next, action);
             }, async (req: Request, res: Response, next: NextFunction) => {

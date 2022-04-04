@@ -13,7 +13,7 @@ Protocol Server uses the [configuration file](/config/default.yaml) to configure
 
 - [default.yaml](/config/default.yaml) needs to be present inside the [config](/config/) folder.
 
-In order to create the configuration file you can use refer to [config-sample.yaml](/config/config-sample.yaml).
+In order to create the configuration file you can refer to [config-sample.yml](/config/config-sample.yml).
 
 ## Basic Configuration
 
