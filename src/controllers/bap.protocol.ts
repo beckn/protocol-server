@@ -13,12 +13,26 @@ export async function bapProtocolHandler(req: Request, res: Response, next : Nex
                 }
             }
         });
+    } catch (error) {
+        next(error);
+    }
 
+    try {
         if(action=='search'){
             responseCache.cacheResponse(req.body);
         }
         clientCallback(req.body, false);
-    } catch (error) {
-        next(error)
+    } catch (error:any) {
+        await clientCallback({
+            context: req.body.context,
+            message: {
+                ack: {
+                    status: "NACK",
+                },
+            },
+            error: { 
+                message: error.toString()   
+            } 
+        }, true);
     }
 }

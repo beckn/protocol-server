@@ -4,6 +4,9 @@ export async function jsonConverter(req: Request, res: Response, next: NextFunct
     // Here we are intentionally converting the raw body to req.body.
     // As we need to avoid the signature that can be caused due to the fact that
     // spaces and tabs in json body are left in the req.body even after the conversion to string.
-    req.body=JSON.parse(res.locals.rawBody);
+    req.body=(res.locals.rawBody) ? JSON.parse(res.locals.rawBody) : null;
+    req.headers ={
+        'someHearder': 'someValue'
+    }
     next();
 }

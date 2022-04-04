@@ -34,7 +34,7 @@ const loadConfigs: Function = (): void => {
 
         process.env = {
             ...process.env,
-            PORT,
+            PORT : PORT ? PORT : 3000,
             dbString,
             mode,
 
