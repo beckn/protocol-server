@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { bapProtocolHandler } from "../controllers/bap.protocol";
 import { bppProtocolHandler, publishResults } from "../controllers/bpp.protocol";
 import { triggerHandler } from "../controllers/bap.trigger";
-import { auth } from "../middlewares/auth";
+import { auth, authCreator } from "../middlewares/auth";
 import { contextMiddleware } from "../middlewares/context";
 import validator from "../middlewares/validator";
 import { ActionTypes, getProvidedActions, } from "../utils/config";
@@ -25,7 +25,7 @@ Object.keys(ActionTypes).forEach((action)=>{
     if(isActionConfigured){
         if(process.env.mode=='bap'){
             // BAP Trigger
-            router.post(`/${action}`, jsonConverter, async (req: Request, res: Response, next: NextFunction) => {
+            router.post(`/${action}`, jsonConverter, authCreator, validator, async (req: Request, res: Response, next: NextFunction) => {
                 await contextMiddleware(req, res, next, action);
             }, async (req: Request, res: Response, next: NextFunction) => {
                 await triggerHandler(req, res, next, action);
@@ -40,7 +40,7 @@ Object.keys(ActionTypes).forEach((action)=>{
                 await bppProtocolHandler(req, res, next, action);
             })
         
-            router.post(`/on_${action}`, jsonConverter,validator, auth, async (req: Request, res: Response, next: NextFunction) => {
+            router.post(`/on_${action}`, jsonConverter, authCreator, validator, async (req: Request, res: Response, next: NextFunction) => {
                 await publishResults(req, res, next, `on_${action}`);
             })
         }
