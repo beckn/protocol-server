@@ -20,6 +20,9 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
     try {
         // TODO:
         // Save transaction id with whether it is a direct or broadcast request.
+        console.log("Finding Gateway in Headers...")
+        console.log(req.headers)
+
         clientCallback(req.body, false);
     } catch (error:any) {
         clientCallback({
@@ -58,7 +61,6 @@ export async function publishResults(req : Request, res : Response, next : NextF
 
     // Asynchronous Block.
     try {
-        
         const axios_config=await createAuthHeaderConfig(requestBody)
 
         // TODO: check whether it is a direct or broadcast request.
