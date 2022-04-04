@@ -56,8 +56,8 @@ In order to configure the protocol server as BAP, you need to provide the follow
 3. Provide the sigin public key and private key
 
     ```yaml
-        privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
-        publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
+        privateKey: "your private key"
+        publicKey: "your public key"
     ```
 
 4. Specify the `subscriberId` and `subscriberUri` as per the registry which is also known as `bap_id` and `bap_uri`.
@@ -134,8 +134,8 @@ In order to configure the protocol server as BPP, you need to provide the follow
 3. Provide the sigin public key and private key
 
     ```yaml
-        privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
-        publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
+        privateKey: "your private key"
+        publicKey: "your public key"
     ```
 
 4. Specify the `subscriberId` and `subscriberUri` as per the registry which is also known as `bpp_id` and `bpp_uri`.
