@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { verifyHeader } from "../utils/auth";
+import { createAuthHeaderConfig, verifyHeader } from "../utils/auth";
 import logger from "../utils/logger";
 const config = require("config");
 
@@ -31,4 +31,12 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     }
 }
 
-// TODO: auth header creator middleware.
+export async function authCreator(req: Request, res: Response, next: NextFunction)  {
+    try {
+        const axios_config=await createAuthHeaderConfig(req.body);
+        req.headers=axios_config.headers;
+        next();
+    } catch (error) {
+        next(error)
+    }
+}

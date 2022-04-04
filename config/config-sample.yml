@@ -8,8 +8,8 @@ app:
     - search
     - init
 
-  privateKey: "O0DrMmoE5ieLwsqLmEloMnEe5HJSUzqdBHylPnl4usVmASaQNlx73+tSqjZ2UDu7gxVmGMXjskm0N+NegD6JPA=="
-  publicKey: "ZgEmkDZce9/rUqo2dlA7u4MVZhjF47JJtDfjXoA+iTw="
+  privateKey: "your private key"
+  publicKey: "your public key"
 
   subscriberId: "dev.bap.protocol-server.com"
   subscriberUri: "https://ayush.free.beeceptor.com/"

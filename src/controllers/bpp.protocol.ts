@@ -5,7 +5,6 @@ import { clientCallback } from "../utils/callbacks";
 
 export async function bppProtocolHandler(req: Request, res: Response, next : NextFunction, action: string) {
     try {
-        clientCallback(req.body, false);
         res.status(202).json({
             message: {
                 ack: {
@@ -15,6 +14,25 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
         });
     } catch (error) {
         next(error)
+    }
+
+    // Asynchronous Block.
+    try {
+        // TODO:
+        // Save transaction id with whether it is a direct or broadcast request.
+        clientCallback(req.body, false);
+    } catch (error:any) {
+        clientCallback({
+            context: req.body.context,
+            message: {
+                ack: {
+                    status: "NACK",
+                }
+            },
+            error: {
+                message: error.toString()
+            }
+        },true);
     }
 }
 
@@ -43,6 +61,7 @@ export async function publishResults(req : Request, res : Response, next : NextF
         
         const axios_config=await createAuthHeaderConfig(requestBody)
 
+        // TODO: check whether it is a direct or broadcast request.
         // TODO: Make calls to the BAP or BG.
         let response = await callNetwork([{
             subscriber_id: req.body.context.bap_id,
