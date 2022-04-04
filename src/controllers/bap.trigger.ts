@@ -12,12 +12,12 @@ import { registryLookup } from "../utils/lookup";
 const responseCache=ResponseCache.getInstance();
 
 export async function triggerHandler(req: Request, res: Response, next: NextFunction, action: string) {
+    const context=req.body.context;
+    const requestBody=req.body;
+    
+    const bpp_id: string | undefined=context.bpp_id;
+    const bpp_uri: string | undefined=context.bpp_uri;
     try {
-        const context=req.body.context;
-        const requestBody=req.body;
-        
-        const bpp_id: string | undefined=context.bpp_id;
-        const bpp_uri: string | undefined=context.bpp_uri;
 
         if((action!=ActionTypes.search)&&((!bpp_id)||(!bpp_uri)||(bpp_id=='')||(bpp_uri==''))){
             res.status(400).json({
@@ -42,7 +42,12 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 }
             }
         });
+    } catch (error) {
+        next(error);
+    }
 
+    // Asynchronous Block.
+    try {
         if(action==ActionTypes.search){
             if(requestBody.context.useCache){
                 const cachedResponses=await responseCache.check(requestBody);
@@ -118,9 +123,18 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
                 message: response.data   
             }
         }, true);
-
-    } catch (error) {
+    } catch (error:any) {
         logger.error(error);
-        next(error);
+        await clientCallback({
+            context,
+            message: {
+                ack: {
+                    status: "NACK",
+                },
+            },
+            error: { 
+                message: error.toString()   
+            }
+        }, true);
     }
 }

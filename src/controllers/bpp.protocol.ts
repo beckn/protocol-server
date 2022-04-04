@@ -19,13 +19,13 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
 }
 
 export async function publishResults(req : Request, res : Response, next : NextFunction, action: string) {
-    try {
-        const context=req.body.context;
-        context.bpp_id=process.env.subscriberId;
-        context.bpp_uri=process.env.subscriberUri;
-        context.ttl=process.env.ttl;
+    const context=req.body.context;
+    context.bpp_id=process.env.subscriberId;
+    context.bpp_uri=process.env.subscriberUri;
+    context.ttl=process.env.ttl;
 
-        const requestBody=req.body;
+    const requestBody=req.body;
+    try {
         
         res.status(202).json({
             message: {
@@ -34,6 +34,12 @@ export async function publishResults(req : Request, res : Response, next : NextF
                 }
             }
         });
+    } catch (error) {
+        next(error)
+    }
+
+    // Asynchronous Block.
+    try {
         
         const axios_config=await createAuthHeaderConfig(requestBody)
 
@@ -65,7 +71,17 @@ export async function publishResults(req : Request, res : Response, next : NextF
                 }
             }, true);
         }
-    } catch (error) {
-        next(error)
+    } catch (error:any) {
+        await clientCallback({
+            context: req.body.context,
+            message: {
+                ack: {
+                    status: "NACK",
+                },
+            },
+            error: { 
+                message: error.toString()   
+            } 
+        }, true);
     }
 }
