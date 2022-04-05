@@ -18,7 +18,7 @@ const loadConfigs: Function = (): void => {
         const subscriberUri = config.get("app.subscriberUri");
 
         const registryUrl = config.get("app.registryUrl");
-        const auth=config.get("app.auth");
+        const auth = config.get("app.auth");
         const uniqueKey = config.get("app.uniqueKey");
 
         const city = config.get("app.city");
@@ -34,7 +34,7 @@ const loadConfigs: Function = (): void => {
 
         process.env = {
             ...process.env,
-            PORT : PORT ? PORT : 3000,
+            PORT: PORT ? PORT : 3000,
             dbString,
             mode,
 
@@ -73,6 +73,10 @@ export const ActionTypes = {
     cancel: "cancel",
     rating: "rating",
     support: "support",
+}
+export const SearchTypes = {
+    broadcast: 'broadcast',
+    direct: 'direct',
 }
 
 export default loadConfigs;

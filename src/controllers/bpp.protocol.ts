@@ -1,7 +1,14 @@
 import { NextFunction, Request, Response } from "express";
+import { Db } from "mongodb";
+import { SubscriberDetail } from "../schemas/subscriberDetails.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { callNetwork } from "../utils/becknRequester";
 import { clientCallback } from "../utils/callbacks";
+import { ActionTypes, SearchTypes } from "../utils/config";
+import { getDb } from "../utils/db";
+import { registryLookup } from "../utils/lookup";
+
+const bppRequestCollectionName="bppRequests";
 
 export async function bppProtocolHandler(req: Request, res: Response, next : NextFunction, action: string) {
     try {
@@ -18,10 +25,21 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
 
     // Asynchronous Block.
     try {
-        // TODO:
-        // Save transaction id with whether it is a direct or broadcast request.
-        console.log("Finding Gateway in Headers...")
-        console.log(req.headers)
+        if(action==ActionTypes.search){
+            // Checking and saving in the database.
+            // In order to decide whether it is a direct search or a broadcast search.
+            // We will save it in DB and use it during on_search.
+            const gatewayHeader=req.headers['x-gateway-authorization'];
+            const db:Db=getDb();
+
+            const bppRequestCollection=db.collection(bppRequestCollectionName);
+            const insertResult=await bppRequestCollection.insertOne({
+                transactionId: req.body.context.transaction_id,
+                gatewayHeader: gatewayHeader,
+                action: action,
+                searchType: ((gatewayHeader)&&(gatewayHeader!="")) ? SearchTypes.broadcast : SearchTypes.direct,
+            });
+        }
 
         clientCallback(req.body, false);
     } catch (error:any) {
@@ -65,13 +83,44 @@ export async function publishResults(req : Request, res : Response, next : NextF
 
         // TODO: check whether it is a direct or broadcast request.
         // TODO: Make calls to the BAP or BG.
-        let response = await callNetwork([{
-            subscriber_id: req.body.context.bap_id,
-            subscriber_url: req.body.context.bap_uri,
-            type: 'BAP',
-            signing_public_key: '',
-            valid_until: (new Date()).toISOString()
-        }], {
+
+        let subscribers:Array<SubscriberDetail>=[];
+        if(action==`on_${ActionTypes.search}`){
+            const db:Db=getDb();
+            const collection=db.collection(bppRequestCollectionName);
+
+            const bppRequestData=await collection.findOne({
+                transactionId: context.transaction_id,
+            });
+
+            if(bppRequestData?.searchType==SearchTypes.broadcast){
+                // In this case it is sent back to BG.
+                subscribers=await registryLookup({
+                    type: 'BG',
+                    domain: context.domain,
+                });
+            }
+            else{
+                subscribers=[{
+                    subscriber_id: req.body.context.bap_id,
+                    subscriber_url: req.body.context.bap_uri,
+                    type: 'BAP',
+                    signing_public_key: '',
+                    valid_until: (new Date(Date.now()+(1000*60*60))).toISOString()
+                }];
+            }
+        }
+        else{
+            subscribers=[{
+                subscriber_id: req.body.context.bap_id,
+                subscriber_url: req.body.context.bap_uri,
+                type: 'BAP',
+                signing_public_key: '',
+                valid_until: (new Date(Date.now()+(1000*60*60))).toISOString()
+            }];
+        }
+
+        let response = await callNetwork(subscribers, {
             context: context,
             message: requestBody.message,
             error: requestBody.error
