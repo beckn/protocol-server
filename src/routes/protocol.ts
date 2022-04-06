@@ -25,9 +25,9 @@ Object.keys(ActionTypes).forEach((action)=>{
     if(isActionConfigured){
         if(process.env.mode=='bap'){
             // BAP Trigger
-            router.post(`/${action}`, jsonConverter, authCreator, validator, async (req: Request, res: Response, next: NextFunction) => {
+            router.post(`/${action}`, jsonConverter, authCreator, async (req: Request, res: Response, next: NextFunction) => {
                 await contextMiddleware(req, res, next, action);
-            }, async (req: Request, res: Response, next: NextFunction) => {
+            }, validator, async (req: Request, res: Response, next: NextFunction) => {
                 await triggerHandler(req, res, next, action);
             });
             
