@@ -13,21 +13,32 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
         const proxy_header = req.headers['proxy-authorization'] || "";
         console.log(req.body?.context?.transaction_id, "headers", req.headers )
         
+        let authVerified=true;
         const isAuthRequired=config.get('app.auth');
         if (isAuthRequired) {
             var verified = await verifyHeader(auth_header, req, res);
             var verified_proxy = proxy_header ? await verifyHeader(proxy_header, req, res) : true;
             console.log(req.body?.context?.transaction_id, "Verification status:", verified, "Proxy verification:", verified_proxy);
-            if (!verified || !verified_proxy) {
-                throw Error("Header verification failed");
-            }
+            authVerified=verified && verified_proxy;
         }
         
-        next();
-    } catch (e) {
-        console.log(req.body?.context?.transaction_id, (e as Error).message);
-        logger.error(e);
-        res.status(401).send('Authentication failed');
+        if(authVerified){
+            next();
+        }
+        else{
+            res.status(401).json({
+                message: {
+                    ack:{
+                        status: "NACK"
+                    }
+                },
+                error:{
+                    message: "Authentication failed"
+                }
+            });
+        }
+    } catch (err) {
+        next(err)
     }
 }
 
