@@ -80,11 +80,6 @@ export async function publishResults(req : Request, res : Response, next : NextF
     try {
         const axios_config=await createAuthHeaderConfig(requestBody)
 
-        console.log("\n Auth header: "+axios_config.headers.authorization+"\n")
-
-        // TODO: check whether it is a direct or broadcast request.
-        // TODO: Make calls to the BAP or BG.
-
         let subscribers:Array<SubscriberDetail>=[];
         if(action==`on_${ActionTypes.search}`){
             const db:Db=getDb();
