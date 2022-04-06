@@ -17,15 +17,18 @@ export function buildContext(context: any, action: string) {
         domain: context.domain,
         country: (context.country) ? context.country : process.env.country,
         city: (context.city) ? context.city : process.env.city,
-        action: action,
         core_version: context.core_version,
-        bap_id: process.env.subscriberId,
-        bap_uri: process.env.subscriberUri,
+        useCache: (context.useCache==true),
+
+        ...context,
+        
         transaction_id: transaction_id,
         message_id: message_id,
         ttl: process.env.ttl,
         timestamp: timestamp,
-        useCache: (context.useCache==true)
+        bap_id: process.env.subscriberId,
+        bap_uri: process.env.subscriberUri,
+        action: action,
     }
 
     return bapContext;
