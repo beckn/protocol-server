@@ -18,9 +18,15 @@ const initializeExpress=async()=>{
         }    
     }))
 
+    // app.use('/',async (req:Request, res: Response, next: NextFunction) => {
+    //     logger.info(JSON.stringify(req.body));
+    //     next();
+    // })
+
     app.use('/', router)
 
     app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+        logger.error(err);
         res.status(err.status || 500).json({
             message: {
                 ack:{

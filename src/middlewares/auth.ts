@@ -34,7 +34,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 export async function authCreator(req: Request, res: Response, next: NextFunction)  {
     try {
         const axios_config=await createAuthHeaderConfig(req.body);
-        req.headers=axios_config.headers;
+        req.headers.authorization=axios_config.headers.authorization;
         next();
     } catch (error) {
         next(error)

@@ -51,7 +51,7 @@ export async function callNetwork(subscribers: SubscriberDetail[], body: any, ax
 
         const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config, parseInt(process.env.httpRetryCount || "0"), action);
         if (response.status == 200) {
-            logger.info(`Result : Request Successful \nStatus: ${response.status} \nData : ${response.data}`);
+            logger.info(`Result : Request Successful \nStatus: ${response.status} \nData : ${response.data} \nSubscriber URL: ${subscribers[i].subscriber_url}`);
             return response;
         }
 
