@@ -58,10 +58,9 @@ export async function bppProtocolHandler(req: Request, res: Response, next : Nex
 }
 
 export async function publishResults(req : Request, res : Response, next : NextFunction, action: string) {
-    const context=req.body.context;
-    context.bpp_id=process.env.subscriberId;
-    context.bpp_uri=process.env.subscriberUri;
-    context.ttl=process.env.ttl;
+    req.body.context.bpp_id=process.env.subscriberId;
+    req.body.context.bpp_uri=process.env.subscriberUri;
+    req.body.context.ttl=process.env.ttl;
 
     const requestBody=req.body;
     try {
@@ -81,6 +80,8 @@ export async function publishResults(req : Request, res : Response, next : NextF
     try {
         const axios_config=await createAuthHeaderConfig(requestBody)
 
+        console.log("\n Auth header: "+axios_config.headers.authorization+"\n")
+
         // TODO: check whether it is a direct or broadcast request.
         // TODO: Make calls to the BAP or BG.
 
@@ -90,20 +91,20 @@ export async function publishResults(req : Request, res : Response, next : NextF
             const collection=db.collection(bppRequestCollectionName);
 
             const bppRequestData=await collection.findOne({
-                transactionId: context.transaction_id,
+                transactionId: req.body.context.transaction_id,
             });
 
             if(bppRequestData?.searchType==SearchTypes.broadcast){
                 // In this case it is sent back to BG.
                 subscribers=await registryLookup({
                     type: 'BG',
-                    domain: context.domain,
+                    domain: requestBody.context.domain,
                 });
             }
             else{
                 subscribers=[{
-                    subscriber_id: req.body.context.bap_id,
-                    subscriber_url: req.body.context.bap_uri,
+                    subscriber_id: requestBody.context.bap_id,
+                    subscriber_url: requestBody.context.bap_uri,
                     type: 'BAP',
                     signing_public_key: '',
                     valid_until: (new Date(Date.now()+(1000*60*60))).toISOString()
@@ -112,8 +113,8 @@ export async function publishResults(req : Request, res : Response, next : NextF
         }
         else{
             subscribers=[{
-                subscriber_id: req.body.context.bap_id,
-                subscriber_url: req.body.context.bap_uri,
+                subscriber_id: requestBody.context.bap_id,
+                subscriber_url: requestBody.context.bap_uri,
                 type: 'BAP',
                 signing_public_key: '',
                 valid_until: (new Date(Date.now()+(1000*60*60))).toISOString()
@@ -121,7 +122,7 @@ export async function publishResults(req : Request, res : Response, next : NextF
         }
 
         let response = await callNetwork(subscribers, {
-            context: context,
+            context: requestBody.context,
             message: requestBody.message,
             error: requestBody.error
         }, axios_config, action);
@@ -130,7 +131,7 @@ export async function publishResults(req : Request, res : Response, next : NextF
             return;
         } else {
             await clientCallback({
-                context: context,
+                context: requestBody.context,
                 message: {
                     ack: {
                         status: "NACK",
