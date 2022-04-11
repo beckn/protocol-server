@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { ResponseCache } from "../models/response.cache";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { createAuthHeaderConfig } from "../utils/auth";
 import { makeBecknRequest, callNetwork } from "../utils/becknRequester";
@@ -8,6 +7,7 @@ import { ActionTypes } from "../utils/config";
 import { buildContext } from "../utils/context";
 import logger from "../utils/logger";
 import { registryLookup } from "../utils/lookup";
+import { ResponseCache } from "../utils/response.cache";
 
 const responseCache=ResponseCache.getInstance();
 

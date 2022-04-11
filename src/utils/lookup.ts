@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { LookupCache } from '../models/lookup.cache';
 import { LookupParameter } from '../schemas/lookupParameter.schema';
 import { SubscriberDetail, subscriberDetailsSchema } from '../schemas/subscriberDetails.schema';
+import { LookupCache } from './lookup.cache';
 
 export function combineURLs(baseURL: string, relativeURL: string) {
     return relativeURL

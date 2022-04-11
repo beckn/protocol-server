@@ -1,7 +1,8 @@
 import axios from "axios";
 import { NextFunction, Request, Response } from "express";
-import { ResponseCache } from "../models/response.cache";
 import { clientCallback } from "../utils/callbacks";
+import { ResponseCache } from "../utils/response.cache";
+
 
 const responseCache=ResponseCache.getInstance();
 export async function bapProtocolHandler(req: Request, res: Response, next : NextFunction, action: string) {

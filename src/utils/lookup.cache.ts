@@ -1,7 +1,7 @@
 import { Db } from "mongodb";
 import { LookupParameter } from "../schemas/lookupParameter.schema";
 import { SubscriberDetail, subscriberDetailsSchema } from "../schemas/subscriberDetails.schema";
-import { getDb } from "../utils/db";
+import { getDb } from "./db";
 import Moment from 'moment'
 
 const lookupCacheCollectionName = 'lookupCache';

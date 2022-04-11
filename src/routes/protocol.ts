@@ -8,8 +8,9 @@ import validator from "../middlewares/validator";
 import { ActionTypes, getProvidedActions, } from "../utils/config";
 import { unConfigureActionHandler } from "../controllers/actionHandler";
 import { jsonConverter } from "../middlewares/jsonConverter";
-import { LookupCache } from "../models/lookup.cache";
-import { ResponseCache } from "../models/response.cache";
+import { LookupCache } from "../utils/lookup.cache";
+import { ResponseCache } from "../utils/response.cache";
+
 
 const router = Router()
 
