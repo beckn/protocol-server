@@ -45,9 +45,9 @@ const initializeExpress=async()=>{
 const main = async () => {
     try {
         loadConfig();
-        connectToDb()
+        await connectToDb()
         // createKeyPair();
-        initializeExpress();
+        await initializeExpress();
     } catch (err) {
         logger.error(err)
     }
