@@ -1,6 +1,4 @@
 import loadConfig from './utils/config'
-loadConfig();
-
 import Express, { NextFunction, Request, Response } from "express";
 
 import logger from './utils/logger';
@@ -46,6 +44,7 @@ const initializeExpress=async()=>{
 
 const main = async () => {
     try {
+        loadConfig();
         connectToDb()
         // createKeyPair();
         initializeExpress();
