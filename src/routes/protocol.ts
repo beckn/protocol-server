@@ -5,7 +5,7 @@ import { triggerHandler } from "../controllers/bap.trigger";
 import { auth, authCreator } from "../middlewares/auth";
 import { contextMiddleware } from "../middlewares/context";
 import validator from "../middlewares/validator";
-import { ActionTypes, getProvidedActions, } from "../utils/config";
+import { ActionTypes, getConfiguredActions, } from "../utils/config";
 import { unConfigureActionHandler } from "../controllers/actionHandler";
 import { jsonConverter } from "../middlewares/jsonConverter";
 import { LookupCache } from "../utils/lookup.cache";
@@ -14,7 +14,7 @@ import { ResponseCache } from "../utils/response.cache";
 
 const router = Router()
 
-const configuredActions = getProvidedActions();
+const configuredActions = getConfiguredActions();
 Object.keys(ActionTypes).forEach((action) => {
     let isActionConfigured = false;
     configuredActions.forEach((configuredAction) => {

@@ -58,7 +58,7 @@ const loadConfigs: Function = (): void => {
     }
 }
 
-export function getProvidedActions(): Array<String> {
+export function getConfiguredActions(): Array<String> {
     return providedActions;
 }
 
