@@ -1,10 +1,8 @@
-import loadConfig from './utils/config'
+import loadConfig, { getConfiguredActions } from './utils/config'
 import Express, { NextFunction, Request, Response } from "express";
 
 import logger from './utils/logger';
 import { connectToDb } from "./utils/db";
-import router from "./routes/protocol";
-import { createKeyPair } from "./utils/auth"
 
 const initializeExpress=async()=>{
     const app = Express()
@@ -25,6 +23,7 @@ const initializeExpress=async()=>{
     })
 
     // Routing.
+    const router=require('./routes/protocol').default;
     app.use('/', router)
 
     // Error Handler.
