@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "generate-keys": "node scripts/generate-keys.js"
   },
   "author": "Sandeep Kumar",
   "license": "ISC",
