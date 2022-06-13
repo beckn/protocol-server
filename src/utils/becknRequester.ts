@@ -9,6 +9,10 @@ export const makeBecknRequest = async (subscriberUrl: string, body: any, axios_c
     try {
         const requestURL = combineURLs(subscriberUrl, `/${action}`);
 
+        if(body?.context){
+            delete body["context"]["useCache"];   
+        }
+
         const response = await axios.post(requestURL, body, axios_config);
 
         return {
@@ -51,11 +55,11 @@ export async function callNetwork(subscribers: SubscriberDetail[], body: any, ax
 
         const response = await makeBecknRequest(subscribers[i].subscriber_url, body, axios_config, parseInt(process.env.httpRetryCount || "0"), action);
         if ((response.status == 200) || (response.status == 201) || (response.status == 202) || (response.status == 204)) {
-            logger.info(`Result : Request Successful \nStatus: ${response.status} \nData : ${response.data} \nSubscriber URL: ${subscribers[i].subscriber_url}`);
+            logger.info(`Result : Request Successful \nStatus: ${response.status} \nData : ${response.data} \nSubscriber Id: ${subscribers[i].subscriber_id}`);
             return response;
         }
 
-        logger.error(`Result : Failed call to Subscriber \nStatus: ${response.status}, \nData: ${response.data}`);
+        logger.error(`Result : Failed call to Subscriber \nSubscriber Id: ${subscribers[i].subscriber_id} \nStatus: ${response.status}, \nData: ${response.data}`);
     }
 
     return {
