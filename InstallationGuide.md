@@ -274,8 +274,6 @@ To subscribe to Beckn network you can follow the network subscription docs [here
 
 Knowledge of the Beckn network and [Beckn Protocol Specifications](https://github.com/beckn/protocol-specifications).
 
-<!-- TODO: Beckn network docs link -->
-
 ### Implementation Overview
 
 Protocol server helps you connect with Beckn network and communicate with the Beckn network. So in order to communicate over the Beckn network each request needs to valid as per the [Beckn Protocol Specifications](https://github.com/beckn/protocol-specifications).
