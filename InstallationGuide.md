@@ -266,7 +266,7 @@ Please save your keys in a secure location.
 
 ## Network Subscription
 
-<!-- TODO: Ask Vrushali For Docs Link -->
+To subscribe to Beckn network you can follow the network subscription docs [here](https://beckn-registry.readthedocs.io/en/latest/).
 
 ## Client Layer Implementation
 
