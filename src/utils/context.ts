@@ -18,7 +18,6 @@ export function buildContext(context: any, action: string) {
         country: (context.country) ? context.country : process.env.country,
         city: (context.city) ? context.city : process.env.city,
         core_version: context.core_version,
-        useCache: (context.useCache==true),
 
         ...context,
         
@@ -29,6 +28,10 @@ export function buildContext(context: any, action: string) {
         bap_id: process.env.subscriberId,
         bap_uri: process.env.subscriberUri,
         action: action,
+    }
+
+    if((context.useCache)&&(context.useCache==true)){
+        bapContext.useCache=true;
     }
 
     return bapContext;

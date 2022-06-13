@@ -8,11 +8,6 @@ import { combineURLs } from "./lookup";
 export const makeBecknRequest = async (subscriberUrl: string, body: any, axios_config: any, retry_count: number, action: string): Promise<BecknResponse> => {
     try {
         const requestURL = combineURLs(subscriberUrl, `/${action}`);
-
-        if(body?.context){
-            delete body["context"]["useCache"];   
-        }
-
         const response = await axios.post(requestURL, body, axios_config);
 
         return {

@@ -77,6 +77,8 @@ export async function triggerHandler(req: Request, res: Response, next: NextFunc
             await responseCache.cacheRequest(requestBody);
         }
 
+        delete requestBody.context.useCache;
+
         // Auth Creation.
         const axios_config=await createAuthHeaderConfig(requestBody)
         
