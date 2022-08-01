@@ -1,8 +1,19 @@
-import loadConfig, { getConfiguredActions } from './utils/config'
-import Express, { NextFunction, Request, Response } from "express";
+import Express, { NextFunction, Request, Response } from "express"
+import { Exception } from "./models/exception.model"
+import { RequestActions } from "./schemas/configs/actions.app.config.schema"
+import { LookupCache } from "./utils/cache/lookup.cache.utils"
+import { RequestCache } from "./utils/cache/request.cache.utils"
+import { ResponseCache } from "./utils/cache/response.cache.utils"
+import { SyncCache } from "./utils/cache/sync.cache.utils"
+import { ClientUtils } from "./utils/client.utils"
 
-import logger from './utils/logger';
-import { connectToDb } from "./utils/db";
+import { getConfig } from "./utils/config.utils"
+import { GatewayUtils } from "./utils/gateway.utils"
+import logger from "./utils/logger.utils"
+
+const app = Express()
+
+app.use(Express.json())
 
 const initializeExpress=async()=>{
     const app = Express()
@@ -22,14 +33,22 @@ const initializeExpress=async()=>{
         next();
     })
 
-    // Routing.
-    const router=require('./routes/protocol').default;
-    app.use('/', router)
+    // Test Routes
+    const testRouter = require('./routes/test.routes').default;
+    app.use('/test', testRouter);
+
+    // Requests Routing.
+    const {requestsRouter} = require('./routes/requests.routes');
+    app.use('/', requestsRouter);
+
+    // Response Routing.
+    const {responsesRouter} = require('./routes/responses.routes');
+    app.use('/', responsesRouter);
 
     // Error Handler.
-    app.use((err : any, req : Request, res : Response, next : NextFunction) => {
+    app.use((err : Exception, req : Request, res : Response, next : NextFunction) => {
         logger.error(err);
-        res.status(err.status || 500).json({
+        res.status(err.code || 500).json({
             message: {
                 ack:{
                     status: "NACK"
@@ -41,19 +60,33 @@ const initializeExpress=async()=>{
         })
     })
 
-    app.listen(process.env.PORT, () => {
-        logger.info('Server started on port '+process.env.PORT);
+    const PORT: number = getConfig().server.port;
+    app.listen(PORT, () => {
+        logger.info('Protocol Server started on PORT : '+PORT);
     })
 }
 
 const main = async () => {
     try {
-        loadConfig();
-        await connectToDb()
-        // createKeyPair();
+        console.log(getConfig());
+
+        await ClientUtils.initializeConnection();
+        await GatewayUtils.getInstance().initialize();
+        if(getConfig().responseCache.enabled){
+            await ResponseCache.getInstance().initialize();
+        }
+        await LookupCache.getInstance().initialize();
+        await RequestCache.getInstance().initialize();
+
         await initializeExpress();
+        
     } catch (err) {
-        logger.error(err)
+        if(err instanceof Exception){
+            logger.error(err.toString());
+        }
+        else{
+            logger.error(err);
+        }
     }
 }
 
