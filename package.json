@@ -1,0 +1,41 @@
+{
+  "name": "protocol-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/app.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "build": "tsc",
+    "generate-keys": "node scripts/generate-keys.js"
+  },
+  "author": "Sandeep Kumar",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
+    "@types/express": "^4.17.13",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/libsodium-wrappers": "^0.7.9",
+    "@types/node": "^17.0.21",
+    "@types/uuid": "^8.3.4",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.6.2"
+  },
+  "dependencies": {
+    "axios": "^0.26.1",
+    "config": "^3.3.7",
+    "express": "^4.17.3",
+    "express-openapi-validator": "^4.13.6",
+    "js-yaml": "^4.1.0",
+    "libsodium-wrappers": "^0.7.9",
+    "moment": "^2.29.1",
+    "mongodb": "^4.4.1",
+    "ts-node-dev": "^2.0.0",
+    "uuid": "^8.3.2",
+    "winston": "^3.6.0",
+    "winston-daily-rotate-file": "^4.6.1",
+    "zod": "^3.14.2"
+  }
+}
