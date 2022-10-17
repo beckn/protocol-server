@@ -1,0 +1,9 @@
+node_modules
+dist/
+logs/
+*-audit.json
+*.log
+config/*.yaml
+!config/config-sample.yaml
+*.pem
+config/default.yml
