@@ -1,0 +1,77 @@
+# Mandatory
+server:
+  port: 3000
+
+# Mandatory.
+cache:
+  host: "0.0.0.0"
+  port: 6379
+  ttl: "PT10M"
+  # Optional. Default is 0.
+  db: 1
+
+# # Optional.
+# responseCache:
+#   mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+#   ttl: "PT10M"
+
+# Mandatory.
+# Priority order will be
+# 1. Synchronous
+# 2. webhook
+# 3. pubSub
+client:
+  webhook:
+    url: "http://0.0.0.0:6000/callback"
+
+# Mandatory.
+app:
+  # Mandatory.
+  mode: bpp
+
+  # Two types of gateway mode present.
+  # client and network.
+  gateway:
+    mode: network
+    inboxQueue: "inbox"
+    outboxQueue: "outbox"
+    amqpURL: "amqp://tvast:password@0.0.0.0:5672"
+
+  # Mandatory.
+  actions:
+    requests:
+      search:
+        ttl: "PT10S"
+      init:
+        ttl: "PT10S"
+
+    responses:
+      on_search:
+        ttl: "PT10S"
+
+      on_init:
+        ttl: "PT10S"
+
+  # Mandatory.
+  privateKey: "P+CBCaYsZWg/n0fnx5VNjWWqVmAXE+oJGkgCzQkCBucJQ6ILoHFY2XPjVjTwL7zVxbQ28I06lAf71R0Izs3t6Q=="
+  publicKey: "CUOiC6BxWNlz41Y08C+81cW0NvCNOpQH+9UdCM7N7ek="
+
+  # Mandatory.
+  subscriberId: "bpp.ps.tvast.in"
+  subscriberUri: "https://bpp.ps.tvast.in/"
+
+  # Mandatory.
+  registryUrl: https://registry.becknprotocol.io/subscribers
+  auth: true
+  uniqueKey: "bpp.ps.tvast.in-key"
+
+  # Mandatory.
+  city: "std:080"
+  country: "IND"
+
+  # Mandatory.
+  ttl: "PT10M"
+
+  # Mandatory.
+  httpTimeout: "PT3S"
+  httpRetryCount: 2

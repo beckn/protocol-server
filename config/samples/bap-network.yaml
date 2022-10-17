@@ -1,0 +1,80 @@
+# Mandatory
+server:
+  port: 5000
+
+# Mandatory.
+cache:
+  host: "0.0.0.0"
+  port: 6379
+  ttl: "PT10M"
+  # Optional. Default is 0.
+  db: 1
+
+# # Optional.
+# responseCache:
+#   mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+#   ttl: "PT10M"
+
+# Mandatory.
+# Priority order will be
+# 1. Synchronous
+# 2. webhook
+# 3. pubSub
+client:
+  # synchronous:
+  #   mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+
+  webhook:
+    url: "https://bap-test.free.beeceptor.com/clientURL"
+
+# Mandatory.
+app:
+  # Mandatory.
+  mode: bap
+
+  # Two types of gateway mode present.
+  # client and network.
+  gateway:
+    mode: network
+    inboxQueue: "inbox"
+    outboxQueue: "outbox"
+    amqpURL: "amqp://tvast:password@0.0.0.0:5672"
+
+  # Mandatory.
+  actions:
+    requests:
+      search:
+        ttl: "PT10S"
+      init:
+        ttl: "PT10S"
+
+    responses:
+      on_search:
+        ttl: "PT10S"
+
+      on_init:
+        ttl: "PT10S"
+
+  # Mandatory.
+  privateKey: "XFTFiwrWZ9ckVD0rJ16/CfeYF+2qSPaMswNRKiXKBYKJswXFoxs7cIvZ5fF+1dwK6XvjQQi0OQm9qPzsSD6+/Q=="
+  publicKey: "ibMFxaMbO3CL2eXxftXcCul740EItDkJvaj87Eg+vv0="
+
+  # Mandatory.
+  subscriberId: "bap.ps.tvast.in"
+  subscriberUri: "https://bap.ps.tvast.in/"
+
+  # Mandatory.
+  registryUrl: https://registry.becknprotocol.io/subscribers
+  auth: true
+  uniqueKey: "bap.ps.tvast.in-key"
+
+  # Mandatory.
+  city: "std:080"
+  country: "IND"
+
+  # Mandatory.
+  ttl: "PT10M"
+
+  # Mandatory.
+  httpTimeout: "PT3S"
+  httpRetryCount: 2

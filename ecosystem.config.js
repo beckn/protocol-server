@@ -1,11 +1,10 @@
 module.exports = {
-    apps: [
-        {
-            name: "protocol-server",
-            script: './dist/app.js',
-            watch: true,
-            instances: 3,
-            exec_mode: "cluster",
-        }
-    ]
-}
+  apps: [
+    {
+      name: "Protocol-Server",
+      script: "./dist/app.js",
+      watch: false,
+      instances: 1,
+    },
+  ],
+};

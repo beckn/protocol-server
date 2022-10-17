@@ -1,0 +1,4 @@
+const webhookResponses={
+    "context":{},
+    "message":{}
+};
