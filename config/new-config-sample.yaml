@@ -1,0 +1,86 @@
+# Mandatory
+server:
+  port: 5000
+
+# Mandatory.
+cache:
+  host: "localhost"
+  port: 6379
+  ttl: "PT10M"
+  # Optional. Default is 0.
+  db: 1
+
+# Optional.
+responseCache:
+  mongoURL: "mongodb://tvast:password@localhost:27017/protocol_server-v2?authSource=admin"
+  ttl: "PT10M"
+
+# Mandatory.
+# Priority order will be
+# 1. Synchronous
+# 2. webhook
+# 3. pubSub
+client:
+  synchronous: 
+    mongoURL: "mongodb://tvast:password@localhost:27017/protocol_server-v2?authSource=admin"
+
+  webhook:
+    url: "https://beckn.free.beeceptor.com/clientURL"
+  
+  messageQueue: 
+    amqpUrl: "amqp://guest:guest@localhost:5672"
+    request-queue: "bap-protocol-server"
+    response-queue: "bap-protocol-client"
+
+# TODO: yet to decide Client Auth for requests.
+
+# Mandatory.
+app:
+  # Mandatory.
+  mode: bap
+
+  # Two types of gateway mode present.
+  # client and network.
+  gateway:
+    mode: client
+    inbox-queue: "inbox-queue"
+    outbox-queue: "outbox-queue"
+
+  # Mandatory.
+  actions:
+    requests:
+      search:
+        ttl : "PT10S"
+      init:
+        ttl : "PT10S"
+    
+    responses: 
+      on_search:
+        ttl: "PT10S"
+      
+      on_init:
+        ttl: "PT10S"
+  
+  # Mandatory.
+  privateKey: "your private key"
+  publicKey: "your public key"
+
+  # Mandatory.
+  subscriberId: "dev.bap.protocol-server.com"
+  subscriberUri: "https://ayush.free.beeceptor.com/"
+  
+  # Mandatory.
+  registryUrl: https://registry.becknprotocol.io/subscribers
+  auth: true
+  uniqueKey: "dev.bap.protocol-server.key"
+  
+  # Mandatory.
+  city: "std:080"
+  country: "IND"
+
+  # Mandatory.
+  ttl: "PT10M"
+
+  # Mandatory.
+  httpTimeout: "PT3S"
+  httpRetryCount: 2
