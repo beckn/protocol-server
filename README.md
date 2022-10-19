@@ -122,7 +122,7 @@ Beckn Protocol Server’s Docker image is available on[ Docker Hub](https://hub.
 
 ## _Configuration_
 
-Please follow the[ Configuration Guide](https://github.com/beckn/protocol-server/Configuration_Guide.md) to configure the Beckn Protocol Server.
+Please follow the[ Configuration Guide](https://github.com/beckn/protocol-server/blob/v2/guides/configuration-guide.md) to configure the Beckn Protocol Server.
 
 ## _Keys Generation_
 
