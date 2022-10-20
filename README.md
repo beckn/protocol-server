@@ -116,7 +116,7 @@ Please save your keys in a secure location.
 
 After configuration, Protocol Server can be run as below.
 
-To run the instance in Development Mode(For Debug Purposes):
+To run the instance in Development Mode (For Debug Purposes):
 
 ```bash
 npm run dev
