@@ -337,6 +337,24 @@ app:
   httpRetryCount: 2
 ```
 
-<!-- TODO: Add Docker Configuration Steps here -->
+## Docker Configuration
 
-<!-- TODO: Add OpenAPI Schema Configuration here -->
+The Config file (i.e. default.yaml) is the same as mentioned above. Create a default.yaml file and mount it to the container.
+
+Mounting to the container:
+
+```yaml
+volumes:
+  # Volume created for config file
+  - ./config:/usr/src/app/config
+    # Volume created to store logs
+  - ./logs:/usr/src/app/logs
+    # Volume created to load other network schemas
+  - ./schemas:/usr/src/app/schemas
+```
+
+As seen above, the first volume is used to mount the config file. The second volume is used to store the logs. The third volume is used to load other network schemas.
+
+Another Image can be created using the Docker Image as the base image.
+
+**NOTE:** While using Docker, run the app on port 3056 as the container exposes only port number 3056 for communication. This port can then be mapped to any other port on the server.
