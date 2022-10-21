@@ -34,9 +34,7 @@ services:
       RABBITMQ_DEFAULT_PASS: password
 
   protocol-server:
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+    image: becknfoundation/protocol-server:v2
     restart: unless-stopped
     depends_on:
       - mongo_db
