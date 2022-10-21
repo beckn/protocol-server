@@ -29,7 +29,12 @@ This section contains the HTTP server configuration for the protocol server. The
 - Port: The port on which the HTTP server will be listening for the incoming requests.
   Example: port: 8000
 
-<!-- TODO: Add Example Server YAML here -->
+### Example:
+
+```yaml
+server:
+  port: 5001
+```
 
 ## Cache Configuration
 
@@ -43,7 +48,15 @@ This section contains the cache configuration for the protocol server. The cache
   Example: db: 0 <br/>
   In this case db 51 will be used for lookup cache and db 52 will be used for request cache.
 
-<!-- TODO: Add Example Cache YAML here -->
+### Example:
+
+```yaml
+cache:
+  host: "0.0.0.0"
+  port: 6379
+  ttl: "PT10M"
+  db: 1
+```
 
 ## Response Cache Configuration
 
@@ -53,7 +66,13 @@ This section contains the response cache configuration for the protocol server. 
 - ttl: The time to live of the cache. It needs to be in ISO Duration format.<br/>
   Example: ttl: "PT10M"
 
-<!-- TODO: Add Example Response Cache YAML here -->
+### Example
+
+```yaml
+responseCache:
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+  ttl: "PT10M"
+```
 
 ## Client Configuration
 
@@ -72,7 +91,13 @@ In the case of BAP Mode, all the requests from the client are sent to the Beckn 
 
   Example: mongoURL: "mongodb://<username>:<password>@<host>:<port>/<database-name>?authSource=admin"
 
-<!-- TODO: Add Example Synchronous Mode YAML here -->
+### Example
+
+```yaml
+client:
+  synchronous:
+    mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+```
 
 ### Webhook Mode Configuration
 
@@ -81,7 +106,14 @@ This section contains the webhook configuration for the protocol server. Webhook
 - url: The URL of the webhook. All the requests and responses from the Beckn Network are sent to the webhook configured in this URL.
 
   Example: url: "https://webhook.site/4f7e1b7a-1b1a-4b1a-8b1a-4f7e1b7a1b1a"
-  <!-- TODO: Add Example Webhook Mode YAML here -->
+
+  ### Example
+
+  ```yaml
+  client:
+    webhook:
+    url: "https://webhook.site/4f7e1b7a-1b1a-4b1a-8b1a-4f7e1b7a1b1a"
+  ```
 
 ## Application Configuration
 
@@ -122,7 +154,15 @@ The protocol server gateway communication configuration is required to be config
   <br/>
   outbox-queue: "outbox"
 
-  <!-- TODO: Add Example Protocol Server Gateway Configuration YAML here -->
+### Example
+
+```yaml
+gateway:
+  mode: client
+  inboxQueue: "inbox"
+  outboxQueue: "outbox"
+  amqpURL: "amqp://tvast:password@0.0.0.0:5672"
+```
 
 ## Actions Configuration
 
@@ -133,9 +173,27 @@ The Beckn Protocol Server provides a set of actions that are divided into two ca
 
   Configuration of actions is done in two sections one for requests and one for responses.
 
-<!-- TODO: Add Example Request Actions Configuration Example YAML here -->
+### Request Example
 
-<!-- TODO: Add Example Response Actions Configuration Example YAML here -->
+```yaml
+actions:
+requests:
+  search:
+    ttl: "PT10S"
+  init:
+    ttl: "PT10S"
+```
+
+### Response Example
+
+```yaml
+responses:
+  on_search:
+    ttl: "PT10S"
+
+  on_init:
+    ttl: "PT10S"
+```
 
 ## Network Participant Detail Configuration
 
@@ -196,7 +254,88 @@ In order to communicate with the Beckn Network, the Beckn Protocol Server needs 
   Example:
   httpRetryCount: 3
 
-<!-- TODO: Add Example Network Participant Detail Configuration YAML here -->
+### Network Particpant Example
+
+```yaml
+# Mandatory.
+privateKey: "XFTFiwrWZ9ckVD0rJ16/CfeYF+2qSPaMswNRKiXKBYKJswXFoxs7cIvZ5fF+1dwK6XvjQQi0OQm9qPzsSD6+/Q=="
+publicKey: "ibMFxaMbO3CL2eXxftXcCul740EItDkJvaj87Eg+vv0="
+
+# Mandatory.
+subscriberId: "bap.ps.tvast.in"
+subscriberUri: "https://bap.ps.tvast.in/"
+
+# Mandatory.
+registryUrl: https://registry.becknprotocol.io/subscribers
+auth: true
+uniqueKey: "bap.ps.tvast.in-key"
+
+# Mandatory.
+city: "std:080"
+country: "IND"
+
+# Mandatory.
+ttl: "PT10M"
+
+# Mandatory.
+httpTimeout: "PT3S"
+httpRetryCount: 2
+```
+
+### Overall Application Configuration Example
+
+```yaml
+app:
+  # Mandatory.
+  mode: bap
+
+  # Two types of gateway mode present.
+  # client and network.
+  gateway:
+    mode: client
+    inboxQueue: "inbox"
+    outboxQueue: "outbox"
+    amqpURL: "amqp://tvast:password@0.0.0.0:5672"
+
+  # Mandatory.
+  actions:
+    requests:
+      search:
+        ttl: "PT10S"
+      init:
+        ttl: "PT10S"
+
+    responses:
+      on_search:
+        ttl: "PT10S"
+
+      on_init:
+        ttl: "PT10S"
+
+  # Mandatory.
+  privateKey: "XFTFiwrWZ9ckVD0rJ16/CfeYF+2qSPaMswNRKiXKBYKJswXFoxs7cIvZ5fF+1dwK6XvjQQi0OQm9qPzsSD6+/Q=="
+  publicKey: "ibMFxaMbO3CL2eXxftXcCul740EItDkJvaj87Eg+vv0="
+
+  # Mandatory.
+  subscriberId: "bap.ps.tvast.in"
+  subscriberUri: "https://bap.ps.tvast.in/"
+
+  # Mandatory.
+  registryUrl: https://registry.becknprotocol.io/subscribers
+  auth: true
+  uniqueKey: "bap.ps.tvast.in-key"
+
+  # Mandatory.
+  city: "std:080"
+  country: "IND"
+
+  # Mandatory.
+  ttl: "PT10M"
+
+  # Mandatory.
+  httpTimeout: "PT3S"
+  httpRetryCount: 2
+```
 
 <!-- TODO: Add Docker Configuration Steps here -->
 
