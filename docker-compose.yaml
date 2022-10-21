@@ -45,5 +45,9 @@ services:
     ports:
       - 5000:3056
     volumes:
+      # Volume created for config file
       - ./config:/usr/src/app/config
+        # Volume created to store logs
       - ./logs:/usr/src/app/logs
+        # Volume created to load other network schemas
+      - ./schemas:/usr/src/app/schemas
