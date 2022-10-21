@@ -1,16 +1,13 @@
 # Beckn Protocol Server
 
-## Latest Version
-2.0
+## Introduction
 
-## Release History
-[TODO]
+### Overview
 
-## Overview
+Beckn Protocol Server is a service that helps the application connect to Beckn Network. It follows the [Beckn Protocol](https://beckn.network/protocol) and makes it more accessible for the applications to get started with Beckn implementation. Any network participant can run this server and connect to Beckn Network.
 
-Beckn Protocol Server is a service that helps the application connect to Beckn Network. It follows the[ Beckn Protocol](https://beckn.network/protocol) and makes it more accessible for the applications to get started with Beckn implementation. Any network participant can run this server and connect to Beckn Network.
+### Features
 
-## Features
 - Connects a client application with the Beckn network.
 - Acts as BAP Adaptor in case of Beckn Application Platform.
 - Acts as BPP Adaptor in case of Beckn Provider Platform.
@@ -19,118 +16,85 @@ Beckn Protocol Server is a service that helps the application connect to Beckn N
 - Stores log for each process.
 - Comes with key generation scripts for the Network participants.
 
-## Installation from Source
+## Architecture
 
-There are multiple ways for installing Beckn Protocol Server.
+![alt text](https://raw.githubusercontent.com/beckn/protocol-server/v2/guides/images/general-architecture.png?raw=true)
 
-### Installation Requirements
+There would 2 instances of Protocol Server that is running. One is `Client` facing and the other is `Network` facing.
 
-Installation of the protocol server requires the following applications to be installed on your machine.
+#### In the case of BAP
 
-- [MongoDB](https://www.mongodb.com/products/mongodb-enterprise-edition)
-- [Redis](https://redis.io/). Version 3.x or higher is required.
-- [Docker](https://www.docker.com/community-edition)
-- [GitHub CLI](https://help.github.com/en/github/setting-up-and-managing-a-repository/using-the-command-line-interface)
-- [Git](https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/en/download/). Version 16.x or higher is recommended.
-- [NPM](https://www.npmjs.com/get-npm). Version 5.x or higher is recommended.
-- [Yarn](https://yarnpkg.com/en/docs/install)
-- [Typescript](https://www.typescriptlang.org/). Version 3.x or higher is recommended.
+`Client` facing Protocol Server manages building the context, validating the request body as per the Standard Beckn Open API schema, listens to the Message Queue, Aggregates the results in the case of Synchronous mode and forwards the results to the client side application as a webhook callback.
 
-### Download the Source-code
+`Network` facing Protocol Server manages forwarding the request to the respective Participant or Beckn Gateway (BG). Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
 
-1. Run the following command on your terminal to download the source-code for the protocol server
+#### In the case of BPP
 
+`Client` facing Protocol Server listens to the Message Queue and forwards the request to client side application, exposes an endpoint where the client side application can send the results to the network which is again validated against the Standard Beckn Open API schema and pushed to the network facing Protocol Server.
+
+`Network` facing Protocol Server also listens to the Message Queue and forwards the request to the respective Participant or BG. Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
+
+## Installation
+
+### Requirements
+
+- Node.js version 16 or above
+- npm version 8 or above
+- MongoDB version 4.4 or above
+- RabbitMQ version 3.8 or above
+- Redis version 6.2 or above
+
+(Optional)
+
+- Docker version 20.10 or above
+
+Docker can be used to run the above services. An example docker-compose file is provided in docker/docker-compose.yaml
+
+### Download
+
+As the Protocol Server repository is Public, clone the repository and checkout to v2 branch.
+
+```bash
+git clone https://github.com/beckn/protocol-server.git
 ```
-git clone https://github.com/beckn/protocol-server
-```
-2. Go to your project
-```
+
+```bash
 cd protocol-server
 ```
 
-3. Install the Dependencies.
-
-```
-npm install
+```bash
+git checkout v2
 ```
 
-4. Build the application.
+### Install
+
+Installation of the Protocol Server consists of installing the necessary dependencies and building the project as the project is written in TypeScript.
+
+```bash
+npm i
 ```
+
+```bash
 npm run build
 ```
 
-5. Run the server 
+### Configure
 
-Using `npm`
-```
-npm run start
-```
-**OR**
+The configuration of Protocol Server is done in config/default.yaml file.
 
-Using `pm2`
-```
-npm install -g pm2
-pm2 start ecosystem.config.js
-```
+Sample configurations of the same can be found in config/samples for the different modes of running Protocol Server.
 
-## Installation via Docker
-If you are installing from source, _skip this section_
-
-Beckn Protocol Server’s Docker image is available on [Docker Hub](https://hub.docker.com/r/beckn/protocol-server/). You can use the image directly by running the following command.
-
-#### Installation steps
-
-1. Run the following command to pull the image.
-```
-docker pull beckn/protocol-server
-```
-
-2. Run the following command to run the image.
-```
-docker run -d -p 8080:8080 beckn/protocol-server
-```
-
-3. Run the following command to check the status of the image.
-```
-docker ps
-```
-
-## Configuration
-
-Please follow the [Configuration Guide](https://github.com/beckn/protocol-server/blob/v2/guides/configuration-guide.md) to configure the Beckn Protocol Server.
-
-## Key-pair Generation
+### Key-Pair Generation
 
 Beckn Protocol Server comes with key generation scripts for the Network participants. You can use the scripts to generate the keys for the Network participants.
 
-### Pre-requisites for Key Generation
+**NOTE:** To generate the key pairs, the above steps must be completed.
 
-In order to generate a key pair, you need to have the following applications installed on your machine
-
-- [GitHub CLI](https://help.github.com/en/github/setting-up-and-managing-a-repository/using-the-command-line-interface)
-- [Git](https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/en/download/). Version 16. x or higher is recommended.
-- [NPM](https://www.npmjs.com/get-npm). Version 5. x or higher is recommended.
-- [Yarn](https://yarnpkg.com/en/docs/install)
-
-### Procedure for Generating Keys
-
-1. Clone the repository.
-```
-git clone https://github.com/beckn/protocol-server
-```
-2. Install the dependencies.
-cd protocol-server
-```
-npm install
-```
-3. Run the following command to generate the keys.
-```
+```bash
 npm run generate-keys
 ```
-### Sample Output
-The output will look like the one shown below
+
+#### Sample Output
 
 ```
 Generating Key Pairs...
@@ -148,15 +112,24 @@ Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxV
 Please save your keys in a secure location.
 ```
 
-## Architecture
+### Run
 
-Beckn Protocol Server follows dual gateway architecture. It has two gateways, one for the Client-side Application and one for the Beckn Network.
+After configuration, Protocol Server can be run as below.
 
-All the requests or responses sent from the Client-side Application are sent to the Client-side gateway first.
+To run the instance in Development Mode (For Debug Purposes):
 
-Each incoming request or response from the network is handled by the Network-side gateway. The Network-side gateway validates the request or response and sends it to the Client-side gateway.
+```bash
+npm run dev
+```
 
-The Network-side is responsible for communicating with the Beckn Network while the Client-side is responsible for communicating with the Client-side Application.
+To run the instance in Production Mode:
+
+```bash
+npm i -g pm2
+pm2 start ecosystem.config.js
+```
+
+**NOTE:** If the same server is used to host both the instances of Protocol Server, then make sure to edit the app name in ecosystem.config.js file as per the instance.
 
 ### License
 
