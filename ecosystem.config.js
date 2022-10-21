@@ -4,7 +4,7 @@ module.exports = {
       name: "Protocol-Server",
       script: "./dist/app.js",
       watch: false,
-      instances: 1,
+      instances: 3,
     },
   ],
 };
