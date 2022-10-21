@@ -339,6 +339,8 @@ app:
 
 ## Docker Configuration
 
+Docker Hub Repository: [Link](https://hub.docker.com/r/becknfoundation/protocol-server)
+
 The Config file (i.e. default.yaml) is the same as mentioned above. Create a default.yaml file and mount it to the container.
 
 Mounting to the container:
