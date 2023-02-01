@@ -57,7 +57,8 @@ export const bapNetworkResponseSettler = async (message: AmqbLib.ConsumeMessage 
                 break;
             }
             case  ClientConfigType.webhook:{
-                responseCallback(responseBody);
+                console.log("S")
+		responseCallback(responseBody);
                 break;
             }
             case  ClientConfigType.messageQueue:{
