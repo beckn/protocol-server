@@ -7,17 +7,19 @@ import { responseCallbackSchema } from "../schemas/callbacks/response.callback.s
 import { ClientConfigType, WebhookClientConfigDataType } from "../schemas/configs/client.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "./config.utils";
+import logger from "./logger.utils";
 
 async function makeClientCallback(data:any){
     try {
         if(getConfig().client.type!=ClientConfigType.webhook){
             throw new Exception(ExceptionType.Client_InvalidCall, "Client type is not webhook", 500);
         }
-
+	console.log("Webhook Triggered")
         const clientConnectionConfig=getConfig().client.connection as WebhookClientConfigDataType;
         const response=await axios.post(clientConnectionConfig.url, data);
     } catch (error : any) {
-        if (error instanceof Exception) {
+        console.log("Error from makeClient")
+	if (error instanceof Exception) {
             throw error;
         }
 
@@ -35,6 +37,7 @@ async function makeClientCallback(data:any){
 
 export async function responseCallback(data: any){
     try {
+	logger.info("Response cache SINoin")	
         const callbackData=responseCallbackSchema.parse(data);
         await makeClientCallback(callbackData);
     } catch (error) {

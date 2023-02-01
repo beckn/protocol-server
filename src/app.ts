@@ -21,8 +21,8 @@ const initializeExpress=async(successCallback: Function)=>{
     
     // Middleware for request body conversion to json and raw body creation.
     app.use(Express.json({
-        verify: (req: Request, res: Response, buf: Buffer) => {
-            res.locals={
+        verify: (req: Request, res: Response, buf: Buffer) => {    
+	res.locals={
                 rawBody: buf.toString()
             }
         }    
@@ -30,7 +30,7 @@ const initializeExpress=async(successCallback: Function)=>{
 
     // Request Logger.
     app.use('/',async (req:Request, res: Response, next: NextFunction) => {
-        logger.info(JSON.stringify(req.body));
+        //logger.info(JSON.stringify(req.body));
         next();
     })
 
