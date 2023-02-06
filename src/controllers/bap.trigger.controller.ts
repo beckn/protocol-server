@@ -76,11 +76,11 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
                 subscriber_id: bpp_id
             });
 
-            for(let i=0; i<subscribers.length; i++){
-                subscribers[i].subscriber_url=bpp_uri;
+            for(let i=0; i<subscribers!.length; i++){
+                subscribers![i].subscriber_url=bpp_uri;
             }
 
-            response=await callNetwork(subscribers, requestBody, axios_config, action);
+            response=await callNetwork(subscribers!, requestBody, axios_config, action);
         }
         else{
             const subscribers=await registryLookup({
@@ -88,7 +88,7 @@ export const bapClientTriggerSettler = async (message: AmqbLib.ConsumeMessage | 
                 domain: requestBody.context.domain
             });
 
-            response=await callNetwork(subscribers, requestBody, axios_config, action);
+            response=await callNetwork(subscribers!, requestBody, axios_config, action);
         }
 
         if((response.status==200)||(response.status==202)||(response.status==206)){

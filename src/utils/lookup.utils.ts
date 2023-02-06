@@ -15,7 +15,7 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
     try {
         const lookupCache = LookupCache.getInstance();
         const cachedResponse = await lookupCache.check(lookupParameter);
-        if (cachedResponse) {
+        if (cachedResponse && cachedResponse!.length > 0) {
             return cachedResponse;
         }
 
@@ -50,11 +50,11 @@ export async function getSubscriberDetails(subscriber_id: string, unique_key_id:
             unique_key_id: unique_key_id
         })
 
-        if (subsribers.length == 0) {
+        if (subsribers!.length == 0) {
             throw new Exception(ExceptionType.Registry_NoSubscriberFound, "No subscriber found", 404);
         }
 
-        return subsribers[0];
+        return subsribers![0];
     } catch (error: any) {
         if (error instanceof Exception) {
             throw error;

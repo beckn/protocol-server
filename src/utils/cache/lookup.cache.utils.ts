@@ -62,12 +62,18 @@ export class LookupCache {
 
     public async check(parameters: LookupParameter): Promise<Array<SubscriberDetail> | null> {
         const queryKey = this.createQueryKey(parameters);
+        console.log('queryKey :', queryKey);
         const redisResponse = await this.redisClient.get(queryKey);
+        
+        //bug fix: added validation for redisResponse == '[]'
         if (!redisResponse) {
             return null;
         }
 
-        const subsObjs=JSON.parse(redisResponse);
+        console.log('queryKey :', queryKey);
+        console.log('redisResponse :', redisResponse);
+
+        const subsObjs=JSON.parse(redisResponse as string);
         const subscribers: Array<SubscriberDetail> = [];
         subsObjs.forEach((subObj: object) => {
             try {
