@@ -10,6 +10,7 @@ import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
+import logger from "../utils/logger.utils";
 
 export const responsesRouter = Router();
 
@@ -21,6 +22,7 @@ if ((getConfig().app.mode === AppMode.bap) && (getConfig().app.gateway.mode === 
             responsesRouter.post(`/${action}`, jsonCompressorMiddleware, 
             authValidatorMiddleware, openApiValidatorMiddleware, 
             async (req: Request, res: Response, next: NextFunction) => {
+                logger.info(`response from bpp: ${JSON.stringify(req.body)}`);
                 await bapNetworkResponseHandler(req, res, next, action as ResponseActions);
             });
         } else {

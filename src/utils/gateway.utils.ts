@@ -70,7 +70,7 @@ export class GatewayUtils{
         if(getConfig().app.gateway.mode===GatewayMode.network){
             throw new Exception(ExceptionType.Gateway_InvalidUse, "Gateway is in network mode, cannot send data to network side gateway", 500);
         }
-
+        
         await this.mqClient.publishMessage(getConfig().app.gateway.outboxQueue, data);
     }
 }

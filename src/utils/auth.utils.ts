@@ -96,6 +96,8 @@ const split_auth_header_space = (auth_header: string) => {
 
 export async function getSenderDetails(header: string) : Promise<SubscriberDetail>{
     try {
+
+        logger.info(`Header recieved from bpp: ${JSON.stringify(header)}`)
         const parts = split_auth_header(header);
         if (!parts || Object.keys(parts).length === 0) {
             throw (new Error("Header parsing failed"));
@@ -107,6 +109,7 @@ export async function getSenderDetails(header: string) : Promise<SubscriberDetai
         const subscriber_details = await getSubscriberDetails(subscriber_id, unique_key_id);
         return subscriber_details;
     } catch (error) {
+        logger.error(error);  
         throw error;
     }
 }
