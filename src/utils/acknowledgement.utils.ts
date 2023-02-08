@@ -5,6 +5,7 @@ import {
   BecknErrorDataType,
   becknErrorSchema,
 } from "../schemas/becknError.schema";
+import logger from "./logger.utils";
 
 function acknowledge(res: Response, data: any) {
   try {
@@ -36,6 +37,7 @@ export function acknowledgeACK(res: Response, context: any) {
     });
   } catch (error) {
     if (error instanceof Exception) {
+      logger.error(error);
       throw error;
     }
 

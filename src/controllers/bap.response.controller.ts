@@ -30,7 +30,13 @@ export const bapNetworkResponseHandler = async (req: Request, res: Response<{}, 
             return;
         }
 
+        logger.info(`sending ack to bpp`);
+        logger.info(`request to bpp ${JSON.stringify(req.body.context)}`);
         acknowledgeACK(res, req.body.context);
+
+        logger.info(`sending response to inbox queue`);
+        logger.info(`response: ${JSON.stringify(req.body)}`);
+        
         await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
 
     } catch (err) {
@@ -48,7 +54,13 @@ export const bapNetworkResponseHandler = async (req: Request, res: Response<{}, 
 
 export const bapNetworkResponseSettler = async (message: AmqbLib.ConsumeMessage | null) => {
     try {
+        
+        logger.info('Protocol Client Server (Network Settler) recieving message from inbox queue');
+        
         const responseBody=JSON.parse(message?.content.toString()!)
+
+        logger.info(`message: ${JSON.stringify(responseBody)}`);
+
         const message_id=responseBody.context.message_id;
         const action=ActionUtils.getCorrespondingRequestAction(responseBody.context.action);
         switch(getConfig().client.type){
