@@ -10,6 +10,8 @@ const config = require("config");
 
 export const authValidatorMiddleware = async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
     try {
+        logger.info(`\nNew Request txn_id ${req.body?.context?.transaction_id}`);
+        logger.info(`Response from BPP ${JSON.stringify(req.body)}`);
         console.log("\nNew Request txn_id", req.body?.context?.transaction_id);
         if (req.body?.context?.bap_id) {
             console.log(req.body?.context?.transaction_id, "Request from", req.body?.context?.bpp_id)
