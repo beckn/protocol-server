@@ -13,8 +13,7 @@ export const bapContextBuilder = (context: any, action: string)  : BecknContextD
     if (!context.domain) {
         throw new Exception(ExceptionType.Context_DomainNotFound, "Domain not found in the context", 404);
     }
-    //change: based on ver 1.0.0
-    if(!context.version){
+    if(!context.core_version){
         throw new Exception(ExceptionType.Context_CoreVersionNotFound, "Core version not found in the context", 404);
     }
 
@@ -22,14 +21,13 @@ export const bapContextBuilder = (context: any, action: string)  : BecknContextD
     const message_id=uuid_v4();
     const bapContext : BecknContextDataType={
         domain: context.domain,
-        version: context.version,
+        core_version: context.core_version,
         action: ActionUtils.parseAction(context.action),
         
         bap_id: (context.bap_id) ? context.bap_id : getConfig().app.subscriberId,
         bap_uri: (context.bap_uri) ? context.bap_uri : getConfig().app.subscriberUri,
-        location: context.location,
-        //country: (context.country) ? context.country : getConfig().app.country,
-        //city: (context.city) ? context.city : getConfig().app.city,
+        country: (context.country) ? context.country : getConfig().app.country,
+        city: (context.city) ? context.city : getConfig().app.city,
         
         bpp_id: context.bpp_id,
         bpp_uri: context.bpp_uri,
@@ -51,8 +49,7 @@ export const bppContextBuilder = (context: any, action: string)  : BecknContextD
     if (!context.domain) {
         throw new Exception(ExceptionType.Context_DomainNotFound, "Domain not found in the context", 404);
     }
-    //change: based on ver 1.0.0
-    if(!context.version){
+    if(!context.core_version){
         throw new Exception(ExceptionType.Context_CoreVersionNotFound, "Core version not found in the context", 404);
     }
     if(!context.transaction_id){
@@ -64,14 +61,13 @@ export const bppContextBuilder = (context: any, action: string)  : BecknContextD
 
     const bppContext : BecknContextDataType={
         domain: context.domain,
-        version: context.version,
+        core_version: context.core_version,
         action: ActionUtils.parseAction(context.action),
         
         bpp_id: (context.bpp_id) ? context.bpp_id : getConfig().app.subscriberId,
         bpp_uri: (context.bpp_uri) ? context.bpp_uri : getConfig().app.subscriberUri,
-        location: context.location,
-        //country: (context.country) ? context.country : getConfig().app.country,
-        //city: (context.city) ? context.city : getConfig().app.city,
+        country: (context.country) ? context.country : getConfig().app.country,
+        city: (context.city) ? context.city : getConfig().app.city,
         
         bap_id: context.bap_id,
         bap_uri: context.bap_uri,
