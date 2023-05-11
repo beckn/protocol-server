@@ -853,7 +853,6 @@ paths:
                   properties:
                     phone:
                       type: string
-                      format: phone
                     email:
                       type: string
                       format: email
