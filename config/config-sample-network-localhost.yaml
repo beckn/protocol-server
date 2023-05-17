@@ -58,6 +58,10 @@ app:
         ttl : "PT10S"
       status:
         ttl : "PT10S"
+      get_cancellation_reasons:
+        ttl: "PT10S"
+      get_rating_categories:
+        ttl: "PT10S"
     
     responses: 
       on_search:
@@ -70,6 +74,10 @@ app:
       on_confirm:
         ttl: "PT10S"
       on_status:
+        ttl: "PT10S"
+      cancellation_reasons:
+        ttl: "PT10S"
+      rating_categories:
         ttl: "PT10S"
   
   # Mandatory.
