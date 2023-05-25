@@ -1502,6 +1502,8 @@ components:
             - cancel
             - rating
             - support
+            - get_cancellation_reasons
+            - get_rating_categories
             - on_search
             - on_select
             - on_init
@@ -1512,6 +1514,8 @@ components:
             - on_cancel
             - on_rating
             - on_support
+            - cancellation_reasons
+            - rating_categories
         core_version:
           type: string
           description: Version of Beckn core API specification being used

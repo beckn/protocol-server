@@ -24,6 +24,10 @@ export class ActionUtils{
                 return ResponseActions.on_track;
             case RequestActions.update:
                 return ResponseActions.on_update;
+            case RequestActions.get_cancellation_reasons:
+                return ResponseActions.cancellation_reasons;
+            case RequestActions.get_rating_categories:
+                return ResponseActions.rating_categories;
         }
     }
 
@@ -49,6 +53,10 @@ export class ActionUtils{
                 return RequestActions.track;
             case ResponseActions.on_update:
                 return RequestActions.update;
+            case ResponseActions.cancellation_reasons:
+                return RequestActions.get_cancellation_reasons;
+            case ResponseActions.rating_categories:
+                return RequestActions.get_rating_categories;
         }
     }
 

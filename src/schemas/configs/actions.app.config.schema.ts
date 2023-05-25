@@ -13,6 +13,8 @@ export enum RequestActions {
     cancel = "cancel",
     rating = "rating",
     support = "support",
+    get_cancellation_reasons = "get_cancellation_reasons",
+    get_rating_categories = "get_rating_categories"
 }
 
 export enum ResponseActions {
@@ -26,6 +28,8 @@ export enum ResponseActions {
     on_cancel = "on_cancel",
     on_rating = "on_rating",
     on_support = "on_support",
+    cancellation_reasons = "cancellation_reasons",
+    rating_categories = "rating_categories"
 }
 
 export enum RequestType {
@@ -45,6 +49,8 @@ export const actionsAppConfigSchema = z.object({
         [RequestActions.cancel]: actionConfigSchema.optional(),
         [RequestActions.rating]: actionConfigSchema.optional(),
         [RequestActions.support]: actionConfigSchema.optional(),
+        [RequestActions.get_cancellation_reasons]: actionConfigSchema.optional(),
+        [RequestActions.get_rating_categories]: actionConfigSchema.optional()
     }),
 
     responses: z.object({
@@ -58,6 +64,8 @@ export const actionsAppConfigSchema = z.object({
         [ResponseActions.on_cancel]: actionConfigSchema.optional(),
         [ResponseActions.on_rating]: actionConfigSchema.optional(),
         [ResponseActions.on_support]: actionConfigSchema.optional(),
+        [ResponseActions.cancellation_reasons]: actionConfigSchema.optional(),
+        [ResponseActions.rating_categories]: actionConfigSchema.optional()
     }),
 });
 
