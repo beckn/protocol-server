@@ -1,4 +1,71 @@
-# Protocol server (Setup and installation)
+# Protocol server
+
+## Add BAP entry in registry
+
+1. Go to url <https://registry.becknprotocol.io/login> and to login with your google account.
+2. Go to url <https://registry.becknprotocol.io/network_participants/blank> and create network Participant Id.
+3. Go to url <https://registry.becknprotocol.io/network_participants/index> and edit the created Participant Id.
+4. On the edit page of Network Participant, go to Network Role tab and click on Add (+) button and create a new Network Role by filling below details:
+
+- **Network domain**: Domain for which BAP will be triggered.
+- **Type**: BAP.
+- **Subscriber Id**: Same as Participant Id.
+- **Url**: Public server address of BAP network.
+- **Status**: SUBSCRIBED.
+- After filling it up, hit the Done button.
+
+5. On the edit page of Network Participant, go to Participant Key tab and click on Add (+) button and create a new Participant Key by filling below details:
+
+- **Network Participant**: Same as Participant Id.
+- **Key Id**: unique string value.
+- **Signing Public Key**: Get this from default.yml file (publicKey).
+- **Encr Public Key**: Same as Signing Public Key (above field).
+- **Valid From**: Select the start date.
+- **Valid Until**: Select the end date.
+- **Verified**: Check this to make it verified
+- After filling it up, hit the Done button.
+
+## Add BPP entry in registry
+
+1. Go to url <https://registry.becknprotocol.io/login> and to login with your google account.
+2. Go to url <https://registry.becknprotocol.io/network_participants/blank> and create network Participant Id.
+3. Go to url <https://registry.becknprotocol.io/network_participants/index> and edit the created Participant Id.
+4. On the edit page of Network Participant, go to Network Role tab and click on Add (+) button and create a new Network Role by filling below details:
+
+- **Network domain**: Domain for which BPP will be triggered.
+- **Type**: BPP.
+- **Subscriber Id**: Same as Participant Id.
+- **Url**: Public server address of BPP network.
+- **Status**: SUBSCRIBED.
+- After filling it up, hit the Done button.
+
+5. On the edit page of Network Participant, go to Participant Key tab and click on Add (+) button and create a new Participant Key by filling below details:
+
+- **Network Participant**: Same as Participant Id.
+- **Key Id**: unique string value.
+- **Signing Public Key**: Get this from default.yml file (publicKey).
+- **Encr Public Key**: Same as Signing Public Key (above field).
+- **Valid From**: Select the start date.
+- **Valid Until**: Select the end date.
+- **Verified**: Check this to make it verified
+- After filling it up, hit the Done button.
+
+## Pre-requisite for protocol server setup
+
+- Postman
+- Ngrok
+- Tunel
+- MongoDB and Rabbit MQ
+- Redis. Version 3.x or higher is required.
+- Docker
+- GitHub CLI
+- Git
+- Node.js. Version 16.x or higher is recommended.
+- NPM. Version 5.x or higher is recommended.
+- Yarn
+- Typescript. Version 3.x or higher is recommended.
+
+We need to setup **BAP Client**, **BAP Network**, **BPP Client** and **BPP Network**. Find the setup guide for these **4 Protocol Server** below.
 
 ## Protocol Server BAP Client Setup
 
