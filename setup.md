@@ -409,12 +409,14 @@ cp config/config-sample-client-localhost.yaml config/default.yml
     mongoURL: "mongodb://username:passwordd@127.0.0.1:27017/ps-bpp?authSource=admin"
   ```
 
-- Configure the `client`'s `mongoURL` with working connection string
+- Comment the `client`'s `synchronous` behaviour and use `webhook`'s `url` as shown below. Webhook url is public url of webhook server
 
   ```yml
   client:
-    synchronous: 
-      mongoURL: "mongodb://username:password@127.0.0.1:27017/ps-bpp?authSource=admin"
+    # synchronous: 
+      # mongoURL: "mongodb://username:password@127.0.0.1:27017/ps-bpp?authSource=admin"
+    webhook:
+        url: "https://831a1a7471f8286e0cf42a22c74be341.loophole.site"
   ```
 
 - Keep `app`'s `mode` as `bpp`
@@ -582,14 +584,17 @@ cp config/config-sample-network-localhost.yaml config/default.yml
     mongoURL: "mongodb://username:passwordd@127.0.0.1:27017/ps?authSource=admin"
   ```
 
-- Configure the `client`'s `mongoURL` with working connection string
+- Comment the `client`'s `synchronous` behaviour and use `webhook`'s `url` as shown below. Webhook url is public url of webhook server
 
   ```yml
   client:
-    synchronous: 
-      mongoURL: "mongodb://username:password@127.0.0.1:27017/ps?authSource=admin"
-  ```yml
-  - Keep `app`'s `mode` as `bpp`
+    # synchronous: 
+      # mongoURL: "mongodb://username:password@127.0.0.1:27017/ps-bpp?authSource=admin"
+    webhook:
+        url: "https://831a1a7471f8286e0cf42a22c74be341.loophole.site"
+  ```
+  
+- Keep `app`'s `mode` as `bpp`
 
 ```yml
 # Mandatory
