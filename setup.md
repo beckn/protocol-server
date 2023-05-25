@@ -180,7 +180,8 @@ publicKey: "asRiVjIEHc2yu6ungf+oHSHHqfxUc8fA0Bj8NjjhZt0="
   httpRetryCount: 2
 ```
 
-6. Execute the command `npm run dev` to start the server.
+6. Execute the command `npm run install` to npm packages.
+7. Execute the command `npm run dev` to start the server.
 
 ## Protocol Server BAP Network Setup
 
@@ -353,8 +354,9 @@ httpTimeout: "PT3S"
 httpRetryCount: 2
 ```
 
-6. Execute the command `npm run dev` to start the server.
-7. Make the BAP Network server publicly accessible by using6. Execute the command `npm run dev` to start the server. tools like [localtunnel](https://theboroer.github.io/localtunnel-www), [ngrok](https://ngrok.com/docs), [loophole](https://loophole.cloud/docs). This **public url** will be used in `config/default.yml` and `Beckn registry`.
+6. Execute the command `npm run install` to npm packages.
+7. Execute the command `npm run dev` to start the server.
+8. Make the BAP Network server publicly accessible by using6. Execute the command `npm run dev` to start the server. tools like [localtunnel](https://theboroer.github.io/localtunnel-www), [ngrok](https://ngrok.com/docs), [loophole](https://loophole.cloud/docs). This **public url** will be used in `config/default.yml` and `Beckn registry`.
 
 ## Protocol Server BPP Client Setup
 
@@ -529,7 +531,8 @@ cp config/config-sample-client-localhost.yaml config/default.yml
   httpRetryCount: 2
 ```
 
-6. Execute the command `npm run dev` to start the server.
+6. Execute the command `npm run install` to npm packages.
+7. Execute the command `npm run dev` to start the server.
 
 ## Protocol Server BPP Network Setup
 
@@ -704,5 +707,6 @@ httpTimeout: "PT3S"
 httpRetryCount: 2
 ```
 
-6. Execute the command `npm run dev` to start the server.
-7. Make the BPP Network server publicly accessible by using tools like [localtunnel](https://theboroer.github.io/localtunnel-www), [ngrok](https://ngrok.com/docs), [loophole](https://loophole.cloud/docs). This **public url** will be used in `config/default.yml` and `Beckn registry`.
+6. Execute the command `npm run install` to npm packages.
+7. Execute the command `npm run dev` to start the server.
+8. Make the BPP Network server publicly accessible by using tools like [localtunnel](https://theboroer.github.io/localtunnel-www), [ngrok](https://ngrok.com/docs), [loophole](https://loophole.cloud/docs). This **public url** will be used in `config/default.yml` and `Beckn registry`.
