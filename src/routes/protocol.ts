@@ -57,7 +57,7 @@ Object.keys(ActionTypes).forEach((action) => {
     }
 })
 
-router.delete('/lookupCacbe', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('/lookupCache', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const lookupCache = LookupCache.getInstance();
         await lookupCache.clear();
@@ -69,7 +69,7 @@ router.delete('/lookupCacbe', async (req: Request, res: Response, next: NextFunc
         next(error)
     }
 });
-router.delete('/responseCacbe', async (req: Request, res: Response, next: NextFunction) => {
+router.delete('/responseCache', async (req: Request, res: Response, next: NextFunction) => {
     try {
         const responseCache = ResponseCache.getInstance();
         await responseCache.clear();
