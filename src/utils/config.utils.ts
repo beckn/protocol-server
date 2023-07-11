@@ -6,14 +6,18 @@ const config = require("config");
 let configuration: ConfigDataType | null;
 
 export const getConfig = (): ConfigDataType => {
-    if (configuration) {
-        return configuration;
-    }
+  if (configuration) {
+    return configuration;
+  }
 
-    configuration = parseConfig(config);
-    if(!configuration){
-        throw new Exception(ExceptionType.Config_NotFound, "Config file is not found.", 404);
-    }
+  configuration = parseConfig(config);
+  if (!configuration) {
+    throw new Exception(
+      ExceptionType.Config_NotFound,
+      "Config file is not found.",
+      404
+    );
+  }
 
-    return configuration!;
-}
+  return configuration!;
+};
