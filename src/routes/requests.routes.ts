@@ -13,11 +13,14 @@ import {
   authValidatorMiddleware
 } from "../middlewares/auth.middleware";
 import { contextBuilderMiddleware } from "../middlewares/context.middleware";
-import openApiValidatorMiddleware from "../middlewares/schemaValidator.middleware";
+import openApiValidatorMiddleware, {
+  schemaErrorHandler
+} from "../middlewares/schemaValidator.middleware";
 import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
 import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller";
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
+import * as OpenApiValidator from "express-openapi-validator";
 
 export const requestsRouter = Router();
 
@@ -33,12 +36,46 @@ if (
       requestsRouter.post(
         `/${action}`,
         jsonCompressorMiddleware,
-
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await contextBuilderMiddleware(req, res, next, action);
         },
+
+        async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          const version = req?.body?.context?.core_version
+            ? req?.body?.context?.core_version
+            : req?.body?.context?.version;
+          const openApiValidator = OpenApiValidator.middleware({
+            apiSpec: `schemas/core_${version}.yaml`,
+            validateRequests: true,
+            validateResponses: false,
+            $refParser: {
+              mode: "dereference"
+            }
+          });
+
+          const walkSubstack = function (
+            stack: any,
+            req: any,
+            res: any,
+            next: NextFunction
+          ) {
+            if (typeof stack === "function") {
+              stack = [stack];
+            }
+            const walkStack = function (i: any, err?: any) {
+              if (err) {
+                return schemaErrorHandler(err, req, res, next);
+              }
+              if (i >= stack.length) {
+                return next();
+              }
+              stack[i](req, res, walkStack.bind(null, i + 1));
+            };
+            walkStack(0);
+          };
+          walkSubstack([...openApiValidator], req, res, next);
+        },
         authBuilderMiddleware,
-        [...openApiValidatorMiddleware],
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await bapClientTriggerHandler(
             req,

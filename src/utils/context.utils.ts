@@ -6,10 +6,7 @@ import { AppMode } from "../schemas/configs/app.config.schema";
 import { ActionUtils } from "./actions.utils";
 import { getConfig } from "./config.utils";
 
-export const bapContextBuilder = (
-  context: any,
-  action: string
-): BecknContextDataType => {
+export const bapContextBuilder = (context: any, action: string): any => {
   if (!context) {
     throw new Exception(
       ExceptionType.Context_NotFound,
@@ -24,7 +21,7 @@ export const bapContextBuilder = (
       404
     );
   }
-  if (!context.version) {
+  if (!context.version && !context?.core_version) {
     throw new Exception(
       ExceptionType.Context_CoreVersionNotFound,
       "Core version not found in the context",
@@ -36,11 +33,11 @@ export const bapContextBuilder = (
     ? context.transaction_id
     : uuid_v4();
   const message_id = uuid_v4();
-  const bapContext: BecknContextDataType = {
+  const bapContext: any = {
     domain: context.domain,
-    version: context.version,
+    version: context?.version,
+    core_version: context?.core_version,
     action: ActionUtils.parseAction(context.action),
-
     bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
     bap_uri: context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri,
     country: context.country ? context.country : getConfig().app.country,
@@ -59,10 +56,7 @@ export const bapContextBuilder = (
   return bapContext;
 };
 
-export const bppContextBuilder = (
-  context: any,
-  action: string
-): BecknContextDataType => {
+export const bppContextBuilder = (context: any, action: string): any => {
   if (!context) {
     throw new Exception(
       ExceptionType.Context_NotFound,
@@ -77,7 +71,7 @@ export const bppContextBuilder = (
       404
     );
   }
-  if (!context.version) {
+  if (!context.core_version && !context.version) {
     throw new Exception(
       ExceptionType.Context_CoreVersionNotFound,
       "Core version not found in the context",
@@ -99,11 +93,11 @@ export const bppContextBuilder = (
     );
   }
 
-  const bppContext: BecknContextDataType = {
+  const bppContext: any = {
     domain: context.domain,
-    version: context.version,
     action: ActionUtils.parseAction(context.action),
-
+    version: context?.version,
+    core_version: context?.core_version,
     bpp_id: context.bpp_id ? context.bpp_id : getConfig().app.subscriberId,
     bpp_uri: context.bpp_uri ? context.bpp_uri : getConfig().app.subscriberUri,
     country: context.country ? context.country : getConfig().app.country,
