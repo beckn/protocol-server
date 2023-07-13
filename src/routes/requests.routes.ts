@@ -37,42 +37,6 @@ if (
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await contextBuilderMiddleware(req, res, next, action);
         },
-
-        // async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
-        //   const version = req?.body?.context?.core_version
-        //     ? req?.body?.context?.core_version
-        //     : req?.body?.context?.version;
-        //   const openApiValidator = OpenApiValidator.middleware({
-        //     apiSpec: `schemas/core_${version}.yaml`,
-        //     validateRequests: true,
-        //     validateResponses: false,
-        //     $refParser: {
-        //       mode: "dereference"
-        //     }
-        //   });
-
-        //   const walkSubstack = function (
-        //     stack: any,
-        //     req: any,
-        //     res: any,
-        //     next: NextFunction
-        //   ) {
-        //     if (typeof stack === "function") {
-        //       stack = [stack];
-        //     }
-        //     const walkStack = function (i: any, err?: any) {
-        //       if (err) {
-        //         return schemaErrorHandler(err, req, res, next);
-        //       }
-        //       if (i >= stack.length) {
-        //         return next();
-        //       }
-        //       stack[i](req, res, walkStack.bind(null, i + 1));
-        //     };
-        //     walkStack(0);
-        //   };
-        //   walkSubstack([...openApiValidator], req, res, next);
-        // },
         openApiValidatorMiddleware,
         authBuilderMiddleware,
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {

@@ -2,14 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import * as OpenApiValidator from "express-openapi-validator";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
-// export const openApiValidator = OpenApiValidator.middleware({
-//   apiSpec: "schemas/core.yaml",
-//   validateRequests: true,
-//   validateResponses: false,
-//   $refParser: {
-//     mode: "dereference"
-//   }
-// });
 
 export const schemaErrorHandler = (
   err: any,
@@ -70,6 +62,3 @@ export const openApiValidatorMiddleware = async (
   };
   walkSubstack([...openApiValidator], req, res, next);
 };
-
-// const openApiValidatorMiddleware = [...openApiValidator, schemaErrorHandler];
-// export default openApiValidatorMiddleware;
