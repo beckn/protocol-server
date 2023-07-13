@@ -8,8 +8,9 @@ import {
 } from "../middlewares/auth.middleware";
 import { contextBuilderMiddleware } from "../middlewares/context.middleware";
 import { jsonCompressorMiddleware } from "../middlewares/jsonParser.middleware";
-import openApiValidatorMiddleware, {
-  schemaErrorHandler
+import {
+  schemaErrorHandler,
+  openApiValidatorMiddleware
 } from "../middlewares/schemaValidator.middleware";
 import * as OpenApiValidator from "express-openapi-validator";
 import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
@@ -103,7 +104,7 @@ if (
           await contextBuilderMiddleware(req, res, next, action);
         },
         authBuilderMiddleware,
-        [...openApiValidatorMiddleware],
+        openApiValidatorMiddleware,
         async (req: Request, res: Response, next: NextFunction) => {
           await bppClientResponseHandler(
             req,

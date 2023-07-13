@@ -1,7 +1,6 @@
 import moment from "moment";
 import { v4 as uuid_v4 } from "uuid";
 import { Exception, ExceptionType } from "../models/exception.model";
-import { BecknContextDataType } from "../schemas/becknContext.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { ActionUtils } from "./actions.utils";
 import { getConfig } from "./config.utils";
