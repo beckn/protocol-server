@@ -1,9 +1,8 @@
 import { response, Response } from "express";
 import { Exception, ExceptionType } from "../models/exception.model";
-import { becknContextSchema } from "../schemas/becknContext.schema";
 import {
   BecknErrorDataType,
-  becknErrorSchema,
+  becknErrorSchema
 } from "../schemas/becknError.schema";
 import logger from "./logger.utils";
 
@@ -26,14 +25,14 @@ function acknowledge(res: Response, data: any) {
 
 export function acknowledgeACK(res: Response, context: any) {
   try {
-    const contextData = becknContextSchema.parse(context);
+    const contextData = JSON.parse(JSON.stringify(context));
     acknowledge(res, {
       context: contextData,
       message: {
         ack: {
-          status: "ACK",
-        },
-      },
+          status: "ACK"
+        }
+      }
     });
   } catch (error) {
     if (error instanceof Exception) {
@@ -57,15 +56,15 @@ export function acknowledgeNACK(
 ) {
   try {
     const errorData = becknErrorSchema.parse(error);
-    const contextData = becknContextSchema.parse(context);
+    const contextData = JSON.parse(JSON.stringify(context));
     acknowledge(res, {
       context: contextData,
       message: {
         ack: {
-          status: "NACK",
-        },
+          status: "NACK"
+        }
       },
-      error: errorData,
+      error: errorData
     });
   } catch (error) {
     if (error instanceof Exception) {
