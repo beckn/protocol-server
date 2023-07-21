@@ -37,8 +37,8 @@ if (
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await contextBuilderMiddleware(req, res, next, action);
         },
-        openApiValidatorMiddleware,
         authBuilderMiddleware,
+        openApiValidatorMiddleware,
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await bapClientTriggerHandler(
             req,
