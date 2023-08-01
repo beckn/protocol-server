@@ -32,25 +32,51 @@ export const bapContextBuilder = (context: any, action: string): any => {
     ? context.transaction_id
     : uuid_v4();
   const message_id = uuid_v4();
-  const bapContext: any = {
-    domain: context.domain,
-    version: context?.version,
-    core_version: context?.core_version,
-    action: ActionUtils.parseAction(context.action),
-    bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
-    bap_uri: context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri,
-    country: context.country ? context.country : getConfig().app.country,
-    city: context.city ? context.city : getConfig().app.city,
+  let bapContext: any = {};
+  if (context?.domain.includes("dsep")) {
+    bapContext = {
+      domain: context.domain,
+      version: context?.version,
+      core_version: context?.core_version,
+      action: ActionUtils.parseAction(context.action),
+      bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
+      bap_uri: context.bap_uri
+        ? context.bap_uri
+        : getConfig().app.subscriberUri,
+      location: context?.location,
 
-    bpp_id: context.bpp_id,
-    bpp_uri: context.bpp_uri,
+      bpp_id: context.bpp_id,
+      bpp_uri: context.bpp_uri,
 
-    transaction_id: transaction_id,
-    message_id: message_id,
+      transaction_id: transaction_id,
+      message_id: message_id,
 
-    ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString()
-  };
+      ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
+      timestamp: new Date().toISOString()
+    };
+  } else {
+    bapContext = {
+      domain: context.domain,
+      version: context?.version,
+      core_version: context?.core_version,
+      action: ActionUtils.parseAction(context.action),
+      bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
+      bap_uri: context.bap_uri
+        ? context.bap_uri
+        : getConfig().app.subscriberUri,
+      country: context.country ? context.country : getConfig().app.country,
+      city: context.city ? context.city : getConfig().app.city,
+
+      bpp_id: context.bpp_id,
+      bpp_uri: context.bpp_uri,
+
+      transaction_id: transaction_id,
+      message_id: message_id,
+
+      ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
+      timestamp: new Date().toISOString()
+    };
+  }
 
   return bapContext;
 };
