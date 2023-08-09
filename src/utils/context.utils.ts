@@ -1,11 +1,15 @@
 import moment from "moment";
+import fs from "fs";
 import { v4 as uuid_v4 } from "uuid";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { ActionUtils } from "./actions.utils";
 import { getConfig } from "./config.utils";
 
-export const bapContextBuilder = (context: any, action: string): any => {
+export const bapContextBuilder = async (
+  context: any,
+  action: string
+): Promise<any> => {
   if (!context) {
     throw new Exception(
       ExceptionType.Context_NotFound,
@@ -28,31 +32,28 @@ export const bapContextBuilder = (context: any, action: string): any => {
     );
   }
 
-  let transaction_id = context.transaction_id
-    ? context.transaction_id
-    : uuid_v4();
-  const message_id = uuid_v4();
-  const bapContext: any = {
-    domain: context.domain,
-    version: context?.version,
-    core_version: context?.core_version,
-    action: ActionUtils.parseAction(context.action),
-    bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
-    bap_uri: context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri,
-    country: context.country ? context.country : getConfig().app.country,
-    city: context.city ? context.city : getConfig().app.city,
+  const rawdata: any = await fs.promises.readFile(
+    `schemas/context_${context.version?context.version:context.core_version}.json`
+  );
 
-    bpp_id: context.bpp_id,
-    bpp_uri: context.bpp_uri,
-
-    transaction_id: transaction_id,
-    message_id: message_id,
-
-    ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString()
-  };
-
+  const bapContext = Object.entries(JSON.parse(rawdata)).reduce(
+    (accum: any, [key, val]: any) => {
+      accum[key] = eval(val);
+      return accum;
+    },
+    {
+      ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
+      action: ActionUtils.parseAction(context.action),
+      timestamp: new Date().toISOString(),
+      message_id: uuid_v4(),
+      transaction_id: context.transaction_id
+        ? context.transaction_id
+        : uuid_v4(),
+    }
+  );
+  console.log("BAP Context:::", bapContext);
   return bapContext;
+
 };
 
 export const bppContextBuilder = (context: any, action: string): any => {
@@ -99,8 +100,9 @@ export const bppContextBuilder = (context: any, action: string): any => {
     core_version: context?.core_version,
     bpp_id: context.bpp_id ? context.bpp_id : getConfig().app.subscriberId,
     bpp_uri: context.bpp_uri ? context.bpp_uri : getConfig().app.subscriberUri,
-    country: context.country ? context.country : getConfig().app.country,
-    city: context.city ? context.city : getConfig().app.city,
+    country: context?.country ? context.country : getConfig().app.country,
+    city: context?.city ? context.city : getConfig().app.city,
+    location: context?.location,
 
     bap_id: context.bap_id,
     bap_uri: context.bap_uri,
@@ -109,8 +111,7 @@ export const bppContextBuilder = (context: any, action: string): any => {
     message_id: context.message_id,
 
     ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
-
   return bppContext;
 };
