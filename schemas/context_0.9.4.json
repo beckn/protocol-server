@@ -1,0 +1,10 @@
+{
+  "domain": "context.domain",
+  "core_version": "context.core_version",
+  "bap_id": "context.bap_id ? context.bap_id : getConfig().app.subscriberId",
+  "bap_uri": "context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri",
+  "country": "context.country",
+  "city": "context.city",
+  "bpp_id": "context.bpp_id",
+  "bpp_uri": "context.bpp_uri"
+}

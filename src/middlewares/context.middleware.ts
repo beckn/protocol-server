@@ -9,7 +9,7 @@ export async function contextBuilderMiddleware(req: Request, res: Response<{}, L
         let context=null;
         switch(getConfig().app.mode){
             case AppMode.bap:{
-                context=bapContextBuilder(req.body.context, action);
+                context=await bapContextBuilder(req.body.context, action);
                 break;
             }
             case AppMode.bpp:{
