@@ -1,9 +1,14 @@
 {
   "domain": "context.domain",
   "core_version": "context.core_version",
+  "bap_id": "context.bap_id ? context.bap_id  === '' ? defaltConfig.app.subscriberId : context.bap_id : defaltConfig.app.subscriberId",
+  "bap_uri": "context.bap_uri ? context.bap_uri  === '' ? defaltConfig.app.subscriberUri : context.bap_uri : defaltConfig.app.subscriberUri",
   "country": "context.country",
   "city": "context.city",
   "bpp_id": "context.bpp_id",
-  "bpp_uri": "context.bpp_uri"
+  "bpp_uri": "context.bpp_uri",
+  "timestamp":"new Date().toISOString()",
+  "message_id": "id",
+  "transaction_id": "context.transaction_id? context.transaction_id: id"
   
 }

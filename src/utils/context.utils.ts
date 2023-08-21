@@ -36,25 +36,24 @@ export const contextBuilder = async (
     `schemas/context_${context.version?context.version:context.core_version}.json`
   );
 
+
+  const defaltConfig = getConfig()
+  const id=uuid_v4()
+
   const dynamicContext = Object.entries(JSON.parse(rawdata)).reduce(
     (accum: any, [key, val]: any) => {
       accum[key] = eval(val);
       return accum;
     },
     {
-      bap_id: context.bap_id ? context.bap_id : getConfig().app.subscriberId,
-      bap_uri: context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri,
+      
       ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-      action: ActionUtils.parseAction(context.action),
-      timestamp: new Date().toISOString(),
-      message_id: uuid_v4(),
-      transaction_id: context.transaction_id
-        ? context.transaction_id
-        : uuid_v4(),
+      action: ActionUtils.parseAction(context.action)
+     
     }
   );
-  
+ // console.log(dynamicContext)
   return dynamicContext ;
-
+ 
 };
 

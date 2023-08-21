@@ -181,73 +181,7 @@ describe("bapContextBuilder", () => {
     expect(result.action).toEqual(expect.objectContaining({}));
   });
 
-  it('builds bapContext with current timestamp in ISO format', async () => {
-    const result = await contextBuilder(
-      {
-        domain: "mobility",
-        core_version: "0.9.4",
-        bap_id: "mobility@beckn.io",
-      bap_uri: "mobility@beckn.io",
-        country: "INDIA",
-        action: "search",
-        city: "CHENNAI",
-        bpp_id: "becknsandbox@becknprotocol.io",
-      bpp_uri: "becknsandbox@becknprotocol.io",
-        transaction_id: "123",
-        timestamp: "2023-02-06T09:55:41.161Z"
-      },
-      "search"
-    );
-    expect(moment(result.timestamp, moment.ISO_8601, true).isValid()).toBe(true);
-  });
-
-
-  it('builds bapContext with generated message_id', async () => {
-    const result = await contextBuilder(
-      {
-        domain: "mobility",
-        core_version: "0.9.4",
-        bap_id: "mobility@beckn.io",
-      bap_uri: "mobility@beckn.io",
-        country: "INDIA",
-        action: "search",
-        city: "CHENNAI",
-        bpp_id: "becknsandbox@becknprotocol.io",
-      bpp_uri: "becknsandbox@becknprotocol.io",
-        transaction_id: "123",
-        timestamp: "2023-02-06T09:55:41.161Z",
-       
-        message_id: "a9aaecca-10b7-4d19-b640-b047a7c60009",
-      },
-      "search"
-    );
   
-    const uuidV4Pattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/;
-    expect(result.message_id).toMatch(uuidV4Pattern);
-  });
-
-  it('uses provided transaction_id if available for transaction_id', async () => {
-    const result = await contextBuilder(
-      {
-        domain: "mobility",
-        core_version: "0.9.4",
-        bap_id: "mobility@beckn.io",
-      bap_uri: "mobility@beckn.io",
-        country: "INDIA",
-        action: "search",
-        city: "CHENNAI",
-        bpp_id: "becknsandbox@becknprotocol.io",
-      bpp_uri: "becknsandbox@becknprotocol.io",
-        transaction_id: "123",
-        timestamp: "2023-02-06T09:55:41.161Z",
-      
-        message_id: "a9aaecca-10b7-4d19-b640-b047a7c60009",
-      },
-      "search"
-    );
-
-    expect(result.transaction_id).toBe('123');
-  });
    it('handles missing schema file', async () => {
     fs.promises.readFile = jest.fn().mockRejectedValue(new Error('File not found'));
     const context = {

@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`bapContextBuilder handles missing schema file 1`] = `"File not found"`;
+
+exports[`bapContextBuilder throws an exception if both context version and core_version are missing 1`] = `"Core version not found in the context"`;

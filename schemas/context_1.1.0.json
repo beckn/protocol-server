@@ -1,10 +1,13 @@
 {
   "domain": "context.domain",
   "version": "context.version",
-  "bap_id": "context.bap_id ? context.bap_id : getConfig().app.subscriberId",
-  "bap_uri": "context.bap_uri ? context.bap_uri : getConfig().app.subscriberUri",
-  "location": "context.location",
+  "bap_id": "context.bap_id ? context.bap_id  === '' ? defaltConfig.app.subscriberId : context.bap_id : defaltConfig.app.subscriberId",
+  "bap_uri": "context.bap_uri ? context.bap_uri  === '' ? defaltConfig.app.subscriberUri : context.bap_uri : defaltConfig.app.subscriberUri",
+  "location": "context.location ? context.location : {city: {name: defaltConfig.app.city, code: defaltConfig.app.city }, country: {name: defaltConfig.app.country, code: defaltConfig.app.country}} ",
   "bpp_id": "context.bpp_id",
-  "bpp_uri": "context.bpp_uri"
-  
+  "bpp_uri": "context.bpp_uri",
+  "timestamp":"new Date().toISOString()",
+  "message_id": "id",
+  "transaction_id": "context.transaction_id? context.transaction_id: id"
+
 }
