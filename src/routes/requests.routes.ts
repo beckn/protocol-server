@@ -22,6 +22,12 @@ import * as OpenApiValidator from "express-openapi-validator";
 
 export const requestsRouter = Router();
 
+requestsRouter.get("/getLogs", (req, res) => {
+  res.json({
+    message: "logs fetched"
+  });
+});
+
 // BAP Client-Side Gateway Configuration.
 if (
   getConfig().app.mode === AppMode.bap &&
