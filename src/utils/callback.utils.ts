@@ -23,17 +23,25 @@ async function makeClientCallback(data: any) {
         500
       );
     }
-    console.log("Webhook Triggered");
+
     const clientConnectionConfig = getConfig().client
       .connection as WebhookClientConfigDataType;
+    logger.info(`\nWebhook Triggered on:==> ${clientConnectionConfig.url}\n\n`);
     const response = await axios.post(clientConnectionConfig.url, data);
+    logger.info(
+      `Response from Webhook:==>\n ${JSON.stringify(
+        response.data
+      )}\nWith Data\n${JSON.stringify(data)}\n\n`
+    );
   } catch (error: any) {
     console.log("Error from makeClient");
+    console.log("====>", error);
     if (error instanceof Exception) {
       throw error;
     }
 
     if (error.response) {
+      console.log("\n\n", error, "\n\n");
       throw new Exception(
         ExceptionType.Client_CallbackFailed,
         "Callback to client failed.",
