@@ -41,7 +41,7 @@ export const bapNetworkResponseHandler = async (
       return;
     }
 
-    logger.info(`sending ack to bpp`);
+    logger.info(`\nsending ack to bpp\n\n`);
     logger.info(`request to bpp ${JSON.stringify(req.body.context)}`);
     acknowledgeACK(res, req.body.context);
 

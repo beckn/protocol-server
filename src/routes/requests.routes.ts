@@ -19,13 +19,22 @@ import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller"
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import * as OpenApiValidator from "express-openapi-validator";
+import fs from "fs";
+import path from "path";
 
 export const requestsRouter = Router();
 
-requestsRouter.get("/getLogs", (req, res) => {
-  res.json({
-    message: "logs fetched"
-  });
+requestsRouter.get("/logs", (req, res) => {
+  const files = fs.readdirSync(path.join(__dirname + "../../../logs/info"));
+
+  return res.sendFile(
+    path.join(__dirname + `../../../logs/info/${files[files.length - 1]}`),
+    (err) => {
+      if (err) {
+        res.json({ success: false, message: err.message });
+      }
+    }
+  );
 });
 
 // BAP Client-Side Gateway Configuration.
