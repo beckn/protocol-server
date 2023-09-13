@@ -60,8 +60,8 @@ export const bapClientTriggerHandler = async (
       getConfig().app.actions.requests[action]?.ttl!
     );
 
-    logger.info("sending message to outbox queue");
-    logger.info(`request: ${JSON.stringify(req.body)}`);
+    logger.info("sending message to outbox queue \n\n");
+    logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
 
     if (getConfig().client.type == ClientConfigType.synchronous) {

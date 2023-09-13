@@ -5,6 +5,7 @@ import { Exception, ExceptionType } from "../models/exception.model";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { ActionUtils } from "./actions.utils";
 import { getConfig } from "./config.utils";
+import logger from "./logger.utils";
 
 export const bapContextBuilder = async (
   context: any,
@@ -33,7 +34,9 @@ export const bapContextBuilder = async (
   }
 
   const rawdata: any = await fs.promises.readFile(
-    `schemas/context_${context.version?context.version:context.core_version}.json`
+    `schemas/context_${
+      context.version ? context.version : context.core_version
+    }.json`
   );
 
   const bapContext = Object.entries(JSON.parse(rawdata)).reduce(
@@ -48,12 +51,11 @@ export const bapContextBuilder = async (
       message_id: uuid_v4(),
       transaction_id: context.transaction_id
         ? context.transaction_id
-        : uuid_v4(),
+        : uuid_v4()
     }
   );
-  console.log("BAP Context:::", bapContext);
+  logger.info(`BAP Context:\n ${JSON.stringify(bapContext)}\n\n`);
   return bapContext;
-
 };
 
 export const bppContextBuilder = (context: any, action: string): any => {
@@ -111,7 +113,7 @@ export const bppContextBuilder = (context: any, action: string): any => {
     message_id: context.message_id,
 
     ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString()
   };
   return bppContext;
 };
