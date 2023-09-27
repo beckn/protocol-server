@@ -142,7 +142,7 @@ Please save your keys in a secure location.
 - Select the "Network Role Tab."
 - Choose the network domain (leave it blank for universal BAP/BPP).
 - Set the Type as "BAP" for BAP network and "BPP" for BPP network.
-- Enter the respective "SubscriberID" created in step [Create Network Participants] (https://github.com/beckn/protocol-server/blob/master/README.md#create-network-participants)
+- Enter the respective "SubscriberID" created in step [Create Network Participants] (https://github.com/beckn/protocol-server/tree/devops#create-network-participants)
 - Set the Status field to "subscribed."
 
 ### Set Up Local Tunneling:
