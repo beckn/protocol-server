@@ -48,7 +48,26 @@ There would 2 instances of Protocol Server that is running. One is `Client` faci
 
 - Docker version 20.10 or above
 
-You can utilize Docker to operate the services mentioned above. We've included an illustrative docker-compose file located in `docker/docker-compose.yaml`.
+
+### Download
+
+As the Protocol Server repository is Public, clone the repository and checkout to v2 branch.
+
+```bash
+git clone https://github.com/beckn/protocol-server.git
+```
+
+```bash
+cd protocol-server
+```
+
+```bash
+git checkout master
+```
+
+### Install
+
+You can utilize Docker to deploy the MongoDB, RabbitMQ and Redis services. We've included an illustrative docker-compose file located in `docker/docker-compose.yaml`.
 
 To set things up effortlessly, run the `setup.sh` command. This command not only copies the Follow file to your home directory but also generates a `docker_data` directory. Within this directory, you'll find the `docker-compose.yaml` file for configuring the aforementioned services.
 
@@ -68,24 +87,6 @@ Please set the user name and password as per requirement in docker-compose.yaml 
 ```bash
 bash setup.sh
 ```
-
-### Download
-
-As the Protocol Server repository is Public, clone the repository and checkout to v2 branch.
-
-```bash
-git clone https://github.com/beckn/protocol-server.git
-```
-
-```bash
-cd protocol-server
-```
-
-```bash
-git checkout master
-```
-
-### Install
 
 Installation of the Protocol Server consists of installing the necessary dependencies and building the project as the project is written in TypeScript.
 
