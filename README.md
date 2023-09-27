@@ -142,7 +142,7 @@ Please save your keys in a secure location.
 - Select the "Network Role Tab."
 - Choose the network domain (leave it blank for universal BAP/BPP).
 - Set the Type as "BAP" for BAP network and "BPP" for BPP network.
-- Enter the respective "SubscriberID" created in step [Create Network Participants] (https://github.com/beckn/protocol-server/tree/devops#create-network-participants)
+- Enter the respective "SubscriberID" created in step [Create Network Participants](https://github.com/beckn/protocol-server/tree/devops#create-network-participants)
 - Set the Status field to "subscribed."
 
 ### Set Up Local Tunneling:
@@ -157,20 +157,20 @@ Please save your keys in a secure location.
 - In the Registry, navigate to the participant key tab for both BAP and BPP networks.
 - Click the "+" icon to add a participant key entry.
 - Provide a key (used as uniqueKey in default.yml).
-- Copy the generated public keys in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation) and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
+- Copy the generated public keys in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation) and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
 - Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
 - Check the "Verified" checkbox and save the entry.
 
 ### Update Configuration Files which we have copied at home directory
 -   In the BAP Client and BAP Network codebases, update the `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` file with the following values:
-    -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Private Key: Copy the private key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Public Key: Copy the public key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
     -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
     -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
     -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
 -   In the BPP Client and BPP Network codebases, update the `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` file with the following values:
-    -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Private Key: Copy the private key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Public Key: Copy the public key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
     -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
     -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
     -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
