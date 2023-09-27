@@ -98,12 +98,6 @@ npm i
 npm run build
 ```
 
-### Configure
-
-The configuration of Protocol Server is done in config/default.yaml file.
-
-Sample configurations of the same can be found in config/samples for the different modes of running Protocol Server.
-
 ### Key-Pair Generation
 
 Beckn Protocol Server comes with key generation scripts for the Network participants. You can use the scripts to generate the keys for the Network participants.
@@ -132,19 +126,18 @@ Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxV
 Please save your keys in a secure location.
 ```
 
-### Register Local BAP and BPP Networks:
+## Configure
 
+### Register Local BAP and BPP Networks:
     - Access the [Registry URL](https://registry.becknprotocol.io/login).
     - Log in using your Gmail ID.
 
 ### Create Network Participants:
-
     - In the Registry, navigate to the admin tab and select "Network Participant."
     - Click the "+" icon to create entries for both the BAP and BPP networks.
     - Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will call this as "subscriberIDs" going further.)
 
 ### Configure Network Roles:
-
     - Edit the created entries for BAP and BPP networks.
     - Select the "Network Role Tab."
     - Choose the network domain (leave it blank for universal BAP/BPP).
@@ -153,17 +146,14 @@ Please save your keys in a secure location.
     - Set the Status field to "subscribed."
 
 ### Set Up Local Tunneling:
-
     - Install `localtunnel` globally using `npm install -g localtunnel`.
     - Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
 
 ### Update Registry URLs:
-
     - Copy the generated URLs and paste them in the URL field on the respective network role tab in the Registry.
     - Save the changes.
 
 ### Configure Participant Keys:
-
     - In the Registry, navigate to the participant key tab for both BAP and BPP networks.
     - Click the "+" icon to add a participant key entry.
     - Provide a key (used as uniqueKey in default.yml).
@@ -172,14 +162,12 @@ Please save your keys in a secure location.
     - Check the "Verified" checkbox and save the entry.
 
 ### Update Configuration Files which we have copied at home directory
-
 -   In the BAP Client and BAP Network codebases, update the `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` file with the following values:
     -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
     -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
     -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
     -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
     -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
-
 -   In the BPP Client and BPP Network codebases, update the `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` file with the following values:
     -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
     -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
