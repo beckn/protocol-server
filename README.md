@@ -50,16 +50,16 @@ There would 2 instances of Protocol Server that is running. One is `Client` faci
 
 You can utilize Docker to operate the services mentioned above. We've included an illustrative docker-compose file located in `docker/docker-compose.yaml`.
 
-To set things up effortlessly, run the `setup.sh` command. This command not only copies the Follow file to your home directory but also generates a docker_data directory. Within this directory, you'll find the docker-compose.yaml file for configuring the aforementioned services.
+To set things up effortlessly, run the `setup.sh` command. This command not only copies the Follow file to your home directory but also generates a `docker_data` directory. Within this directory, you'll find the `docker-compose.yaml` file for configuring the aforementioned services.
 
 Additionally, here's a list of files included for your reference:
 
-`deploy-bap.sh`
-`deploy-bpp.sh`
-`dfault-bap-client.yml`
-`dfault-bap-network.yml`
-`dfault-bpp-client.yml`
-`dfault-bpp-network.yml`
+ - `deploy-bap.sh`
+ - `deploy-bpp.sh`
+ - `dfault-bap-client.yml`
+ - `dfault-bap-network.yml`
+ - `dfault-bpp-client.yml`
+ - `dfault-bpp-network.yml`
 
 Feel free to explore and use these resources as needed for your setup.
 
