@@ -48,7 +48,26 @@ There would 2 instances of Protocol Server that is running. One is `Client` faci
 
 - Docker version 20.10 or above
 
-Docker can be used to run the above services. An example docker-compose file is provided in docker/docker-compose.yaml
+You can utilize Docker to operate the services mentioned above. We've included an illustrative docker-compose file located in `docker/docker-compose.yaml`.
+
+To set things up effortlessly, run the `setup.sh` command. This command not only copies the Follow file to your home directory but also generates a docker_data directory. Within this directory, you'll find the docker-compose.yaml file for configuring the aforementioned services.
+
+Additionally, here's a list of files included for your reference:
+
+`deploy-bap.sh`
+`deploy-bpp.sh`
+`dfault-bap-client.yml`
+`dfault-bap-network.yml`
+`dfault-bpp-client.yml`
+`dfault-bpp-network.yml`
+
+Feel free to explore and use these resources as needed for your setup.
+
+Please set the user name and password as per requirement in docker-compose.yaml file inside docker_data directory. 
+
+```bash
+bash setup.sh
+```
 
 ### Download
 
@@ -63,7 +82,7 @@ cd protocol-server
 ```
 
 ```bash
-git checkout v2
+git checkout master
 ```
 
 ### Install
@@ -112,7 +131,74 @@ Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxV
 Please save your keys in a secure location.
 ```
 
+### Register Local BAP and BPP Networks:
+
+    - Access the [Registry URL](https://registry.becknprotocol.io/login).
+    - Log in using your Gmail ID.
+
+### Create Network Participants:
+
+    - In the Registry, navigate to the admin tab and select "Network Participant."
+    - Click the "+" icon to create entries for both the BAP and BPP networks.
+    - Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will call this as "subscriberIDs" going further.)
+
+### Configure Network Roles:
+
+    - Edit the created entries for BAP and BPP networks.
+    - Select the "Network Role Tab."
+    - Choose the network domain (leave it blank for universal BAP/BPP).
+    - Set the Type as "BAP" for BAP network and "BPP" for BPP network.
+    - Enter the respective "SubscriberID" created in step [Create Network Participants] (https://github.com/beckn/protocol-server/blob/master/README.md#create-network-participants)
+    - Set the Status field to "subscribed."
+
+### Set Up Local Tunneling:
+
+    - Install `localtunnel` globally using `npm install -g localtunnel`.
+    - Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
+
+### Update Registry URLs:
+
+    - Copy the generated URLs and paste them in the URL field on the respective network role tab in the Registry.
+    - Save the changes.
+
+### Configure Participant Keys:
+
+    - In the Registry, navigate to the participant key tab for both BAP and BPP networks.
+    - Click the "+" icon to add a participant key entry.
+    - Provide a key (used as uniqueKey in default.yml).
+    - Copy the generated public keys in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation) and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
+    - Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
+    - Check the "Verified" checkbox and save the entry.
+
+### Update Configuration Files which we have copied at home directory
+
+-   In the BAP Client and BAP Network codebases, update the `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` file with the following values:
+    -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
+    -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
+    -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
+
+-   In the BPP Client and BPP Network codebases, update the `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` file with the following values:
+    -   Private Key: Copy the private key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Public Key: Copy the public key generated in step [Key-Pair Generation] (https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
+    -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
+    -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
+    -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
+    -   WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook
+
 ### Run
+
+##### Docker deployment
+Execute `~/deploy-bap.sh` file to deploye the the BAP Client and Network. 
+
+Execute `~/deploy-bpp.sh` file to deploye the the BPP Client and Network.
+
+
+##### PM2 deployment
+
+For PM2 deployment you need to git clone protocol-server four times to setup the BAP Client and Network and BPP Client and Network. Then copy `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` to config directory in respective git clone directory of BAP Client and Network. 
+Also copy `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` to config directory in respective git clone directory of BPP Client and Network. 
 
 After configuration, Protocol Server can be run as below.
 

@@ -1,6 +1,6 @@
 # Mandatory
 server:
-  port: 3001
+  port: 6001
 
 # Mandatory.
 cache:
@@ -8,12 +8,12 @@ cache:
   port: 6379
   ttl: "PT10M"
   # Optional. Default is 0.
-  db: 1
+  db: 0 
 
-# # Optional.
-# responseCache:
-#   mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
-#   ttl: "PT10M"
+# Optional.
+responseCache:
+  mongoURL: "mongodb://beckn:becknPasS41@0.0.0.0:27017/protocol-server-bpp-v2?authSource=admin"
+  ttl: "PT10M"
 
 # Mandatory.
 # Priority order will be
@@ -21,8 +21,16 @@ cache:
 # 2. webhook
 # 3. pubSub
 client:
+#   synchronous: 
+#     mongoURL: "mongodb://tvast:password@0.0.0.0:27017/ps?authSource=admin"
+
   webhook:
-    url: "http://0.0.0.0:3456"
+   url: "http://0.0.0.0:3005"
+  
+  #messageQueue: 
+  #  amqpURL: "amqp://guest:guest@localhost:5672"
+  #  incomingQueue: "protocol-server-incoming"
+  #  outgoingQueue: "protocol-server-outgoing"
 
 # Mandatory.
 app:
@@ -33,25 +41,64 @@ app:
   # client and network.
   gateway:
     mode: client
-    inboxQueue: "inbox"
-    outboxQueue: "outbox"
+    inboxQueue: "inbox-bpp"
+    outboxQueue: "outbox-bpp"
     amqpURL: "amqp://tvast:password@0.0.0.0:5672"
 
   # Mandatory.
   actions:
     requests:
       search:
-        ttl: "PT10S"
+        ttl : "PT15S"
       init:
-        ttl: "PT10S"
-
-    responses:
+        ttl : "PT15S"
+      select:
+        ttl : "PT15S"
+      confirm:
+        ttl : "PT15S"
+      status:
+        ttl : "PT15S"
+      track:
+        ttl : "PT15S"
+      cancel:
+        ttl : "PT15S"
+      update:
+        ttl : "PT15S"
+      rating:
+        ttl : "PT15S"
+      support:
+        ttl : "PT15S"
+      get_cancellation_reasons:
+        ttl: "PT15S"
+      get_rating_categories:
+        ttl: "PT15S"          
+    
+    responses: 
       on_search:
-        ttl: "PT10S"
-
+        ttl: "PT15S"
       on_init:
-        ttl: "PT10S"
-
+        ttl: "PT15S"
+      on_select:
+        ttl: "PT15S"
+      on_confirm:
+        ttl: "PT15S"
+      on_status:
+        ttl: "PT15S"
+      on_track:
+        ttl: "PT15S"
+      on_cancel:
+        ttl: "PT15S"
+      on_update:
+        ttl: "PT15S"
+      on_rating:
+        ttl: "PT15S"
+      on_support:
+        ttl: "PT15S"
+      cancellation_reasons:
+        ttl: "PT15S"
+      rating_categories:
+        ttl: "PT15S"          
+  
   # Mandatory.
   privateKey: "P+CBCaYsZWg/n0fnx5VNjWWqVmAXE+oJGkgCzQkCBucJQ6ILoHFY2XPjVjTwL7zVxbQ28I06lAf71R0Izs3t6Q=="
   publicKey: "CUOiC6BxWNlz41Y08C+81cW0NvCNOpQH+9UdCM7N7ek="
@@ -64,7 +111,7 @@ app:
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
   uniqueKey: "bpp.ps.tvast.in-key"
-
+  
   # Mandatory.
   city: "std:080"
   country: "IND"

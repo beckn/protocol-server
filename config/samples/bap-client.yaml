@@ -10,17 +10,27 @@ cache:
   # Optional. Default is 0.
   db: 1
 
+# Optional.
+responseCache:
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+  ttl: "PT10M"
+
 # Mandatory.
 # Priority order will be
 # 1. Synchronous
 # 2. webhook
 # 3. pubSub
 client:
-  #synchronous:
-  #  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+  synchronous: 
+    mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
 
-  webhook:
-    url: "http://0.0.0.0:3500/webhook/search"
+  #webhook:
+  #  url: "https://beckn.free.beeceptor.com/clientURL"
+  
+  #messageQueue: 
+  #  amqpURL: "amqp://guest:guest@localhost:5672"
+  #  incomingQueue: "protocol-server-incoming"
+  #  outgoingQueue: "protocol-server-outgoing"
 
 # Mandatory.
 app:
@@ -39,17 +49,58 @@ app:
   actions:
     requests:
       search:
-        ttl: "PT10S"
+        ttl : "PT15S"
       init:
-        ttl: "PT10S"
+        ttl : "PT10S"
+      select:
+        ttl : "PT10S"
+      confirm:
+        ttl : "PT10S"
+      status:
+        ttl : "PT10S"
+      track:
+        ttl : "PT10S"
+      cancel:
+        ttl : "PT10S"
+      update:
+        ttl : "PT10S"
+      rating:
+        ttl : "PT10S"
+      support:
+        ttl : "PT10S"
+      get_cancellation_reasons:
+        ttl : "PT10S"
+      get_rating_categories:
+        ttl : "PT10S"
+      cancellation:
+        ttl : "PT10S"
 
-    responses:
+    responses: 
       on_search:
-        ttl: "PT10S"
-
+        ttl: "PT15S"
       on_init:
         ttl: "PT10S"
-
+      on_select:
+        ttl: "PT10S"
+      on_confirm:
+        ttl: "PT10S"
+      on_status:
+        ttl: "PT10S"
+      on_track:
+        ttl: "PT10S"
+      on_cancel:
+        ttl: "PT10S"
+      on_update:
+        ttl: "PT10S"
+      on_rating:
+        ttl: "PT10S"
+      on_support:
+        ttl: "PT10S"
+      cancellation_reasons:
+        ttl: "PT10S"
+      rating_categories:
+        ttl: "PT10S"          
+  
   # Mandatory.
   privateKey: "XFTFiwrWZ9ckVD0rJ16/CfeYF+2qSPaMswNRKiXKBYKJswXFoxs7cIvZ5fF+1dwK6XvjQQi0OQm9qPzsSD6+/Q=="
   publicKey: "ibMFxaMbO3CL2eXxftXcCul740EItDkJvaj87Eg+vv0="
@@ -60,9 +111,9 @@ app:
 
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
-  auth: true
+  auth: false
   uniqueKey: "bap.ps.tvast.in-key"
-
+  
   # Mandatory.
   city: "std:080"
   country: "IND"
