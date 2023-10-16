@@ -31,7 +31,7 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
       `\nLooking Up in registry...!\nWith URL:${combineURLs(
         getConfig().app.registryUrl,
         "/lookup"
-      )}\n Payload:${lookupParameter}`
+      )}\n Payload:${JSON.stringify(lookupParameter)}`
     );
 
     const response = await axios.post(
