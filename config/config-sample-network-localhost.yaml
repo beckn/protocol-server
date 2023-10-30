@@ -43,7 +43,7 @@ app:
     mode: network
     inboxQueue: "inbox"
     outboxQueue: "outbox"
-    amqpURL: "amqp://guest:guest@127.0.0.1:5672"
+    amqpURL: "amqp://tvast:password@127.0.0.1:5672"
 
   # Mandatory.
   actions:
