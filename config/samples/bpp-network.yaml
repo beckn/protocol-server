@@ -12,7 +12,7 @@ cache:
 
 # Optional.
 responseCache:
-  mongoURL: "mongodb://beckn:becknPasS41@0.0.0.0:27017/protocol-server-bpp-v2?authSource=admin"
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol-server-bpp-v2?authSource=admin"
   ttl: "PT10M"
 
 # Mandatory.
@@ -122,3 +122,4 @@ app:
   # Mandatory.
   httpTimeout: "PT3S"
   httpRetryCount: 2
+
