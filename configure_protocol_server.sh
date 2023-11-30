@@ -48,7 +48,8 @@ install_nginx_certbot() {
 
 # Function to update the Docker Compose file
 update_docker_compose() {
-    local docker_compose_file="$home/docker_data/docker-compose.yaml"
+    mkdir ~/docker_data && cp docker/docker-compose.yaml ~/docker_data/
+    local docker_compose_file="$HOME/docker_data/docker-compose.yaml"
 
     # Check if the docker-compose file exists
     if [ ! -f "$docker_compose_file" ]; then
@@ -71,7 +72,7 @@ update_docker_compose() {
 # Function to bring up Docker Compose services
 docker_compose_up() {
     mkdir ~/docker_data && cp docker/docker-compose.yaml ~/docker_data/
-    cd $home/docker_data/
+    cd $HOME/docker_data/
     docker-compose up -d
 }
 
