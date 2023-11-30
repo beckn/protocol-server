@@ -31,14 +31,14 @@ install_docker() {
         echo "Unsupported package manager. Please install Docker manually."
         exit 1
     fi
-    sleep 10
-    sudo systemctl enable docker.service
-    sudo systemctl restart docker.service
-    sudo usermod -a -G docker $USER
 
     # Check if Docker installation was successful
     if [ $? -eq 0 ]; then
         echo "Docker installed successfully."
+        sleep 10
+        sudo systemctl enable docker.service
+        sudo systemctl restart docker.service
+        sudo usermod -a -G docker $USER
     else
         echo "Failed to install Docker. Exiting."
         exit 1
