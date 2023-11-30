@@ -131,10 +131,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --bap_subscriber_uri)
             if [ -n "$2" ]; then
-                subscriber_uri="$2"
+                bap_subscriber_uri="$2"
                 shift 2
             else
-                echo "error: --subscriber_uri requires a non-empty option argument."
+                echo "error: --bap_subscriber_uri requires a non-empty option argument."
                 exit 1
             fi
             ;;
@@ -204,7 +204,7 @@ done
 
 # Check if required parameters are set
 if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_uri" ]; then
-    echo "error: --bap_subscriber_id and --subscriber_uri are required parameters."
+    echo "error: --bap_subscriber_id and --bap_subscriber_uri are required parameters."
     display_help
 fi
 
