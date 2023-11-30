@@ -6,6 +6,14 @@ networkFile="$HOME/default-bpp-network.yml"
 
 client_port=6001
 network_port=6002
+
+mongo_initdb_root_username="beckn"
+mongo_initdb_root_password="beckn123"
+mongo_initdb_database="protocol_server"
+rabbitmq_default_user="beckn"
+rabbitmq_default_pass="beckn123"
+registry_url="https://registry.becknprotocol.io/subscribers"
+
 # Display current values
 echo "Current BPP_CLIENT_PORT value is set to 6001."
 
@@ -91,16 +99,23 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --bpp_subscriber_id)
-            bpp_subscriber_id="$2"
-            shift 2
+            if [ -n "$2" ]; then
+                bpp_subscriber_id="$2"
+                bpp_subscriber_id_key="$2-key"
+                shift 2
+            else
+                echo "error: --bpp_subscriber_id requires a non-empty option argument."
+                exit 1
+            fi
             ;;
-        --subscriber_url)
-            subscriber_url="$2"
-            shift 2
-            ;;
-        --bpp_subscriber_id_key)
-            bpp_subscriber_id_key="$2"
-            shift 2
+        --bpp_subscriber_uri)
+            if [ -n "$2" ]; then
+                bpp_subscriber_uri="$2"
+                shift 2
+            else
+                echo "error: --bpp_subscriber_uri requires a non-empty option argument."
+                exit 1
+            fi
             ;;
         *)
             echo "error: Unknown option $1"

@@ -6,6 +6,14 @@ networkFile="$HOME/default-bap-network.yml"
 
 client_port=5001
 network_port=5002
+
+mongo_initdb_root_username="beckn"
+mongo_initdb_root_password="beckn123"
+mongo_initdb_database="protocol_server"
+rabbitmq_default_user="beckn"
+rabbitmq_default_pass="beckn123"
+registry_url="https://registry.becknprotocol.io/subscribers"
+
 # Display current values
 echo "Current BAP_CLIENT_PORT value is set to 5001."
 
@@ -90,17 +98,23 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --bap_subscriber_id)
-            bap_subscriber_id="$2"
-            shift 2
+            if [ -n "$2" ]; then
+                bap_subscriber_id="$2"
+                bap_subscriber_id_key="$2-key"
+                shift 2
+            else
+                echo "error: --bap_subscriber_id requires a non-empty option argument."
+                exit 1
+            fi
             ;;
-        --subscriber_url)
-            subscriber_url="$2"
-            shift 2
-            ;;
-        --bap_subscriber_id_key)
-            bap_subscriber_id_key="$2"
-            shift 2
-            ;;
+        --bap_subscriber_uri)
+            if [ -n "$2" ]; then
+                bap_subscriber_uri="$2"
+                shift 2
+            else
+                echo "error: --bap_subscriber_uri requires a non-empty option argument."
+                exit 1
+            fi
         *)
             echo "error: Unknown option $1"
             exit 1
@@ -120,7 +134,7 @@ declare -A replacements=(
     ["PRIVATE_KEY"]=$private_key
     ["PUBLIC_KEY"]=$public_key
     ["BAP_SUBSCRIBER_ID"]=$bap_subscriber_id
-    ["SUBSCRIBER_URL"]=$subscriber_url
+    ["SUBSCRIBER_URL"]=$bap_subscriber_uri
     ["BAP_SUBSCRIBER_ID_KEY"]=$bap_subscriber_id_key
 )
 
