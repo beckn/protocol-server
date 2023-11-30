@@ -4,6 +4,8 @@
 clientFile="$HOME/bap_client.yaml"
 networkFile="$HOME/bap_network.yaml"
 
+client_port=5001
+network_port=5002
 # Display current values
 echo "Current BAP_CLIENT_PORT value is set to 5001."
 

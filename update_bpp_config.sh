@@ -4,6 +4,8 @@
 clientFile="$HOME/bpp_client.yaml"
 networkFile="$HOME/bpp_network.yaml"
 
+client_port=6001
+network_port=6002
 # Display current values
 echo "Current BPP_CLIENT_PORT value is set to 6001."
 
