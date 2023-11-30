@@ -13,8 +13,9 @@ echo "Current BAP_CLIENT_PORT value is set to 5001."
 read -p "Do you want to change the BAP_CLIENT_PORT value? (y/n): " changeClientPort
 if [[ "${changeClientPort,,}" == "yes" || "${changeClientPort,,}" == "y" ]]; then
     read -p "Enter new BAP_CLIENT_PORT value: " newClientPort
-    sed -i "s/BAP_CLIENT_PORT/$newClientPort/" $clientFile
-    echo "BAP_CLIENT_PORT value updated to $newClientPort."
+    client_port=$newClientPort
+    # sed -i "s/BAP_CLIENT_PORT/$newClientPort/" $clientFile
+    # echo "BAP_CLIENT_PORT value updated to $newClientPort."
 else
     echo "Keeping the default BAP_CLIENT_PORT value."
 fi
@@ -27,8 +28,9 @@ read -p "Do you want to change the BAP_NETWORK_PORT value? (y/n): " changeNetwor
 
 if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y" ]]; then
     read -p "Enter new BAP_NETWORK_PORT value: " newNetworkPort
-    sed -i "s/BAP_NETWORK_PORT/$newNetworkPort/" $networkFile
-    echo "BAP_NETWORK_PORT value updated to $newNetworkPort."
+    network_port=$newNetworkPort
+    # sed -i "s/BAP_NETWORK_PORT/$newNetworkPort/" $networkFile
+    # echo "BAP_NETWORK_PORT value updated to $newNetworkPort."
 else
     echo "Keeping the default BAP_NETWORK_PORT value."
 fi

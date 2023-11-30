@@ -12,9 +12,10 @@ echo "Current BPP_CLIENT_PORT value is set to 6001."
 # Prompt user for BPP_CLIENT_PORT value
 read -p "Do you want to change the BPP_CLIENT_PORT value? (y/n): " changeClientPort
 if [[ "${changeClientPort,,}" == "yes" || "${changeClientPort,,}" == "y" ]]; then
-    read -p "Enter new BPP_CLIENT_PORT value: " newClientPort
-    sed -i "s/BPP_CLIENT_PORT/$newClientPort/" $clientFile
-    echo "BPP_CLIENT_PORT value updated to $newClientPort."
+    read -p "Enter new BPP_CLIENT_PORT value: " newClientPort\
+    client_port=$newClientPort
+    # sed -i "s/BPP_CLIENT_PORT/$newClientPort/" $clientFile
+    # echo "BPP_CLIENT_PORT value updated to $newClientPort."
 else
     echo "Keeping the default BPP_CLIENT_PORT value."
 fi
@@ -27,8 +28,9 @@ read -p "Do you want to change the BPP_NETWORK_PORT value? (y/n): " changeNetwor
 
 if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y" ]]; then
     read -p "Enter new BPP_NETWORK_PORT value: " newNetworkPort
-    sed -i "s/BPP_CLIENT_PORT/$newNetworkPort/" $clientFile
-    echo "BPP_NETWORK_PORT value updated to $newNetworkPort."
+    network_port=$newNetworkPort
+    # sed -i "s/BPP_CLIENT_PORT/$newNetworkPort/" $clientFile
+    # echo "BPP_NETWORK_PORT value updated to $newNetworkPort."
 else
     echo "Keeping the default BPP_NETWORK_PORT value."
 fi
