@@ -27,11 +27,14 @@ install_docker() {
         # Amazon Linux 2
         sudo amazon-linux-extras install docker
         sudo service docker start
-        sudo usermod -a -G docker ec2-user
     else
         echo "Unsupported package manager. Please install Docker manually."
         exit 1
     fi
+    sleep 10
+    sudo systemctl enable docker.service
+    sudo systemctl restart docker.service
+    sudo usermod -a -G docker $USER
 
     # Check if Docker installation was successful
     if [ $? -eq 0 ]; then
