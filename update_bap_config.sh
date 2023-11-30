@@ -58,6 +58,12 @@ else
     rabbitmqUrl="0.0.0.0"
 fi
 
+read -p "Is MonogDB running on the same instance? (y/n): " mongoSameInstance
+if [[ "${mongoSameInstance,,}" == "no" || "${mongoSameInstance,,}" == "n" ]]; then
+    read -p "Enter the private IP or URL for MonogDB: " mongoUrl
+else
+    mongoUrl="0.0.0.0"
+fi
 
 curl_response=$(curl -s https://registry-ec.becknprotocol.io/subscribers/generateEncryptionKeys)
 
@@ -70,6 +76,9 @@ else
     private_key=$(echo "$curl_response" | jq -r '.private_key')
     public_key=$(echo "$curl_response" | jq -r '.public_key')
 fi
+echo "Private Key: $private_key" 
+echo "Public Key: $public_key"
+
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -129,6 +138,7 @@ declare -A replacements=(
     ["MONGO_USERNAME"]=$mongo_initdb_root_username
     ["MONGO_PASSWORD"]=$mongo_initdb_root_password
     ["MONGO_DB_NAME"]=$mongo_initdb_database
+    ["MONOG_URL"]=$mongoUrl
     ["RABBITMQ_USERNAME"]=$rabbitmq_default_user
     ["RABBITMQ_PASSWORD"]=$rabbitmq_default_pass
     ["RABBITMQ_URL"]=$rabbitmqUrl
