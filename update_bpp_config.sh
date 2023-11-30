@@ -159,7 +159,7 @@ declare -A replacements=(
 # Apply replacements in both files
 for file in "$clientFile" "$networkFile"; do
     for key in "${!replacements[@]}"; do
-        sed -i "s/$key/${replacements[$key]}/" "$file"
+        sed -i "s|$key|${replacements[$key]}|" "$file"
     done
 done
 
