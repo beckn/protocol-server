@@ -56,13 +56,16 @@ install_docker() {
 
 # Function to install Docker Compose
 install_docker_compose() {
-    echo "Installing Docker Compose..."
-    # Add any installation steps specific to Docker Compose
-    # Follow the official Docker Compose installation guide: https://docs.docker.com/compose/install/
 
-    # Example installation for Linux
-    sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    if command -v docker-compose &> /dev/null; then
+        echo "docker-compose is already installed."
+        return
+    else
+
+        echo "Installing Docker Compose..."
+        sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+    fi
 
     # Check if Docker Compose installation was successful
     if [ $? -eq 0 ]; then
