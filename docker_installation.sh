@@ -42,7 +42,13 @@ install_docker() {
     fi
 
     # Install Docker Bash completion
-    sudo curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
+    if [ -f /etc/bash_completion.d/docker ]; then
+        echo "Docker Bash completion is already installed."
+    else
+        # Install Docker Bash completion
+        echo "Installing Docker Bash completion..."
+        sudo curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker -o /etc/bash_completion.d/docker
+    fi
 }
 
 # Function to install Docker Compose
@@ -63,8 +69,13 @@ install_docker_compose() {
         exit 1
     fi
 
-    # Install Docker Compose Bash completion
-    sudo curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+    if [ -f /etc/bash_completion.d/docker-compose ]; then
+        echo "Docker Compose Bash completion is already installed."
+    else
+        # Install Docker Compose Bash completion
+        echo "Installing Docker Compose Bash completion..."
+        sudo curl -L https://raw.githubusercontent.com/docker/compose/master/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
+    fi
 }
 
 
