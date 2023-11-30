@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File names
-clientFile="$HOME/bpp_client.yaml"
-networkFile="$HOME/bpp_network.yaml"
+clientFile="$HOME/default-bpp-client.yml"
+networkFile="$HOME/default-bpp-network.yml"
 
 client_port=6001
 network_port=6002

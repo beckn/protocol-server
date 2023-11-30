@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File names
-clientFile="$HOME/bap_client.yaml"
-networkFile="$HOME/bap_network.yaml"
+clientFile="$HOME/default-bap-client.yml"
+networkFile="$HOME/default-bap-network.yml"
 
 client_port=5001
 network_port=5002
