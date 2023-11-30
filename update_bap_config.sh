@@ -68,7 +68,7 @@ else
     mongoUrl="0.0.0.0"
 fi
 
-curl_response=$(curl -s https://registry-ec.becknprotocol.io/subscribers/generateEncryptionKeys)
+curl_response=$(curl -s $registry_url/generateEncryptionKeys)
 
 # Check if the curl command was successful
 if [ $? -ne 0 ]; then
@@ -169,4 +169,4 @@ if [ -z "$subscriber_id" ] || [ -z "$subscriber_uri" ]; then
     exit 1
 fi
 
-create_network_participant
+create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$subscriber_uri" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"

@@ -1,19 +1,18 @@
 #!/bin/bash
 
 # Set your variables
-registry_url="https://registry-ec.becknprotocol.io/subscribers"
-content_type="application/json"
-subscriber_id="$subscriber_id"
-pub_key_id="$subscriber_id_key"
-subscriber_url="$subscriber_uri"
-encr_public_key="$private_key"
-signing_public_key="$private_key"
-valid_from="$valid_from"
-valid_until="$valid_until"
-type="$type"
+    local registry_url="$1"
+    local content_type="$2"
+    local subscriber_id="$3"
+    local pub_key_id="$4"
+    local subscriber_url="$5"
+    local encr_public_key="$6"
+    local signing_public_key="$7"
+    local valid_from="$8"
+    local valid_until="$9"
+    local type="${10}"
 
-# Construct JSON data
-json_data=$(cat <<EOF
+    local json_data=$(cat <<EOF
 {
     "subscriber_id": "$subscriber_id",
     "pub_key_id": "$pub_key_id",
