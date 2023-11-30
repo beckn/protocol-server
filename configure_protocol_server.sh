@@ -70,6 +70,7 @@ update_docker_compose() {
 
 # Function to bring up Docker Compose services
 docker_compose_up() {
+    mkdir ~/docker_data && cp docker/docker-compose.yaml ~/docker_data/
     cd $home/docker_data/
     docker-compose up -d
 }
