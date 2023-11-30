@@ -43,6 +43,9 @@ else
     echo "Keeping the default BPP_NETWORK_PORT value."
 fi
 
+
+sed -i "s/BPP_CLIENT_PORT/$client_port/g; s/BPP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bpp.sh" "networkFile"
+
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
 if [[ "${redisSameInstance,,}" == "no" || "${redisSameInstance,,}" == "n" ]]; then
@@ -78,6 +81,10 @@ else
 fi
 echo "Private Key: $private_key" 
 echo "Public Key: $public_key"
+
+valid_from=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+valid_until=$(date -u -d "+1 year" +"%Y-%m-%dT%H:%M:%S.%3NZ")
+type=BPP
 
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
@@ -155,3 +162,10 @@ for file in "$clientFile" "$networkFile"; do
         sed -i "s/$key/${replacements[$key]}/" "$file"
     done
 done
+
+if [ -z "$bpp_subscriber_id" ] || [ -z "$bpp_subscriber_uri" ]; then
+    echo "error: Both --bpp_subscriber_id and --bpp_subscriber_uri must be provided."
+    exit 1
+fi
+
+create_network_participant

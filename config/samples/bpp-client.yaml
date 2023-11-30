@@ -1,6 +1,6 @@
 # Mandatory
 server:
-  port: 6001
+  port: BPP_CLIENT_PORT
 
 # Mandatory.
 cache:
@@ -51,66 +51,66 @@ app:
       search:
         ttl : "PT15S"
       init:
-        ttl : "PT15S"
+        ttl : "PT10S"
       select:
-        ttl : "PT15S"
+        ttl : "PT10S"
       confirm:
-        ttl : "PT15S"
+        ttl : "PT10S"
       status:
-        ttl : "PT15S"
+        ttl : "PT10S"
       track:
-        ttl : "PT15S"
+        ttl : "PT10S"
       cancel:
-        ttl : "PT15S"
+        ttl : "PT10S"
       update:
-        ttl : "PT15S"
+        ttl : "PT10S"
       rating:
-        ttl : "PT15S"
+        ttl : "PT10S"
       support:
-        ttl : "PT15S"
+        ttl : "PT10S"
       get_cancellation_reasons:
-        ttl: "PT15S"
+        ttl: "PT10S"
       get_rating_categories:
-        ttl: "PT15S"          
+        ttl: "PT10S"          
     
     responses: 
       on_search:
         ttl: "PT15S"
       on_init:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_select:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_confirm:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_status:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_track:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_cancel:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_update:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_rating:
-        ttl: "PT15S"
+        ttl: "PT10S"
       on_support:
-        ttl: "PT15S"
+        ttl: "PT10S"
       cancellation_reasons:
-        ttl: "PT15S"
+        ttl: "PT10S"
       rating_categories:
-        ttl: "PT15S"          
+        ttl: "PT10S"          
   
   # Mandatory.
   privateKey: "PRIVATE_KEY"
   publicKey: "PUBLIC_KEY"
 
   # Mandatory.
-  subscriberId: "SUBSCRIBER_ID"
-  subscriberUri: "SUBSCRIBER_URL"
+  subscriberId: "BPP_SUBSCRIBER_ID"
+  subscriberUri: "BPP_SUBSCRIBER_URL"
 
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
-  uniqueKey: "SUBSCRIBER_ID_KEY"
+  uniqueKey: "BPP_SUBSCRIBER_ID_KEY"
   
   # Mandatory.
   city: "std:080"

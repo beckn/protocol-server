@@ -1,6 +1,6 @@
 # Mandatory
 server:
-  port: 6002
+  port: BPP_NETWORK_PORT
 
 # Mandatory.
 cache:
@@ -104,13 +104,13 @@ app:
   publicKey: "PUBLIC_KEY"
 
   # Mandatory.
-  subscriberId: "SUBSCRIBER_ID"
-  subscriberUri: "SUBSCRIBER_URL"
+  subscriberId: "BPP_SUBSCRIBER_ID"
+  subscriberUri: "BPP_SUBSCRIBER_URL"
 
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
-  uniqueKey: "SUBSCRIBER_ID_KEY"
+  uniqueKey: "BPP_SUBSCRIBER_ID_KEY"
   
   # Mandatory.
   city: "std:080"

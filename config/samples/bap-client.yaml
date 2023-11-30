@@ -1,6 +1,6 @@
 # Mandatory
 server:
-  port: 5001
+  port: BAP_CLIENT_PORT
 
 # Mandatory.
 cache:
@@ -106,13 +106,13 @@ app:
   publicKey: "PUBLIC_KEY"
 
   # Mandatory.
-  subscriberId: "SUBSCRIBER_ID"
-  subscriberUri: "SUBSCRIBER_URL"
+  subscriberId: "BAP_SUBSCRIBER_ID"
+  subscriberUri: "BAP_SUBSCRIBER_URL"
 
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: false
-  uniqueKey: "SUBSCRIBER_ID_KEY"
+  uniqueKey: "BAP_SUBSCRIBER_ID_KEY"
   
   # Mandatory.
   city: "std:080"

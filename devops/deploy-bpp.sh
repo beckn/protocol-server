@@ -1,8 +1,8 @@
 cp Dockerfile default-bpp-client.yml default-bpp-network.yml ~/protocol-server
 cd ~/protocol-server
 
-docker build -t bpp-client --build-arg default_yml=default-bpp-client.yml --build-arg port=6001 .
-docker build -t bpp-network --build-arg default_yml=default-bpp-network.yml --build-arg port=6000 .
+docker build -t bpp-client --build-arg default_yml=default-bpp-client.yml --build-arg port=BPP_CLIENT_PORT .
+docker build -t bpp-network --build-arg default_yml=default-bpp-network.yml --build-arg port=BPP_NETWORK_PORT .
 
 docker stop bpp-network bpp-client
 docker rm bpp-network bpp-client

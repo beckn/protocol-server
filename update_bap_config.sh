@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source registry_entry.sh
 # File names
 clientFile="$HOME/default-bap-client.yml"
 networkFile="$HOME/default-bap-network.yml"
@@ -37,11 +38,13 @@ read -p "Do you want to change the BAP_NETWORK_PORT value? (y/n): " changeNetwor
 if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y" ]]; then
     read -p "Enter new BAP_NETWORK_PORT value: " newNetworkPort
     network_port=$newNetworkPort
-    # sed -i "s/BAP_NETWORK_PORT/$newNetworkPort/" $networkFile
-    # echo "BAP_NETWORK_PORT value updated to $newNetworkPort."
+    sed -i "s/BAP_NETWORK_PORT/$newNetworkPort/" $networkFile
+    echo "BAP_NETWORK_PORT value updated to $newNetworkPort."
 else
     echo "Keeping the default BAP_NETWORK_PORT value."
 fi
+
+sed -i "s/BAP_CLIENT_PORT/$client_port/g; s/BAP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bap.sh" "networkFile"
 
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
@@ -79,6 +82,11 @@ fi
 echo "Private Key: $private_key" 
 echo "Public Key: $public_key"
 
+valid_from=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
+valid_until=$(date -u -d "+1 year" +"%Y-%m-%dT%H:%M:%S.%3NZ")
+type=BAP
+
+
 # Parse command-line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -106,22 +114,22 @@ while [[ $# -gt 0 ]]; do
             rabbitmqUrl="$2"
             shift 2
             ;;
-        --bap_subscriber_id)
+        --subscriber_id)
             if [ -n "$2" ]; then
-                bap_subscriber_id="$2"
-                bap_subscriber_id_key="$2-key"
+                subscriber_id="$2"
+                subscriber_id_key="$2-key"
                 shift 2
             else
-                echo "error: --bap_subscriber_id requires a non-empty option argument."
+                echo "error: --subscriber_id requires a non-empty option argument."
                 exit 1
             fi
             ;;
-        --bap_subscriber_uri)
+        --subscriber_uri)
             if [ -n "$2" ]; then
-                bap_subscriber_uri="$2"
+                subscriber_uri="$2"
                 shift 2
             else
-                echo "error: --bap_subscriber_uri requires a non-empty option argument."
+                echo "error: --subscriber_uri requires a non-empty option argument."
                 exit 1
             fi
             ;;
@@ -144,9 +152,9 @@ declare -A replacements=(
     ["RABBITMQ_URL"]=$rabbitmqUrl
     ["PRIVATE_KEY"]=$private_key
     ["PUBLIC_KEY"]=$public_key
-    ["BAP_SUBSCRIBER_ID"]=$bap_subscriber_id
-    ["SUBSCRIBER_URL"]=$bap_subscriber_uri
-    ["BAP_SUBSCRIBER_ID_KEY"]=$bap_subscriber_id_key
+    ["BAP_SUBSCRIBER_ID"]=$subscriber_id
+    ["BAP_SUBSCRIBER_URL"]=$subscriber_uri
+    ["BAP_SUBSCRIBER_ID_KEY"]=$subscriber_id_key
 )
 
 # Apply replacements in both files
@@ -155,3 +163,10 @@ for file in "$clientFile" "$networkFile"; do
         sed -i "s/$key/${replacements[$key]}/" "$file"
     done
 done
+
+if [ -z "$subscriber_id" ] || [ -z "$subscriber_uri" ]; then
+    echo "error: Both --subscriber_id and --subscriber_uri must be provided."
+    exit 1
+fi
+
+create_network_participant
