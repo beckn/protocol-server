@@ -115,6 +115,7 @@ while [[ $# -gt 0 ]]; do
                 echo "error: --bap_subscriber_uri requires a non-empty option argument."
                 exit 1
             fi
+            ;;
         *)
             echo "error: Unknown option $1"
             exit 1
