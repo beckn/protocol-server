@@ -1,16 +1,15 @@
 #!/bin/bash
 
 # File names
-clientFile="path/to/your/bpp_client.yaml"
-networkFile="path/to/your/bpp_network.yaml"
+clientFile="$HOME/bpp_client.yaml"
+networkFile="$HOME/bpp_network.yaml"
 
 # Display current values
 echo "Current BPP_CLIENT_PORT value is set to 6001."
 
 # Prompt user for BPP_CLIENT_PORT value
 read -p "Do you want to change the BPP_CLIENT_PORT value? (y/n): " changeClientPort
-
-if [ "$changeClientPort" == "y" ]; then
+if [[ "${changeClientPort,,}" == "yes" || "${changeClientPort,,}" == "y" ]]; then
     read -p "Enter new BPP_CLIENT_PORT value: " newClientPort
     sed -i "s/BPP_CLIENT_PORT/$newClientPort/" $clientFile
     echo "BPP_CLIENT_PORT value updated to $newClientPort."
@@ -24,7 +23,7 @@ echo "Current BPP_NETWORK_PORT value is set to 6002."
 # Prompt user for BPP_NETWORK_PORT value
 read -p "Do you want to change the BPP_NETWORK_PORT value? (y/n): " changeNetworkPort
 
-if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y"]]; then
+if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y" ]]; then
     read -p "Enter new BPP_NETWORK_PORT value: " newNetworkPort
     sed -i "s/BPP_CLIENT_PORT/$newNetworkPort/" $clientFile
     echo "BPP_NETWORK_PORT value updated to $newNetworkPort."
@@ -34,17 +33,30 @@ fi
 
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
-if [[ "${redisSameInstance,,}" == "yes" || "${redisSameInstance,,}" == "y"]]; then
+if [[ "${redisSameInstance,,}" == "no" || "${redisSameInstance,,}" == "n" ]]; then
     read -p "Enter the private IP or URL for Redis: " redisUrl
 else
     redisUrl="0.0.0.0"
 fi
 
 read -p "Is RabbitMQ running on the same instance? (y/n): " rabbitmqSameInstance
-if [[ "${rabbitmqSameInstance,,}" == "yes" || "${rabbitmqSameInstance,,}" == "y"]]; then
+if [[ "${rabbitmqSameInstance,,}" == "no" || "${rabbitmqSameInstance,,}" == "n" ]]; then
     read -p "Enter the private IP or URL for RabbitMQ: " rabbitmqUrl
 else
     rabbitmqUrl="0.0.0.0"
+fi
+
+
+curl_response=$(curl -s https://registry-ec.becknprotocol.io/subscribers/generateEncryptionKeys)
+
+# Check if the curl command was successful
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to execute the curl command. Exiting."
+    exit 1
+else
+    # Extract private_key and public_key from the JSON response
+    private_key=$(echo "$curl_response" | jq -r '.private_key')
+    public_key=$(echo "$curl_response" | jq -r '.public_key')
 fi
 
 # Parse command-line arguments
@@ -72,14 +84,6 @@ while [[ $# -gt 0 ]]; do
             ;;
         --rabbitmqUrl)
             rabbitmqUrl="$2"
-            shift 2
-            ;;
-        --private_key)
-            private_key="$2"
-            shift 2
-            ;;
-        --public_key)
-            public_key="$2"
             shift 2
             ;;
         --bpp_subscriber_id)

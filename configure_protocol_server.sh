@@ -71,9 +71,9 @@ update_docker_compose() {
 
 # Function to bring up Docker Compose services
 docker_compose_up() {
-    mkdir ~/docker_data && cp docker/docker-compose.yaml ~/docker_data/
     cd $HOME/docker_data/
     docker-compose up -d
+    cd -
 }
 
 # Function to copy BAP files
