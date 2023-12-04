@@ -32,25 +32,26 @@ install_required_package() {
 
 # Function to update the Docker Compose file
 update_docker_compose() {
-    mkdir $HOME/docker_data && cp docker/docker-compose.yaml $HOME/docker_data/
-    local docker_compose_file="$HOME/docker_data/docker-compose.yaml"
-
+    docker_dir="$HOME/docker_data"
+    if [ ! $docker_dir ]; then
+        mkdir $HOME/docker_data && cp docker/docker-compose.yaml $HOME/docker_data/
+        local docker_compose_file="$HOME/docker_data/docker-compose.yaml"
+    fi
     # Check if the docker-compose file exists
     if [ ! -f "$docker_compose_file" ]; then
         echo "${RED}error: docker-compose file not found at $docker_compose_file.${NC}"
         exit 1
     else
         echo "Updating docker-compose file"
+        # Update values in the docker-compose file
+        sed -i "s/MONGO_INITDB_ROOT_USERNAME=.*/MONGO_INITDB_ROOT_USERNAME=$mongo_initdb_root_username/" "$docker_compose_file"
+        sed -i "s/MONGO_INITDB_ROOT_PASSWORD=.*/MONGO_INITDB_ROOT_PASSWORD=$mongo_initdb_root_password/" "$docker_compose_file"
+        sed -i "s/MONGO_INITDB_DATABASE=.*/MONGO_INITDB_DATABASE=$mongo_initdb_database/" "$docker_compose_file"
+        sed -i "s/RABBITMQ_DEFAULT_USER=.*/RABBITMQ_DEFAULT_USER=$rabbitmq_default_user/" "$docker_compose_file"
+        sed -i "s/RABBITMQ_DEFAULT_PASS=.*/RABBITMQ_DEFAULT_PASS=$rabbitmq_default_pass/" "$docker_compose_file"
+
+        echo "docker-compose file updated with new values."
     fi
-
-    # Update values in the docker-compose file
-    sed -i "s/MONGO_INITDB_ROOT_USERNAME=.*/MONGO_INITDB_ROOT_USERNAME= $mongo_initdb_root_username/" "$docker_compose_file"
-    sed -i "s/MONGO_INITDB_ROOT_PASSWORD=.*/MONGO_INITDB_ROOT_PASSWORD= $mongo_initdb_root_password/" "$docker_compose_file"
-    sed -i "s/MONGO_INITDB_DATABASE=.*/MONGO_INITDB_DATABASE= $mongo_initdb_database/" "$docker_compose_file"
-    sed -i "s/RABBITMQ_DEFAULT_USER=.*/RABBITMQ_DEFAULT_USER= $rabbitmq_default_user/" "$docker_compose_file"
-    sed -i "s/RABBITMQ_DEFAULT_PASS=.*/RABBITMQ_DEFAULT_PASS= $rabbitmq_default_pass/" "$docker_compose_file"
-
-    echo "docker-compose file updated with new values."
 }
 
 # Function to bring up Docker Compose services

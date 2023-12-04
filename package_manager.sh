@@ -16,11 +16,25 @@ export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 install_package(){
     if [ -x "$(command -v apt-get)" ]; then
         # APT (Debian/Ubuntu)
-        sudo apt-get update >/dev/null 2>&1
-        sudo apt-get install -y $1 >/dev/null 2>&1
+        if [ "$1" == "docker" ];then
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            sudo apt update >/dev/null 2>&1
+            sudo apt install -y docker-ce docker-ce-cli containerd.io >/dev/null 2>&1
+            sudo usermod -aG docker $USER
+        else
+            sudo apt-get update >/dev/null 2>&1
+            sudo apt-get install -y $1 >/dev/null 2>&1
+        fi
     elif [ -x "$(command -v yum)" ]; then
         # YUM (Red Hat/CentOS)
-        sudo yum install -y $1 >/dev/null 2>&1
+        if [ "$1" == "docker" ];then
+            sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+            # Install Docker
+            sudo yum install -y docker-ce docker-ce-cli containerd.io >/dev/null 2>&1
+        else
+            sudo yum install -y $1 >/dev/null 2>&1
+        fi
     elif [ -x "$(command -v amazon-linux-extras)" ]; then
         # Amazon Linux 2
         sudo amazon-linux-extras install $1 >/dev/null 2>&1
@@ -50,7 +64,6 @@ install_docker_bash() {
         sleep 10
         sudo systemctl enable docker.service
         sudo systemctl restart docker.service
-        sudo usermod -a -G docker $USER
     fi
 
     # Install Docker Bash completion
