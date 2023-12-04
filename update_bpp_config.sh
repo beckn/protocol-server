@@ -5,6 +5,25 @@ source generate_keys.sh
 source variables.sh
 source package_manager.sh
 
+display_help() {
+    # Define color codes
+    echo "${YELLOW}usage: $0 [options]${NC}"
+    echo "${GREEN}options:${NC}"
+    echo "  --help${NC}                   display this help message"
+    echo "  ${RED}--bpp_subscriber_id <value>${NC}   set bpp_subscriber_id ${RED}(required)${NC}"
+    echo "  ${RED}--bpp_subscriber_uri <value>${NC}  set bpp_subscriber_uri ${RED}(required)${NC}"
+    echo "  --registry_url <value>    set registry_url without lookup"
+    echo "    For example if your registry lookup URL is ${GREEN}$registry_url/lookup${NC}"
+    echo "    then enter only ${GREEN}$registry_url${NC}"
+    echo "    (default: ${GREEN}$registry_url${NC})"
+    echo "  --mongouser <value>      set mongodb username (default: ${GREEN}$mongo_initdb_root_username${NC})"
+    echo "  --mongopassword <value>  set mongodb password (default: ${GREEN}$mongo_initdb_root_password${NC})"
+    echo "  --mongodatabase <value>  set mongodb database (default: ${GREEN}$mongo_initdb_database${NC})"
+    echo "  --rabbitmquser <value>   set rabbitmq username (default: ${GREEN}$rabbitmq_default_user${NC})"
+    echo "  --rabbitmqpassword <value> set rabbitmq password (default: ${GREEN}$rabbitmq_default_pass${NC})"
+    exit 1
+}
+
 # File names
 clientFile=$bppClientFile
 networkFile=$bppNetworkFile
@@ -182,4 +201,4 @@ if [ -z "$bpp_subscriber_id" ] || [ -z "$bpp_subscriber_url" ]; then
     exit 1
 fi
 
-create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$bpp_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
+create_network_participant "$registry_url" "application/json" "$bpp_subscriber_id" "$bpp_subscriber_id_key" "$bpp_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"

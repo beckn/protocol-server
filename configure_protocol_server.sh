@@ -27,7 +27,7 @@ display_help() {
 
 # Function to install required packages
 install_required_package() {
-    sh package_manager.sh
+    ./package_manager.sh
 }
 
 # Function to update the Docker Compose file
@@ -56,18 +56,18 @@ update_docker_compose() {
 # Function to bring up Docker Compose services
 docker_compose_up() {
     cd $HOME/docker_data/
-    docker-compose up -d
+    sudo docker-compose up -d
     cd -
 }
 
 # Function to copy BAP files
 copy_bap_files() {
-    sh copy_bap_files.sh
+    ./copy_bap_files.sh
 }
 
 # Function to copy BPP files
 copy_bpp_files() {
-    sh copy_bpp_files.sh
+    ./copy_bpp_files.sh
 }
 
 # Function to update default BAP configuration

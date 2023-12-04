@@ -28,8 +28,8 @@ create_network_participant() {
         "country": "IND",
         "status": "SUBSCRIBED"
     }
-    EOF
-    )
+EOF
+)
 
     response=$(curl --location --request POST "$registry_url/register" \
     --header "Content-Type: $content_type" \

@@ -197,4 +197,4 @@ if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_url" ]; then
     exit 1
 fi
 
-create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$bap_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
+create_network_participant "$registry_url" "application/json" "$bap_subscriber_id" "$bap_subscriber_id_key" "$bap_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
