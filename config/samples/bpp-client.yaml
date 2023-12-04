@@ -108,7 +108,7 @@ app:
   subscriberUri: "BPP_SUBSCRIBER_URL"
 
   # Mandatory.
-  registryUrl: https://registry.becknprotocol.io/subscribers
+  registryUrl: REGISTRY_URL
   auth: true
   uniqueKey: "BPP_SUBSCRIBER_ID_KEY"
   

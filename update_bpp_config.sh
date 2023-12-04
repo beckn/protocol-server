@@ -1,18 +1,15 @@
 #!/bin/bash
 
+source registry_entry.sh
+source variables.sh
+source package_manager.sh
+
 # File names
-clientFile="$HOME/default-bpp-client.yml"
-networkFile="$HOME/default-bpp-network.yml"
+clientFile=$bppClientFile
+networkFile=$bppNetworkFile
 
-client_port=6001
-network_port=6002
-
-mongo_initdb_root_username="beckn"
-mongo_initdb_root_password="beckn123"
-mongo_initdb_database="protocol_server"
-rabbitmq_default_user="beckn"
-rabbitmq_default_pass="beckn123"
-registry_url="https://registry.becknprotocol.io/subscribers"
+client_port=$bpp_client_port
+network_port=$bpp_network_port
 
 # Display current values
 echo "Current BPP_CLIENT_PORT value is set to 6001."
@@ -56,31 +53,28 @@ fi
 
 read -p "Is RabbitMQ running on the same instance? (y/n): " rabbitmqSameInstance
 if [[ "${rabbitmqSameInstance,,}" == "no" || "${rabbitmqSameInstance,,}" == "n" ]]; then
-    read -p "Enter the private IP or URL for RabbitMQ: " rabbitmqUrl
+    read -p "${YELLOW}Enter the private IP or URL for RabbitMQ: ${NC}" rabbitmqUrl
+    read -p "${YELLOW}Enter the RabbitMQ Username (default: $rabbitmq_default_user): ${NC}" rabbitmq_default_user
+    read -p "${YELLOW}Enter the RabbitMQ Password (default: $rabbitmq_default_pass): ${NC}" rabbitmq_default_pass
 else
     rabbitmqUrl="0.0.0.0"
 fi
 
 read -p "Is MonogDB running on the same instance? (y/n): " mongoSameInstance
 if [[ "${mongoSameInstance,,}" == "no" || "${mongoSameInstance,,}" == "n" ]]; then
-    read -p "Enter the private IP or URL for MonogDB: " mongoUrl
+    read -p "${YELLOW}Enter the private IP or URL for MonogDB: ${NC}" mongoUrl
+    read -p "${YELLOW}Enter the MonogDB Root Username (default: $mongo_initdb_root_username): ${NC}" mongo_initdb_root_username
+    read -p "${YELLOW}Enter the MonogDB Root Password (default: $mongo_initdb_root_password): ${NC}" mongo_initdb_root_password
+    read -p "${YELLOW}Enter the MonogDB Database Name (default: $mongo_initdb_database):: ${NC}" mongo_initdb_database
 else
     mongoUrl="0.0.0.0"
 fi
 
-curl_response=$(curl -s $registry_url/generateEncryptionKeys)
-
-# Check if the curl command was successful
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to execute the curl command. Exiting."
-    exit 1
-else
-    # Extract private_key and public_key from the JSON response
-    private_key=$(echo "$curl_response" | jq -r '.private_key')
-    public_key=$(echo "$curl_response" | jq -r '.public_key')
-fi
-echo "Private Key: $private_key" 
-echo "Public Key: $public_key"
+install_package nodejs && install_package npm
+get_keys
+echo "Your Private Key: $private_key" 
+echo "Your Public Key: $public_key"
+remove_package nodejs && remove_package npm
 
 valid_from=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
 valid_until=$(date -u -d "+1 year" +"%Y-%m-%dT%H:%M:%S.%3NZ")
@@ -123,6 +117,15 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        --registry_url)
+            if [ -n "$2" ]; then
+                registry_url="$2"
+                shift 2
+            else
+                echo "error: --registry_url requires a non-empty option argument."
+                exit 1
+            fi
+            ;;             
         --bpp_subscriber_uri)
             if [ -n "$2" ]; then
                 bpp_subscriber_uri="$2"
@@ -142,6 +145,7 @@ done
 # Define an associative array for replacements
 declare -A replacements=(
     ["REDIS_URL"]=$redisUrl
+    ["REGISTRY_URL"]=$registry_url
     ["MONGO_USERNAME"]=$mongo_initdb_root_username
     ["MONGO_PASSWORD"]=$mongo_initdb_root_password
     ["MONGO_DB_NAME"]=$mongo_initdb_database

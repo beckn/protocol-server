@@ -110,7 +110,7 @@ app:
   subscriberUri: "BAP_SUBSCRIBER_URL"
 
   # Mandatory.
-  registryUrl: https://registry.becknprotocol.io/subscribers
+  registryUrl: REGISTRY_URL
   auth: false
   uniqueKey: "BAP_SUBSCRIBER_ID_KEY"
   

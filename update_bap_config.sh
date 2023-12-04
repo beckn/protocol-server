@@ -1,19 +1,34 @@
 #!/bin/bash
 
 source registry_entry.sh
-# File names
-clientFile="$HOME/default-bap-client.yml"
-networkFile="$HOME/default-bap-network.yml"
+source variables.sh
+source package_manager.sh
 
-client_port=5001
-network_port=5002
+display_help() {
+    # Define color codes
+    echo "${YELLOW}usage: $0 [options]${NC}"
+    echo "${GREEN}options:${NC}"
+    echo "  --help${NC}                   display this help message"
+    echo "  ${RED}--bap_subscriber_id <value>${NC}   set bap_subscriber_id ${RED}(required)${NC}"
+    echo "  ${RED}--bap_subscriber_uri <value>${NC}  set bap_subscriber_uri ${RED}(required)${NC}"
+    echo "  --registry_url <value>    set registry_url without lookup"
+    echo "    For example if your registry lookup URL is ${GREEN}$registry_url/lookup${NC}"
+    echo "    then enter only ${GREEN}$registry_url${NC}"
+    echo "    (default: ${GREEN}$registry_url${NC})"
+    echo "  --mongouser <value>      set mongodb username (default: ${GREEN}$mongo_initdb_root_username${NC})"
+    echo "  --mongopassword <value>  set mongodb password (default: ${GREEN}$mongo_initdb_root_password${NC})"
+    echo "  --mongodatabase <value>  set mongodb database (default: ${GREEN}$mongo_initdb_database${NC})"
+    echo "  --rabbitmquser <value>   set rabbitmq username (default: ${GREEN}$rabbitmq_default_user${NC})"
+    echo "  --rabbitmqpassword <value> set rabbitmq password (default: ${GREEN}$rabbitmq_default_pass${NC})"
+    exit 1
+}
 
-mongo_initdb_root_username="beckn"
-mongo_initdb_root_password="beckn123"
-mongo_initdb_database="protocol_server"
-rabbitmq_default_user="beckn"
-rabbitmq_default_pass="beckn123"
-registry_url="https://registry.becknprotocol.io/subscribers"
+clientFile=$bapClientFile
+networkFile=$bapNetworkFile
+
+client_port=$bap_client_port
+network_port=$bap_network_port
+
 
 # Display current values
 echo "Current BAP_CLIENT_PORT value is set to 5001."
@@ -23,8 +38,6 @@ read -p "Do you want to change the BAP_CLIENT_PORT value? (y/n): " changeClientP
 if [[ "${changeClientPort,,}" == "yes" || "${changeClientPort,,}" == "y" ]]; then
     read -p "Enter new BAP_CLIENT_PORT value: " newClientPort
     client_port=$newClientPort
-    # sed -i "s/BAP_CLIENT_PORT/$newClientPort/" $clientFile
-    # echo "BAP_CLIENT_PORT value updated to $newClientPort."
 else
     echo "Keeping the default BAP_CLIENT_PORT value."
 fi
@@ -38,10 +51,8 @@ read -p "Do you want to change the BAP_NETWORK_PORT value? (y/n): " changeNetwor
 if [[ "${changeNetworkPort,,}" == "yes" || "${changeNetworkPort,,}" == "y" ]]; then
     read -p "Enter new BAP_NETWORK_PORT value: " newNetworkPort
     network_port=$newNetworkPort
-    sed -i "s/BAP_NETWORK_PORT/$newNetworkPort/" $networkFile
-    echo "BAP_NETWORK_PORT value updated to $newNetworkPort."
 else
-    echo "Keeping the default BAP_NETWORK_PORT value."
+    echo "${GREEN}Keeping the default BAP_NETWORK_PORT value.${NC}"
 fi
 
 sed -i "s/BAP_CLIENT_PORT/$client_port/g; s/BAP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bap.sh" "networkFile"
@@ -49,38 +60,35 @@ sed -i "s/BAP_CLIENT_PORT/$client_port/g; s/BAP_NETWORK_PORT/$network_port/g" "$
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
 if [[ "${redisSameInstance,,}" == "no" || "${redisSameInstance,,}" == "n" ]]; then
-    read -p "Enter the private IP or URL for Redis: " redisUrl
+    read -p "${YELLOW}Enter the private IP or URL for Redis: ${NC}" redisUrl
 else
     redisUrl="0.0.0.0"
 fi
 
 read -p "Is RabbitMQ running on the same instance? (y/n): " rabbitmqSameInstance
 if [[ "${rabbitmqSameInstance,,}" == "no" || "${rabbitmqSameInstance,,}" == "n" ]]; then
-    read -p "Enter the private IP or URL for RabbitMQ: " rabbitmqUrl
+    read -p "${YELLOW}Enter the private IP or URL for RabbitMQ: ${NC}" rabbitmqUrl
+    read -p "${YELLOW}Enter the RabbitMQ Username (default: $rabbitmq_default_user): ${NC}" rabbitmq_default_user
+    read -p "${YELLOW}Enter the RabbitMQ Password (default: $rabbitmq_default_pass): ${NC}" rabbitmq_default_pass
 else
     rabbitmqUrl="0.0.0.0"
 fi
 
 read -p "Is MonogDB running on the same instance? (y/n): " mongoSameInstance
 if [[ "${mongoSameInstance,,}" == "no" || "${mongoSameInstance,,}" == "n" ]]; then
-    read -p "Enter the private IP or URL for MonogDB: " mongoUrl
+    read -p "${YELLOW}Enter the private IP or URL for MonogDB: ${NC}" mongoUrl
+    read -p "${YELLOW}Enter the MonogDB Root Username (default: $mongo_initdb_root_username): ${NC}" mongo_initdb_root_username
+    read -p "${YELLOW}Enter the MonogDB Root Password (default: $mongo_initdb_root_password): ${NC}" mongo_initdb_root_password
+    read -p "${YELLOW}Enter the MonogDB Database Name (default: $mongo_initdb_database):: ${NC}" mongo_initdb_database
 else
     mongoUrl="0.0.0.0"
 fi
 
-curl_response=$(curl -s $registry_url/generateEncryptionKeys)
-
-# Check if the curl command was successful
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to execute the curl command. Exiting."
-    exit 1
-else
-    # Extract private_key and public_key from the JSON response
-    private_key=$(echo "$curl_response" | jq -r '.private_key')
-    public_key=$(echo "$curl_response" | jq -r '.public_key')
-fi
-echo "Private Key: $private_key" 
-echo "Public Key: $public_key"
+install_package nodejs && install_package npm
+get_keys
+echo "Your Private Key: $private_key" 
+echo "Your Public Key: $public_key"
+remove_package nodejs && remove_package npm
 
 valid_from=$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")
 valid_until=$(date -u -d "+1 year" +"%Y-%m-%dT%H:%M:%S.%3NZ")
@@ -110,31 +118,36 @@ while [[ $# -gt 0 ]]; do
             rabbitmq_default_pass="$2"
             shift 2
             ;;
-        --rabbitmqUrl)
-            rabbitmqUrl="$2"
-            shift 2
-            ;;
         --subscriber_id)
             if [ -n "$2" ]; then
                 subscriber_id="$2"
                 subscriber_id_key="$2-key"
                 shift 2
             else
-                echo "error: --subscriber_id requires a non-empty option argument."
+                echo "${RED}error: --subscriber_id requires a non-empty option argument.${NC}"
                 exit 1
             fi
             ;;
+        --registry_url)
+            if [ -n "$2" ]; then
+                registry_url="$2"
+                shift 2
+            else
+                echo "error: --registry_url requires a non-empty option argument."
+                exit 1
+            fi
+            ;;            
         --subscriber_uri)
             if [ -n "$2" ]; then
                 subscriber_uri="$2"
                 shift 2
             else
-                echo "error: --subscriber_uri requires a non-empty option argument."
+                echo "${RED}error: --subscriber_uri requires a non-empty option argument.${NC}"
                 exit 1
             fi
             ;;
         *)
-            echo "error: Unknown option $1"
+            echo "${RED}error: Unknown option $1${NC}"
             exit 1
             ;;
     esac
@@ -143,6 +156,7 @@ done
 # Define an associative array for replacements
 declare -A replacements=(
     ["REDIS_URL"]=$redisUrl
+    ["REGISTRY_URL"]=$registry_url
     ["MONGO_USERNAME"]=$mongo_initdb_root_username
     ["MONGO_PASSWORD"]=$mongo_initdb_root_password
     ["MONGO_DB_NAME"]=$mongo_initdb_database
@@ -165,7 +179,7 @@ for file in "$clientFile" "$networkFile"; do
 done
 
 if [ -z "$subscriber_id" ] || [ -z "$subscriber_uri" ]; then
-    echo "error: Both --subscriber_id and --subscriber_uri must be provided."
+    echo "${RED}error: Both --subscriber_id and --subscriber_uri must be provided. ${NC}"
     exit 1
 fi
 

@@ -1,47 +1,49 @@
 #!/bin/bash
 
-# Function to check if Docker is installed
-check_docker() {
-    if command -v docker &> /dev/null; then
-        echo "Docker is already installed."
-        return 0
+#Required packages list as below.
+package_list=("docker" "docker-compose" "nginx" "certbot" "jq")
+
+command_exists() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+#Install Package
+install_package(){
+    if [ -x "$(command -v apt-get)" ]; then
+        # APT (Debian/Ubuntu)
+        sudo apt-get update
+        sudo apt-get install -y $1
+    elif [ -x "$(command -v yum)" ]; then
+        # YUM (Red Hat/CentOS)
+        sudo yum install -y $1
+    elif [ -x "$(command -v amazon-linux-extras)" ]; then
+        # Amazon Linux 2
+        sudo amazon-linux-extras install $1
     else
-        echo "Docker is not installed."
-        return 1
+        echo "${RED}Unsupported package manager. Please install $1 manually.${NC}"
+        exit 1
+    fi
+}
+
+remove_package(){
+    if [ -x "$(command -v apt-get)" ]; then
+        # APT (Debian/Ubuntu)
+        sudo apt-get purge -y $1  >/dev/null 2>&1
+    elif [ -x "$(command -v yum)" ]; then
+        # YUM (Red Hat/CentOS)
+        sudo yum remove -y $1  >/dev/null 2>&1
+        sudo yum autoremove -y >/dev/null 2>&1
     fi
 }
 
 # Function to install Docker
-install_docker() {
-    echo "Installing Docker..."
-
-    # Check the system package manager and install Docker accordingly
-    if [ -x "$(command -v apt-get)" ]; then
-        # APT (Debian/Ubuntu)
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-    elif [ -x "$(command -v yum)" ]; then
-        # YUM (Red Hat/CentOS)
-        sudo yum install -y docker
-    elif [ -x "$(command -v amazon-linux-extras)" ]; then
-        # Amazon Linux 2
-        sudo amazon-linux-extras install docker
-        sudo service docker start
-    else
-        echo "Unsupported package manager. Please install Docker manually."
-        exit 1
-    fi
-
-    # Check if Docker installation was successful
+install_docker_bash() {
+    # Check if Docker install
     if [ $? -eq 0 ]; then
-        echo "Docker installed successfully."
         sleep 10
         sudo systemctl enable docker.service
         sudo systemctl restart docker.service
         sudo usermod -a -G docker $USER
-    else
-        echo "Failed to install Docker. Exiting."
-        exit 1
     fi
 
     # Install Docker Bash completion
@@ -56,12 +58,11 @@ install_docker() {
 
 # Function to install Docker Compose
 install_docker_compose() {
-
-    if command -v docker-compose &> /dev/null; then
+    command_exists docker-compose
+    if [ $? -eq 0 ]; then
         echo "docker-compose is already installed."
         return
     else
-
         echo "Installing Docker Compose..."
         sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
@@ -85,14 +86,17 @@ install_docker_compose() {
 }
 
 
-# Check if Docker is already installed
-check_docker
+# Check if package is already installed
 
-# Install Docker if not installed
-if [ $? -ne 0 ]; then
-    install_docker
-fi
-
-# Install Docker Compose
-install_docker_compose
+for package in "${packages[@]}"; do
+    if ! command_exists "node"; then
+        install_package "$package"
+    fi
+    if [ "$package" == "docker" ]; then
+        install_docker_bash
+    fi
+    if [ "$package" == "docker-compose" ]; then
+        install_docker_compose
+    fi
+done
 
