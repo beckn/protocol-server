@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source variables.sh
 # Run the script that generates keys and capture the output
 get_keys() {
 output=$(node scripts/generate-keys 2>&1)
@@ -14,6 +14,6 @@ if [ $? -eq 0 ]; then
     private_key=$(echo "$private_key" | tr -d '[:space:]')
 else
     # Print an error message if the script failed
-    echo "Error: Key generation script failed. Please check the script output."
+    echo "${RED}Error: Key generation script failed. Please check the script output.${NC}"
 fi
 }

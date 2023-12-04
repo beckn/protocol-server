@@ -123,15 +123,7 @@ while [[ $# -gt 0 ]]; do
         --rabbitmqUrl)
             rabbitmqUrl="$2"
             shift 2
-            ;;
-        --private_key)
-            private_key="$2"
-            shift 2
-            ;;
-        --public_key)
-            public_key="$2"
-            shift 2
-            ;;            
+            ;;         
         --bap_subscriber_id)
             if [ -n "$2" ]; then
                 bap_subscriber_id="$2"
@@ -197,4 +189,4 @@ if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_url" ]; then
     exit 1
 fi
 
-create_network_participant "$registry_url" "application/json" "$bap_subscriber_id" "$bap_subscriber_id_key" "$bap_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
+create_network_participant "$registry_url" "application/json" "$bap_subscriber_id" "$bap_subscriber_id_key" "$bap_subscriber_url" "$public_key" "$public_key" "$valid_from" "$valid_until" "$type"

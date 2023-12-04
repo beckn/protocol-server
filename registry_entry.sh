@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source variables.sh
 
 create_network_participant() {
     # Set your variables
@@ -36,6 +36,7 @@ EOF
     --data-raw "$json_data" 2>&1)
     
     if [ $? -eq 0 ]; then
+        
         echo "${GREEN}Network Participant Entry is created. Please login to registry and subscribe you Network Participant.${NC}"
     else
         echo "${RED}Error: $response${NC}"

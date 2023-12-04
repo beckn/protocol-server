@@ -79,8 +79,6 @@ update_default_bap() {
     --rabbitmq_default_user "$rabbitmq_default_user" \
     --rabbitmq_default_pass "$rabbitmq_default_pass" \
     --rabbitmqUrl "$rabbitmqUrl" \
-    --private_key "$private_key" \
-    --public_key "$public_key" \
     --bap_subscriber_id "$bap_subscriber_id" \
     --bap_subscriber_url "$bap_subscriber_url"
 }
@@ -94,8 +92,6 @@ update_default_bpp() {
     --rabbitmq_default_user "$rabbitmq_default_user" \
     --rabbitmq_default_pass "$rabbitmq_default_pass" \
     --rabbitmqUrl "$rabbitmqUrl" \
-    --private_key "$private_key" \
-    --public_key "$public_key" \
     --bpp_subscriber_id "$bpp_subscriber_id" \
     --bpp_subscriber_url "$bpp_subscriber_url"
 }

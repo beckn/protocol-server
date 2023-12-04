@@ -1,5 +1,5 @@
 #!/bin/bash
-
+source variables.sh
 #Required packages list as below.
 package_list=("docker" "docker-compose" "nginx" "certbot" "jq")
 
@@ -16,16 +16,13 @@ export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 install_package(){
     if [ -x "$(command -v apt-get)" ]; then
         # APT (Debian/Ubuntu)
-        echo "Installing $1"
         sudo apt-get update >/dev/null 2>&1
         sudo apt-get install -y $1 >/dev/null 2>&1
     elif [ -x "$(command -v yum)" ]; then
         # YUM (Red Hat/CentOS)
-        echo "Installing $1"
         sudo yum install -y $1 >/dev/null 2>&1
     elif [ -x "$(command -v amazon-linux-extras)" ]; then
         # Amazon Linux 2
-        echo "Installing $1"
         sudo amazon-linux-extras install $1 >/dev/null 2>&1
     else
         echo "${RED}Unsupported package manager. Please install $1 manually.${NC}"
@@ -82,7 +79,7 @@ install_docker_compose() {
     if [ $? -eq 0 ]; then
         echo "Docker Compose installed successfully."
     else
-        echo "Failed to install Docker Compose. Exiting."
+        echo "${RED}Failed to install Docker Compose. Exiting.${NC}"
         exit 1
     fi
 
