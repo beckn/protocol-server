@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source variables.sh
+source package_manager.sh
 
 # Function to display help
 display_help() {
@@ -9,9 +10,9 @@ display_help() {
     echo "${GREEN}options:${NC}"
     echo "  --help${NC}                   display this help message"
     echo "  ${RED}--bap_subscriber_id <value>${NC}   set bap_subscriber_id ${RED}(required)${NC}"
-    echo "  ${RED}--bap_subscriber_uri <value>${NC}  set bap_subscriber_uri ${RED}(required)${NC}"
+    echo "  ${RED}--bap_subscriber_url <value>${NC}  set bap_subscriber_url ${RED}(required)${NC}"
     echo "  ${RED}--bpp_subscriber_id <value>${NC}   set bpp_subscriber_id ${RED}(required if setting up on same server)${NC}"
-    echo "  ${RED}--bpp_subscriber_uri <value>${NC}  set bpp_subscriber_uri ${RED}(required if setting up on same server)${NC}"
+    echo "  ${RED}--bpp_subscriber_url <value>${NC}  set bpp_subscriber_url ${RED}(required if setting up on same server)${NC}"
     echo "  --registry_url <value>    set registry_url without lookup"
     echo "    For example if your registry lookup URL is ${GREEN}$registry_url/lookup${NC}"
     echo "    then enter only ${GREEN}$registry_url${NC}"
@@ -81,8 +82,7 @@ update_default_bap() {
     --private_key "$private_key" \
     --public_key "$public_key" \
     --bap_subscriber_id "$bap_subscriber_id" \
-    --bap_subscriber_url "$bap_subscriber_url" \
-    --bap_subscriber_id_key "$bap_subscriber_id_key"
+    --bap_subscriber_url "$bap_subscriber_url"
 }
 
 # Function to update default BPP configuration
@@ -97,8 +97,7 @@ update_default_bpp() {
     --private_key "$private_key" \
     --public_key "$public_key" \
     --bpp_subscriber_id "$bpp_subscriber_id" \
-    --bpp_subscriber_url "$bpp_subscriber_url" \
-    --bpp_subscriber_id_key "$bpp_subscriber_id_key"
+    --bpp_subscriber_url "$bpp_subscriber_url"
 }
 
 # Process command line options
@@ -114,12 +113,12 @@ while [ "$#" -gt 0 ]; do
                 exit 1
             fi
             ;;
-        --bap_subscriber_uri)
+        --bap_subscriber_url)
             if [ -n "$2" ]; then
-                bap_subscriber_uri="$2"
+                bap_subscriber_url="$2"
                 shift 2
             else
-                echo "error: --bap_subscriber_uri requires a non-empty option argument."
+                echo "error: --bap_subscriber_url requires a non-empty option argument."
                 exit 1
             fi
             ;;
@@ -188,8 +187,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 # Check if required parameters are set
-if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_uri" ]; then
-    echo "${RED}error: --bap_subscriber_id and --bap_subscriber_uri are required parameters.${NC}"
+if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_url" ]; then
+    echo "${RED}error: --bap_subscriber_id and --bap_subscriber_url are required parameters.${NC}"
     display_help
 fi
 
@@ -224,9 +223,9 @@ fi
 # Ask if BAP and BPP should be set up on the same server
 read -p "Do you want to set up BPP on the same server? (yes/no): " setup_bpp_same_server
 if [[ "${setup_bpp_same_server,,}" == "yes" || "${setup_bpp_same_server,,}" == "y" ]]; then
-    # Accept input for --bpp_subscriber_id and --bpp_subscriber_uri
+    # Accept input for --bpp_subscriber_id and --bpp_subscriber_url
     read -p "${YELLOW}Enter BPP Subscriber ID: ${NC}" bpp_subscriber_id
-    read -p "${YELLOW}Enter BPP Subscriber URI: ${NC}" bpp_subscriber_uri
+    read -p "${YELLOW}Enter BPP Subscriber URI: ${NC}" bpp_subscriber_url
 fi
 
 # Install Docker and related components

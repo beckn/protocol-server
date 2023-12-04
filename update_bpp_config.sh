@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source registry_entry.sh
+source generate_keys.sh
 source variables.sh
 source package_manager.sh
 
@@ -41,7 +42,7 @@ else
 fi
 
 
-sed -i "s/BPP_CLIENT_PORT/$client_port/g; s/BPP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bpp.sh" "networkFile"
+sed -i "s/BPP_CLIENT_PORT/$client_port/g; s/BPP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bpp.sh" "$networkFile"
 
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
@@ -71,6 +72,7 @@ else
 fi
 
 install_package nodejs && install_package npm
+npm install
 get_keys
 echo "Your Private Key: $private_key" 
 echo "Your Public Key: $public_key"
@@ -107,6 +109,14 @@ while [[ $# -gt 0 ]]; do
             rabbitmqUrl="$2"
             shift 2
             ;;
+        --private_key)
+            private_key="$2"
+            shift 2
+            ;;
+        --public_key)
+            public_key="$2"
+            shift 2
+            ;;
         --bpp_subscriber_id)
             if [ -n "$2" ]; then
                 bpp_subscriber_id="$2"
@@ -126,12 +136,12 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;             
-        --bpp_subscriber_uri)
+        --bpp_subscriber_url)
             if [ -n "$2" ]; then
-                bpp_subscriber_uri="$2"
+                bpp_subscriber_url="$2"
                 shift 2
             else
-                echo "error: --bpp_subscriber_uri requires a non-empty option argument."
+                echo "error: --bpp_subscriber_url requires a non-empty option argument."
                 exit 1
             fi
             ;;
@@ -156,7 +166,7 @@ declare -A replacements=(
     ["PRIVATE_KEY"]=$private_key
     ["PUBLIC_KEY"]=$public_key
     ["BPP_SUBSCRIBER_ID"]=$bpp_subscriber_id
-    ["SUBSCRIBER_URL"]=$subscriber_url
+    ["SUBSCRIBER_URL"]=$$bpp_subscriber_url
     ["BPP_SUBSCRIBER_ID_KEY"]=$bpp_subscriber_id_key
 )
 
@@ -167,9 +177,9 @@ for file in "$clientFile" "$networkFile"; do
     done
 done
 
-if [ -z "$bpp_subscriber_id" ] || [ -z "$bpp_subscriber_uri" ]; then
-    echo "error: Both --bpp_subscriber_id and --bpp_subscriber_uri must be provided."
+if [ -z "$bpp_subscriber_id" ] || [ -z "$bpp_subscriber_url" ]; then
+    echo "error: Both --bpp_subscriber_id and --bpp_subscriber_url must be provided."
     exit 1
 fi
 
-create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$subscriber_uri" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
+create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$bpp_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"

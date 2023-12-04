@@ -48,6 +48,7 @@ remove_package(){
 # Function to install Docker
 install_docker_bash() {
     # Check if Docker install
+    command_exists docker
     if [ $? -eq 0 ]; then
         sleep 10
         sudo systemctl enable docker.service
@@ -98,7 +99,7 @@ install_docker_compose() {
 # Check if package is already installed
 
 for package in "${package_list[@]}"; do
-    if ! command_exists "node"; then
+    if ! command_exists $package; then
         install_package "$package"
     fi
     if [ "$package" == "docker" ]; then

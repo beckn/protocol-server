@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source registry_entry.sh
+source generate_keys.sh
 source variables.sh
 source package_manager.sh
 
@@ -55,7 +56,7 @@ else
     echo "${GREEN}Keeping the default BAP_NETWORK_PORT value.${NC}"
 fi
 
-sed -i "s/BAP_CLIENT_PORT/$client_port/g; s/BAP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bap.sh" "networkFile"
+sed -i "s/BAP_CLIENT_PORT/$client_port/g; s/BAP_NETWORK_PORT/$network_port/g" "$clientFile" "$HOME/deploy-bap.sh" "$networkFile"
 
 # Ask user about Redis and RabbitMQ configurations
 read -p "Is Redis running on the same instance? (y/n): " redisSameInstance
@@ -85,6 +86,7 @@ else
 fi
 
 install_package nodejs && install_package npm
+npm install
 get_keys
 echo "Your Private Key: $private_key" 
 echo "Your Public Key: $public_key"
@@ -118,10 +120,22 @@ while [[ $# -gt 0 ]]; do
             rabbitmq_default_pass="$2"
             shift 2
             ;;
-        --subscriber_id)
+        --rabbitmqUrl)
+            rabbitmqUrl="$2"
+            shift 2
+            ;;
+        --private_key)
+            private_key="$2"
+            shift 2
+            ;;
+        --public_key)
+            public_key="$2"
+            shift 2
+            ;;            
+        --bap_subscriber_id)
             if [ -n "$2" ]; then
-                subscriber_id="$2"
-                subscriber_id_key="$2-key"
+                bap_subscriber_id="$2"
+                bap_subscriber_id_key="$2-key"
                 shift 2
             else
                 echo "${RED}error: --subscriber_id requires a non-empty option argument.${NC}"
@@ -137,12 +151,12 @@ while [[ $# -gt 0 ]]; do
                 exit 1
             fi
             ;;            
-        --subscriber_uri)
+        --bap_subscriber_url)
             if [ -n "$2" ]; then
-                subscriber_uri="$2"
+                bap_subscriber_url="$2"
                 shift 2
             else
-                echo "${RED}error: --subscriber_uri requires a non-empty option argument.${NC}"
+                echo "${RED}error: --bap_subscriber_url requires a non-empty option argument.${NC}"
                 exit 1
             fi
             ;;
@@ -166,9 +180,9 @@ declare -A replacements=(
     ["RABBITMQ_URL"]=$rabbitmqUrl
     ["PRIVATE_KEY"]=$private_key
     ["PUBLIC_KEY"]=$public_key
-    ["BAP_SUBSCRIBER_ID"]=$subscriber_id
-    ["BAP_SUBSCRIBER_URL"]=$subscriber_uri
-    ["BAP_SUBSCRIBER_ID_KEY"]=$subscriber_id_key
+    ["BAP_SUBSCRIBER_ID"]=$bap_subscriber_id
+    ["BAP_SUBSCRIBER_URL"]=$bap_subscriber_url
+    ["BAP_SUBSCRIBER_ID_KEY"]=$bap_subscriber_id_key
 )
 
 # Apply replacements in both files
@@ -178,9 +192,9 @@ for file in "$clientFile" "$networkFile"; do
     done
 done
 
-if [ -z "$subscriber_id" ] || [ -z "$subscriber_uri" ]; then
-    echo "${RED}error: Both --subscriber_id and --subscriber_uri must be provided. ${NC}"
+if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_url" ]; then
+    echo "${RED}error: Both --subscriber_id and --bap_subscriber_url must be provided. ${NC}"
     exit 1
 fi
 
-create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$subscriber_uri" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"
+create_network_participant "$registry_url" "application/json" "$subscriber_id" "$subscriber_id_key" "$bap_subscriber_url" "$private_key" "$private_key" "$valid_from" "$valid_until" "$type"

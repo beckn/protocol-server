@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Run the script that generates keys and capture the output
-get_key() {
+get_keys() {
 output=$(node scripts/generate-keys 2>&1)
 
 # Check if the script executed successfully
