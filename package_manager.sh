@@ -37,6 +37,7 @@ remove_package(){
     if [ -x "$(command -v apt-get)" ]; then
         # APT (Debian/Ubuntu)
         sudo apt-get purge -y $1  >/dev/null 2>&1
+        sudo apt autoremove -y  >/dev/null 2>&1
     elif [ -x "$(command -v yum)" ]; then
         # YUM (Red Hat/CentOS)
         sudo yum remove -y $1  >/dev/null 2>&1
