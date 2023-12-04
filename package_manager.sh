@@ -7,18 +7,26 @@ command_exists() {
   command -v "$1" >/dev/null 2>&1
 }
 
+# Redirect input from /dev/null to silence prompts
+export DEBIAN_FRONTEND=noninteractive
+export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
+
+
 #Install Package
 install_package(){
     if [ -x "$(command -v apt-get)" ]; then
         # APT (Debian/Ubuntu)
-        sudo apt-get update
-        sudo apt-get install -y $1
+        echo "Installing $1"
+        sudo apt-get update >/dev/null 2>&1
+        sudo apt-get install -y $1 >/dev/null 2>&1
     elif [ -x "$(command -v yum)" ]; then
         # YUM (Red Hat/CentOS)
-        sudo yum install -y $1
+        echo "Installing $1"
+        sudo yum install -y $1 >/dev/null 2>&1
     elif [ -x "$(command -v amazon-linux-extras)" ]; then
         # Amazon Linux 2
-        sudo amazon-linux-extras install $1
+        echo "Installing $1"
+        sudo amazon-linux-extras install $1 >/dev/null 2>&1
     else
         echo "${RED}Unsupported package manager. Please install $1 manually.${NC}"
         exit 1
@@ -88,7 +96,7 @@ install_docker_compose() {
 
 # Check if package is already installed
 
-for package in "${packages[@]}"; do
+for package in "${package_list[@]}"; do
     if ! command_exists "node"; then
         install_package "$package"
     fi
