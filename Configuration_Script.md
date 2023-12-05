@@ -1,4 +1,4 @@
-# Protocol Server Configuration Script
+# Protocol Server Configuration Script on Linux server
 
 ## Overview
 
