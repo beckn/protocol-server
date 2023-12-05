@@ -190,3 +190,4 @@ if [ -z "$bap_subscriber_id" ] || [ -z "$bap_subscriber_url" ]; then
 fi
 
 create_network_participant "$registry_url" "application/json" "$bap_subscriber_id" "$bap_subscriber_id_key" "$bap_subscriber_url" "$public_key" "$public_key" "$valid_from" "$valid_until" "$type"
+$HOME/./deploy-bap.sh

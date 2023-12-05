@@ -194,3 +194,4 @@ if [ -z "$bpp_subscriber_id" ] || [ -z "$bpp_subscriber_url" ]; then
 fi
 
 create_network_participant "$registry_url" "application/json" "$bpp_subscriber_id" "$bpp_subscriber_id_key" "$bpp_subscriber_url" "$public_key" "$public_key" "$valid_from" "$valid_until" "$type"
+$HOME/./deploy-bpp.sh

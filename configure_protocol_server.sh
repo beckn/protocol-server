@@ -33,9 +33,9 @@ install_required_package() {
 # Function to update the Docker Compose file
 update_docker_compose() {
     docker_dir="$HOME/docker_data"
+    local docker_compose_file="$HOME/docker_data/docker-compose.yaml"
     if [ ! $docker_dir ]; then
         mkdir $HOME/docker_data && cp docker/docker-compose.yaml $HOME/docker_data/
-        local docker_compose_file="$HOME/docker_data/docker-compose.yaml"
     fi
     # Check if the docker-compose file exists
     if [ ! -f "$docker_compose_file" ]; then
@@ -49,7 +49,6 @@ update_docker_compose() {
         sed -i "s/MONGO_INITDB_DATABASE=.*/MONGO_INITDB_DATABASE=$mongo_initdb_database/" "$docker_compose_file"
         sed -i "s/RABBITMQ_DEFAULT_USER=.*/RABBITMQ_DEFAULT_USER=$rabbitmq_default_user/" "$docker_compose_file"
         sed -i "s/RABBITMQ_DEFAULT_PASS=.*/RABBITMQ_DEFAULT_PASS=$rabbitmq_default_pass/" "$docker_compose_file"
-
         echo "docker-compose file updated with new values."
     fi
 }
