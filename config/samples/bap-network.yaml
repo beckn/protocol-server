@@ -12,7 +12,7 @@ cache:
 
 # Optional.
 responseCache:
-  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol_server-v2?authSource=admin"
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/ps?authSource=admin"
   ttl: "PT10M"
 
 # Mandatory.
