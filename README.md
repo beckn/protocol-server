@@ -18,7 +18,7 @@ Beckn Protocol Server is a service that helps the application connect to Beckn N
 
 ## Architecture
 
-![alt text](https://raw.githubusercontent.com/beckn/protocol-server/v2/guides/images/general-architecture.png?raw=true)
+![alt text](guides/images/general-architecture.png)
 
 There would 2 instances of Protocol Server that is running. One is `Client` facing and the other is `Network` facing.
 
