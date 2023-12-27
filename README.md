@@ -179,6 +179,7 @@ Please save your keys in a secure location.
 ### Run
 
 ##### Docker deployment
+Update the port number inside the deploy-bap.sh and deploy-bpp.sh which you have mentioned in the default.yml file.
 Execute `~/deploy-bap.sh` file to deploye the the BAP Client and Network. 
 
 Execute `~/deploy-bpp.sh` file to deploye the the BPP Client and Network.
