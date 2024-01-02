@@ -48,7 +48,7 @@ export const bapContextBuilder = async (
       ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
       action: ActionUtils.parseAction(context.action),
       timestamp: new Date().toISOString(),
-      message_id: uuid_v4(),
+      message_id: context?.message_id ? context?.message_id : uuid_v4(),
       key: context?.key,
       transaction_id: context.transaction_id
         ? context.transaction_id
