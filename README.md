@@ -205,9 +205,9 @@ npm i -g pm2
 pm2 start ecosystem.config.js
 ```
 
-## Recoding on steps to set up Protocol Server:
+## Recoding on steps to set up Protocol Server using Docker:
 
-[Protocol Server - Local Setup](https://drive.google.com/file/d/13hVyBNkzD0pSjaS9N1-NaeSqmJwA6Jtq/view)
+[Protocol Server - Local Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
 **NOTE:** If the same server is used to host both the instances of Protocol Server, then make sure to edit the app name in ecosystem.config.js file as per the instance.
 
