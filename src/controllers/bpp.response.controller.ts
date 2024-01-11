@@ -22,6 +22,8 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
+import { telemetryCache } from "../schemas/cache/telemetry.cache";
+import { createTelemetryEvent, pushTelemetry } from "../utils/telemetry.utils";
 
 export const bppClientResponseHandler = async (
   req: Request,
@@ -110,6 +112,11 @@ export const bppClientResponseSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
+      // Generate Telemetry if enabled
+      if(getConfig().app.telemetry.enabled) {
+          telemetryCache.get("bpp_client_settled")?.push(createTelemetryEvent({context: responseBody.context, data: response}));
+          await pushTelemetry();
+      }
       return;
     }
 
