@@ -84,3 +84,8 @@ app:
   # Mandatory.
   httpTimeout: "PT3S"
   httpRetryCount: 2
+  telemetry:
+    enabled: true
+    url: ""
+    batchSize: 100
+    syncInterval: 30 # In minutes
