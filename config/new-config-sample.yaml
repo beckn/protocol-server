@@ -85,7 +85,7 @@ app:
   httpTimeout: "PT3S"
   httpRetryCount: 2
   telemetry:
-    enabled: true
+    enabled: false
     url: ""
     batchSize: 100
     syncInterval: 30 # In minutes
