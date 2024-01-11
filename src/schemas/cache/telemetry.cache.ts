@@ -1,4 +1,4 @@
-export const telemetryEnvelop: any ={
+export const telemetryEnvelop: any = {
     eid: "API",
     ets: "",
     ver: "1.0",

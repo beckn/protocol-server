@@ -8,7 +8,7 @@ axiosRetry(axios, { retries: 3 });
 
 const constructCdata = (message: any) => {
     const cdata: any = [];
-    if (message.context.location) {
+    if (message.context.hasOwnProperty('location')) {
         Object.entries(message.context.location).map(([dataKey, dataValue]: any) => {
             cdata.push({
                 type: dataKey,
