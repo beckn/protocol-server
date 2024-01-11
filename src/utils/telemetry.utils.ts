@@ -27,7 +27,7 @@ const constructCdata = (message: any) => {
 
 export function createTelemetryEvent(message: any) {
     let telemetry = { ...telemetryEnvelop };
-    telemetry.ets = new Date().getTime();
+    telemetry.ets = Date.now();
     telemetry.mid = v1();
     telemetry.context = {
         channel: getConfig().app.subscriberId,
