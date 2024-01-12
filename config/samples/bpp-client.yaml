@@ -126,5 +126,6 @@ app:
     enabled: false
     url: ""
     batchSize: 100
-    syncInterval: 30 # In minutes
+    # In minutes
+    syncInterval: 30
     redis_db: 3

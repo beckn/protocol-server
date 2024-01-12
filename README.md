@@ -176,6 +176,27 @@ Please save your keys in a secure location.
     -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
     -   WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook
 
+### Configure Telemetry
+-   In the BAP Client and BAP Network codebases, update the:
+    - `~/dfault-bap-client.yml`
+    - `~/dfault-bap-network.yml`
+    - `~/dfault-bpp-client.yml` 
+    - `~/dfault-bpp-network.yml`
+- To enable to telemetry, set the `telemetry.enabled` to `true` and update the following fields:
+    -   `url`: Populate the telemetry server URL, which accepts data in a `POST` request.
+        -  Example Payload for telemetry server:
+        ```json
+            {
+                "data": {
+                    "id": "UUID",
+                    "events": []
+                }
+            }
+        ```
+    -   `redis_db`: Redis db to write telemetry data if the telemetry server is not reachable
+    -   `batchCount`: No. of events to be batched before sending to telemetry server
+    -   `syncInterval`: Interval in minutes to send telemetry data to telemetry server
+
 ### Run
 
 ##### Docker deployment
