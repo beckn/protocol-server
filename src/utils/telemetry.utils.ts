@@ -4,6 +4,7 @@ import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 import axiosRetry from 'axios-retry';
 import { v1 } from "uuid";
+import { RedisClient } from "./redis.utils";
 axiosRetry(axios, { retries: 3 });
 
 const constructCdata = (message: any) => {
@@ -79,21 +80,37 @@ export async function pushTelemetry() {
     if (now - last_sync_time > getConfig().app.telemetry.syncInterval * 60 * 1000 || events_count >= getConfig().app.telemetry.batchSize) {
         logger.info("Pushing telemetry to server")
         const payload_data = Object.values(settled_messages).flat();
+        const client = new RedisClient(getConfig().app.telemetry.redis_db, true);
         try {
             await axios.post(`${getConfig().app.telemetry.url}`, {
                 data: {
                     id: v1(),
                     events: payload_data,
                 }
-            });
+            })
+            const cacheData = client.getKeys();
+            if(cacheData.length > 0) {
+                logger.info("Pushing cached telemetry to server")
+                await axios.post(`${getConfig().app.telemetry.url}`, {
+                    data: {
+                        id: v1(),
+                        events: cacheData,
+                    }
+                })
+                logger.info("Clearing redis cache")
+                await client.flushDB();
+            }
+        } catch (error) {
+            logger.error(`Error while pushing telemetry to server -`)
+            logger.error(error)
+            logger.info("Writing data to redis cache")
+            await client.set(`cache_${v1()}`, JSON.stringify(payload_data));
+        } finally {
             telemetryCache.set("last_sync_time", now);
             telemetryCache.set("bap_client_settled", []);
             telemetryCache.set("bap_response_settled", []);
             telemetryCache.set("bpp_client_settled", []);
             telemetryCache.set("bpp_request_settled", []);
-        } catch (error) {
-            logger.error(`Error while pushing telemetry to server -`)
-            logger.error(error)
         }
     }
 }
