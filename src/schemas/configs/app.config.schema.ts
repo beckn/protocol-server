@@ -47,7 +47,8 @@ export const appConfigSchema = z.object({
         enabled: z.boolean(),
         url: z.string(),
         batchSize: z.number(),
-        syncInterval: z.number()
+        syncInterval: z.number(),
+        redis_db: z.number()
     }),
 });
 

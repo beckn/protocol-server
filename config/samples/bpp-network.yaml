@@ -127,3 +127,4 @@ app:
     url: ""
     batchSize: 100
     syncInterval: 30 # In minutes
+    redis_db: 3
