@@ -5,7 +5,7 @@ import logger from "../utils/logger.utils";
 import axiosRetry from 'axios-retry';
 import { v1 } from "uuid";
 import { RedisClient } from "./redis.utils";
-axiosRetry(axios, { retries: 3 });
+axiosRetry(axios, { retries: getConfig().app.httpRetryCount });
 
 const constructCdata = (message: any) => {
     const cdata: any = [];
