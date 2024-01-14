@@ -42,6 +42,14 @@ export const appConfigSchema = z.object({
         return duration.asMilliseconds();
     }),
     httpRetryCount: z.number(),
+    
+    telemetry: z.object({
+        enabled: z.boolean(),
+        url: z.string(),
+        batchSize: z.number(),
+        syncInterval: z.number(),
+        redis_db: z.number()
+    }),
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;

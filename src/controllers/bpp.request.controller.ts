@@ -14,6 +14,8 @@ import moment from "moment";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
+import { telemetryCache } from "../schemas/cache/telemetry.cache";
+import { createTelemetryEvent, pushTelemetry } from "../utils/telemetry.utils";
 
 export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: RequestActions) => {
     try {
@@ -43,6 +45,11 @@ export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, L
 export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | null) => {
     try {
         const requestBody = JSON.parse(msg?.content.toString()!);
+        // Generate Telemetry if enabled
+        if(getConfig().app.telemetry.enabled) {
+            telemetryCache.get("bpp_request_settled")?.push(createTelemetryEvent({context: requestBody.context}));
+            await pushTelemetry();
+        }
         switch (getConfig().client.type) {
             case ClientConfigType.synchronous: {
                 throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Synchronous mode is not available for BPP.", 500);
