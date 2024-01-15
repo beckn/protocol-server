@@ -148,7 +148,7 @@ export const bapClientTriggerSettler = async (
     ) {
       // Network Calls Succeeded.
       // Generate Telemetry if enabled
-      if(getConfig().app.telemetry.enabled) {
+      if(getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
         telemetryCache.get("bap_client_settled")?.push(createTelemetryEvent({context: requestBody.context, data: response}));
         await processTelemetry();
       }

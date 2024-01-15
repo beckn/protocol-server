@@ -87,7 +87,7 @@ export const bapNetworkResponseSettler = async (
       responseBody.context.action
     );
     // Generate telemetry if enabled
-    if(getConfig().app.telemetry.enabled) {
+    if(getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
       telemetryCache.get("bap_response_settled")?.push(createTelemetryEvent({context: responseBody.context}));
       await processTelemetry();
     }

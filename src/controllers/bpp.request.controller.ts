@@ -46,7 +46,7 @@ export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | nul
     try {
         const requestBody = JSON.parse(msg?.content.toString()!);
         // Generate Telemetry if enabled
-        if(getConfig().app.telemetry.enabled) {
+        if(getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
             telemetryCache.get("bpp_request_settled")?.push(createTelemetryEvent({context: requestBody.context}));
             await processTelemetry();
         }
