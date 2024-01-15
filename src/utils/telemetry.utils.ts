@@ -5,6 +5,7 @@ import logger from "../utils/logger.utils";
 import axiosRetry from 'axios-retry';
 import { v1 } from "uuid";
 import { RedisClient } from "./redis.utils";
+import { ScanStream } from "ioredis";
 axiosRetry(axios, { retries: getConfig().app.httpRetryCount });
 
 const constructCdata = (message: any) => {
@@ -62,7 +63,49 @@ export function createTelemetryEvent(message: any) {
     return telemetry;
 }
 
-export async function pushTelemetry() {
+const pushTelemetry = async (payload: Record<string, any>) => {
+    try {
+        await axios.post(`${getConfig().app.telemetry.url}`, {
+            data: {
+                id: v1(),
+                events: payload,
+            }
+        })
+        return { success: true, error: null };
+    } catch (error) {
+        return { success: false, error };
+    }
+}
+
+const processCache = async (client: RedisClient, cacheData: ScanStream | undefined) => {
+    let payload: Record<string, any>[] = [];
+    let error: any = null;
+    cacheData?.on("data", (resultKeys: string[]) => {
+        resultKeys.forEach(async (key: any) => {
+            const data: string | null = await client.get(key);
+            payload = data ? [...JSON.parse(data), ...payload] : payload;
+            if(payload.length >= getConfig().app.telemetry.batchSize) {
+                logger.info(`Pushing Telemetry events count - ${payload.length}`);
+                const response = await pushTelemetry(payload);
+                if(response.success) {
+                    logger.info("Telemetry events pushed successfully");
+                } else {
+                    logger.error("Error while pushing telemetry to server -");
+                    logger.error(error);
+                    error = response.error;
+                }
+            }
+        });
+    });
+    cacheData?.on("end", async () => {
+        if(!error) {
+            logger.info("Telemetry cache processed successfully, clearing cache");
+            await client.flushDB();
+        }
+    });
+}
+
+export async function processTelemetry() {
     const last_sync_time = telemetryCache.get("last_sync_time");
     const settled_messages = {
         bap_client_settled: telemetryCache.get("bap_client_settled"),
@@ -82,28 +125,14 @@ export async function pushTelemetry() {
         const payload_data = Object.values(settled_messages).flat();
         const client = new RedisClient(getConfig().app.telemetry.redis_db, true);
         try {
-            await axios.post(`${getConfig().app.telemetry.url}`, {
-                data: {
-                    id: v1(),
-                    events: payload_data,
-                }
-            })
+            const response = await pushTelemetry(payload_data);
+            if(response.error) throw response.error;
+            logger.info("Telemetry events pushed successfully");
             const cacheData = client.getKeys();
-            if(cacheData.length > 0) {
-                logger.info("Pushing cached telemetry to server")
-                await axios.post(`${getConfig().app.telemetry.url}`, {
-                    data: {
-                        id: v1(),
-                        events: cacheData,
-                    }
-                })
-                logger.info("Clearing redis cache")
-                await client.flushDB();
-            }
+            await processCache(client, cacheData);
         } catch (error) {
-            logger.error(`Error while pushing telemetry to server -`)
-            logger.error(error)
-            logger.info("Writing data to redis cache")
+            logger.error("Error while pushing telemetry to server -");
+            logger.error(error);
             await client.set(`cache_${v1()}`, JSON.stringify(payload_data));
         } finally {
             telemetryCache.set("last_sync_time", now);

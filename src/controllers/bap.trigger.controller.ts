@@ -23,7 +23,7 @@ import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import { createTelemetryEvent, pushTelemetry } from "../utils/telemetry.utils";
+import { createTelemetryEvent, processTelemetry } from "../utils/telemetry.utils";
 
 export const bapClientTriggerHandler = async (
   req: Request,
@@ -150,7 +150,7 @@ export const bapClientTriggerSettler = async (
       // Generate Telemetry if enabled
       if(getConfig().app.telemetry.enabled) {
         telemetryCache.get("bap_client_settled")?.push(createTelemetryEvent({context: requestBody.context, data: response}));
-        await pushTelemetry();
+        await processTelemetry();
       }
       return;
     }

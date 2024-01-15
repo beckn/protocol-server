@@ -15,7 +15,7 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import { createTelemetryEvent, pushTelemetry } from "../utils/telemetry.utils";
+import { createTelemetryEvent, processTelemetry } from "../utils/telemetry.utils";
 
 export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: RequestActions) => {
     try {
@@ -48,7 +48,7 @@ export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | nul
         // Generate Telemetry if enabled
         if(getConfig().app.telemetry.enabled) {
             telemetryCache.get("bpp_request_settled")?.push(createTelemetryEvent({context: requestBody.context}));
-            await pushTelemetry();
+            await processTelemetry();
         }
         switch (getConfig().client.type) {
             case ClientConfigType.synchronous: {
