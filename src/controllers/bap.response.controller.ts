@@ -17,7 +17,7 @@ import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { responseCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import { createTelemetryEvent, pushTelemetry } from "../utils/telemetry.utils";
+import { createTelemetryEvent, processTelemetry } from "../utils/telemetry.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -89,7 +89,7 @@ export const bapNetworkResponseSettler = async (
     // Generate telemetry if enabled
     if(getConfig().app.telemetry.enabled) {
       telemetryCache.get("bap_response_settled")?.push(createTelemetryEvent({context: responseBody.context}));
-      await pushTelemetry();
+      await processTelemetry();
     }
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {

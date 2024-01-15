@@ -70,14 +70,10 @@ export class RedisClient {
     }
 
     getKeys(pattern: string = "*", count = 100) {
-        let results: string[] = [];
         const stream = this.redis?.scanStream({
             match: pattern,
             count: count
         });
-        stream?.on("data", (resultKeys) => {
-            results = [...results, ...resultKeys];
-        });
-        return results;
+        return stream;
     }
 }
