@@ -88,6 +88,7 @@ const processCache = async (client: RedisClient, cacheData: ScanStream | undefin
                 logger.info(`Pushing Telemetry events count - ${payload.length}`);
                 const response = await pushTelemetry(payload);
                 if(response.success) {
+                    payload = [];
                     logger.info("Telemetry events pushed successfully");
                 } else {
                     logger.error("Error while pushing telemetry to server -");
@@ -102,6 +103,7 @@ const processCache = async (client: RedisClient, cacheData: ScanStream | undefin
             logger.info("Telemetry cache processed successfully, clearing cache");
             await client.flushDB();
         }
+        payload = [];
     });
 }
 
