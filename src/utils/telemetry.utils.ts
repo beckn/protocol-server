@@ -78,32 +78,28 @@ const pushTelemetry = async (payload: Record<string, any>) => {
 }
 
 const processCache = async (client: RedisClient, cacheData: ScanStream | undefined) => {
-    let payload: Record<string, any>[] = [];
     let error: any = null;
-    cacheData?.on("data", (resultKeys: string[]) => {
-        resultKeys.forEach(async (key: any) => {
-            const data: string | null = await client.get(key);
-            payload = data ? [...JSON.parse(data), ...payload] : payload;
-            if(payload.length >= getConfig().app.telemetry.batchSize) {
-                logger.info(`Pushing Telemetry events count - ${payload.length}`);
-                const response = await pushTelemetry(payload);
-                if(response.success) {
-                    payload = [];
-                    logger.info("Telemetry events pushed successfully");
-                } else {
-                    logger.error("Error while pushing telemetry to server -");
-                    logger.error(error);
-                    error = response.error;
-                }
-            }
+    cacheData?.on("data", async (resultKeys: string[]) => {
+        cacheData.pause();
+        const payload = resultKeys.map(async (key: string) => {
+            const data = await client.get(key);
+            return data
         });
+        const response = await pushTelemetry(payload);
+        if(response.success) {
+            logger.info("Telemetry events pushed successfully");
+        } else {
+            logger.error("Error while pushing telemetry to server -");
+            logger.error(response.error);
+            error = response.error;
+        }
+        cacheData.resume();
     });
     cacheData?.on("end", async () => {
         if(!error) {
             logger.info("Telemetry cache processed successfully, clearing cache");
             await client.flushDB();
         }
-        payload = [];
     });
 }
 
