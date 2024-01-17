@@ -122,3 +122,10 @@ app:
   # Mandatory.
   httpTimeout: "PT3S"
   httpRetryCount: 2
+  telemetry:
+    enabled: false
+    url: ""
+    batchSize: 100
+    # In minutes
+    syncInterval: 30
+    redis_db: 3
