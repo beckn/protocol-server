@@ -30,8 +30,10 @@ Requirements
 •	Redis version 6.2 or above
 (Optional)
 •	Docker version 20.10 or above
+
 Note : we need to have a docker desktop setup to run docker-compose while setting up on the development environment (windows/IOS)
 we suggest setting up the above requirements (MongoDB, RabbitMQ, Redis) using the docker
+
 steps using docker : 
 1. cloning the Repo.
 2. enter into the protocol-server dir 
@@ -41,14 +43,19 @@ steps using docker :
 6. do change the variables as you want it to be (Note: these should be set in default.yaml files)
 7. execute docker-compose up -d to start the (MongoDB, RabbitMQ, Redis) containers  
 
+Developer system setup
 
-3.	Developer system setup
-As the Protocol Server repository is Public, clone the repository and checkout to v2 branch.
+As the Protocol Server repository is Public, clone the repository and checkout to main branch.
+
 git clone https://github.com/beckn/protocol-server.git
+
 cd protocol-server
+
 git checkout master
+
 Install
 You can utilize Docker to deploy the MongoDB, RabbitMQ and Redis services. We've included an illustrative docker-compose file located in docker/docker-compose.yaml.
+
 To set things up effortlessly, run the setup.sh command. This command not only copies the Follow file to your home directory but also generates a docker_data directory. Within this directory, you'll find the docker-compose.yaml file for configuring the aforementioned services.
 Additionally, here's a list of files included for your reference:
 •	deploy-bap.sh
@@ -57,16 +64,24 @@ Additionally, here's a list of files included for your reference:
 •	dfault-bap-network.yml
 •	dfault-bpp-client.yml
 •	dfault-bpp-network.yml
+
 Feel free to explore and use these resources as needed for your setup.
+
 Please set the user name and password as per requirement in docker-compose.yaml file inside docker_data directory.
 bash setup.sh
+
 Installation of the Protocol Server consists of installing the necessary dependencies and building the project as the project is written in TypeScript.
+
 npm i
 npm run build
 Key-Pair Generation
+
 Beckn Protocol Server comes with key generation scripts for the Network participants. You can use the scripts to generate the keys for the Network participants.
+
 NOTE: To generate the key pairs, the above steps must be completed.
+
 npm run generate-keys
+
 Sample Output
 Generating Key Pairs...
 
@@ -81,6 +96,7 @@ Your Private Key :
 Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
 
 Please save your keys in a secure location.
+
 Configure
 Register Local BAP and BPP Networks:
 •	Access the Registry URL.
@@ -123,13 +139,16 @@ o	Subscriber Id: Copy the subscriber ID from the respective Registry entry.
 o	Subscriber Uri: Copy the subscriberUri from the Registry entry.
 o	Unique Key: Copy the participant-key from the Registry entry (participant key tab).
 o	WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook
+
 Run
 Docker deployment
 Update the port number inside the deploy-bap.sh and deploy-bpp.sh which you have mentioned in the default.yml file. Execute ~/deploy-bap.sh file to deploye the the BAP Client and Network.
 Execute ~/deploy-bpp.sh file to deploye the the BPP Client and Network.
+
 PM2 deployment
 For PM2 deployment you need to git clone protocol-server four times to setup the BAP Client and Network and BPP Client and Network. Then copy ~/dfault-bap-client.yml and ~/dfault-bap-network.yml to config directory in respective git clone directory of BAP Client and Network. Also copy ~/dfault-bpp-client.yml and ~/dfault-bpp-network.yml to config directory in respective git clone directory of BPP Client and Network.
 After configuration, Protocol Server can be run as below.
+
 To run the instance in Development Mode (For Debug Purposes):
 npm run dev
 To run the instance in Production Mode:
