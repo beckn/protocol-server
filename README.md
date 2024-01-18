@@ -176,9 +176,31 @@ Please save your keys in a secure location.
     -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
     -   WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook
 
+### Configure Telemetry
+-   In the BAP Client and BAP Network codebases, update the:
+    - `~/dfault-bap-client.yml`
+    - `~/dfault-bap-network.yml`
+    - `~/dfault-bpp-client.yml` 
+    - `~/dfault-bpp-network.yml`
+- To enable to telemetry, set the `telemetry.enabled` to `true` and update the following fields:
+    -   `url`: Populate the telemetry server URL, which accepts data in a `POST` request.
+        -  Example Payload for telemetry server:
+        ```json
+            {
+                "data": {
+                    "id": "UUID",
+                    "events": []
+                }
+            }
+        ```
+    -   `redis_db`: Redis db to write telemetry data if the telemetry server is not reachable
+    -   `batchCount`: No. of events to be batched before sending to telemetry server
+    -   `syncInterval`: Interval in minutes to send telemetry data to telemetry server
+
 ### Run
 
 ##### Docker deployment
+Update the port number inside the deploy-bap.sh and deploy-bpp.sh which you have mentioned in the default.yml file.
 Execute `~/deploy-bap.sh` file to deploye the the BAP Client and Network. 
 
 Execute `~/deploy-bpp.sh` file to deploye the the BPP Client and Network.
@@ -204,9 +226,9 @@ npm i -g pm2
 pm2 start ecosystem.config.js
 ```
 
-## Recoding on steps to set up Protocol Server:
+## Recoding on steps to set up Protocol Server using Docker:
 
-[Protocol Server - Local Setup](https://drive.google.com/file/d/13hVyBNkzD0pSjaS9N1-NaeSqmJwA6Jtq/view)
+[Protocol Server - Local Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
 **NOTE:** If the same server is used to host both the instances of Protocol Server, then make sure to edit the app name in ecosystem.config.js file as per the instance.
 

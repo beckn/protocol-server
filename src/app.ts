@@ -12,13 +12,18 @@ import { RequestCache } from "./utils/cache/request.cache.utils";
 import { ResponseCache } from "./utils/cache/response.cache.utils";
 import { SyncCache } from "./utils/cache/sync.cache.utils";
 import { ClientUtils } from "./utils/client.utils";
+
 import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
 
 const app = Express();
 
-app.use(Express.json());
+app.use(
+  Express.json({
+    limit: "200kb",
+  })
+);
 
 const initializeExpress = async (successCallback: Function) => {
   const app = Express();
@@ -48,6 +53,7 @@ const initializeExpress = async (successCallback: Function) => {
           rawBody: buf.toString(),
         };
       },
+      limit: "200kb",
     })
   );
 
