@@ -1,9 +1,10 @@
 import Express, { NextFunction, Request, Response } from "express";
+import cors from "cors";
 import { Exception } from "./models/exception.model";
 import {
   BecknErrorDataType,
   becknErrorSchema,
-  BecknErrorType
+  BecknErrorType,
 } from "./schemas/becknError.schema";
 import { RequestActions } from "./schemas/configs/actions.app.config.schema";
 import { LookupCache } from "./utils/cache/lookup.cache.utils";
@@ -20,22 +21,39 @@ const app = Express();
 
 app.use(
   Express.json({
-    limit: "200kb"
+    limit: "200kb",
   })
 );
 
 const initializeExpress = async (successCallback: Function) => {
   const app = Express();
 
+  // Enabling Cors
+  app.options(
+    "*",
+    cors<Request>({
+      origin: "*",
+      optionsSuccessStatus: 200,
+      credentials: true,
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+    })
+  );
+  app.use(
+    cors({
+      origin: "*",
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+    })
+  );
+
   // Middleware for request body conversion to json and raw body creation.
   app.use(
     Express.json({
       verify: (req: Request, res: Response, buf: Buffer) => {
         res.locals = {
-          rawBody: buf.toString()
+          rawBody: buf.toString(),
         };
       },
-      limit: "200kb"
+      limit: "200kb",
     })
   );
 
@@ -65,24 +83,24 @@ const initializeExpress = async (successCallback: Function) => {
         code: err.code,
         message: err.message,
         data: err.errorData,
-        type: BecknErrorType.domainError
+        type: BecknErrorType.domainError,
       } as BecknErrorDataType;
       res.status(err.code).json({
         message: {
           ack: {
-            status: "NACK"
-          }
+            status: "NACK",
+          },
         },
-        error: errorData
+        error: errorData,
       });
     } else {
       res.status(err.code || 500).json({
         message: {
           ack: {
-            status: "NACK"
-          }
+            status: "NACK",
+          },
         },
-        error: err
+        error: err,
       });
     }
   });
