@@ -176,7 +176,7 @@ For Updating the OS, Steps to set up docker, Steps to setup docker-compose follo
 
 ### To deploy BAP Client and BAP Network codebases, update the ~/dfault-bap-client.yml and ~/dfault-bap-network.yml file with the following values:
 
-o	port : enter the port you want to run your 
+o	port : enter the port you want to run your application
 
 o cache: change the host and port where your radis is running, if you are running in same machine using docker-compose file then host = "0.0.0.0" port = 6379 
 
