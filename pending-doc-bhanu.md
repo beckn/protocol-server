@@ -1,155 +1,148 @@
 # Introduction
-
-Beckn Protocol Server is a service that helps the application connect to Beckn Network. It follows the Beckn Protocol and makes it more accessible for the applications to get started with Beckn implementation. Any network participant can run this server and connect to Beckn Network.
+The Beckn Protocol Server is a service that helps applications in connecting to the Beckn Network. It follows the Beckn Protocol, making it easier for applications to begin using Beckn Protocol. Any network participant can run this server and connect with the Beckn Network.
 
 # Architecture
 
- 
 ![image](https://github.com/beckn/protocol-server/assets/126443511/af9093a8-14d5-4d9d-a13d-c2bdfc267d78)
 
+# Parts of Protocol Server - Client/Network and Webhook in Case of BPP
 
-## Parts of protocol server - Client/Network and Webhook in case of BPP
+## Client and Network Roles
 
-•	what does the client do, what does the Network do
+There are two instances of the Protocol Server running: one for the client side and the other for the network side.
 
-There would 2 instances of Protocol Server that is running. One is Client facing and the other is Network facing.
+## BAP Scenario
 
-## In the case of BAP
+### Client-Facing Protocol Server
 
-**Client** facing Protocol Server manages building the context, validating the request body as per the Standard Beckn Open API schema, listens to the Message Queue, Aggregates the results in the case of Synchronous mode and forwards the results to the client side application as a webhook callback.
+This server manages context building, validates request bodies based on the Standard Beckn Open API schema, listens to the Message Queue, aggregates results in Synchronous mode, and forwards the results to the client-side application as a webhook callback.
 
-**Network** facing Protocol Server manages forwarding the request to the respective Participant or Beckn Gateway (BG). Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
+### Network-Facing Protocol Server
 
-## In the case of BPP
+This server forwards requests to the respective Participant or Beckn Gateway (BG). It validates incoming requests from Participants & BG according to the Standard Beckn Open API schema and verifies the signature sent from clients to ensure data integrity.
 
-**Client** facing Protocol Server listens to the Message Queue and forwards the request to client side application, exposes an endpoint where the client side application can send the results to the network which is again validated against the Standard Beckn Open API schema and pushed to the network facing Protocol Server.
+## BPP Scenario
 
-**Network** facing Protocol Server also listens to the Message Queue and forwards the request to the respective Participant or BG. Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
+### Client-Facing Protocol Server
 
-# Use of protocol server
+This server listens to the Message Queue, forwards requests to the client-side application, exposes an endpoint for the client-side application to send results to the network. The received data is validated against the Standard Beckn Open API schema and pushed to the network-facing Protocol Server.
 
-Protocol server is the application that helps the BAP and BPP interact with the network. Apart from network interaction it also does validation of the network participant and keeps track of the request and responses made to the network or any network participant
+### Network-Facing Protocol Server
+
+This server listens to the Message Queue, forwards requests to the respective Participant or BG, and validates incoming requests from Participants & BG based on the Standard Beckn Open API schema. It also verifies the signature sent from clients to ensure data integrity.
+
+# Use of Protocol Server
+
+The Protocol Server is the application that facilitates interaction between BAP and BPP with the network. Besides network interaction, it also validates network participants and keeps track of requests and responses made to the network or any network participant.
 
 # Requirements
 
-•	Node.js version 16 or above 
+To run the application, make sure you have the following installed:
 
-•	npm version 8 or above
+- [Node.js](https://nodejs.org/) version 16 or above
+- [npm](https://www.npmjs.com/) version 8 or above
+- [MongoDB](https://www.mongodb.com/) version 4.4 or above
+- [RabbitMQ](https://www.rabbitmq.com/) version 3.8 or above
+- [Redis](https://redis.io/) version 6.2 or above
 
-•	MongoDB version 4.4 or above
+*(Optional)*
 
-•	RabbitMQ version 3.8 or above
+- [Docker](https://www.docker.com/) version 20.10 or above
 
-•	Redis version 6.2 or above
+**Note:** It's recommended to set up Docker Desktop to use docker-compose for development environments (Windows/Mac). We suggest configuring MongoDB, RabbitMQ, and Redis using Docker.
 
-(Optional)
+## Steps using Docker:
 
-•	Docker version 20.10 or above
-
-**Note** : we need to have a docker desktop setup to run docker-compose while setting up on the development environment (windows/IOS)
-we suggest setting up the above requirements (MongoDB, RabbitMQ, Redis) using the docker
-
-## steps using docker: 
-1. cloning the Repo.
-2. enter into the protocol-server dir 
-3. execute `sh setup.sh`
-4. go back to home dir where you find a docker-data dir
-5. enter into docker-data dir and you find a docker-compose file which helps for deploying MongoDB, RabbitMQ, Redis containers.
-6. do change the variables as per your requirement (Note: these should be set in default.yaml files)
-7. execute `docker-compose up -d` to start the (MongoDB, RabbitMQ, Redis) containers  
-
-### Cloning the github
-
-As the Protocol Server repository is Public, clone the repository and checkout to main branch.
-
-`git clone https://github.com/beckn/protocol-server.git`
-
-`cd protocol-server`
-
-`git checkout master`
-
-### setup the Requirements
-
-#### Installation of node.js and npm using nvm (ubuntu machine)
-
-`sudo apt update`
-
-`curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
-
-`source ~/.bashrc`
-
-`nvm install node`
-
-`nvm install 16`
-
-`nvm use 16`
-
-`nvm alias default 16`
-
-`node --version`
-
-`npm --version`
-
-#### Installation of docker for RabbitMQ, MongoDB & Redis deployment using docker-compose
-
-`sudo apt update`
-
-`sudo apt install -y apt-transport-https ca-certificates curl software-properties-common`
-
-`curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg`
-
-`echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null`
-
-`sudo apt update`
-
-`sudo apt install -y docker-ce docker-ce-cli containerd.io`
-
-`sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose`
-
-`sudo chmod +x /usr/local/bin/docker-compose`
-
-`sudo docker --version && docker-compose --version`
-
-`sudo usermod -aG docker $USER`
-
-`newgrp docker`
-
-`cd ~` or go to the dir where you cloned the protocol-server repo.
-
-`cd protocol-server`
-
-execute `sh setup.sh` 
-
-go back to home dir where you find a docker-data dir
-
-enter into docker-data dir and you find a docker-compose file which helps for deploying MongoDB, RabbitMQ, Redis continers.
-
-do change the variables as you want it to be (Note: these should be set in default.yaml files)
-
-execute `docker-compose up -d` to start the (MongoDB, RabbitMQ, Redis) containers
-
-`docker ps` to check the (MongoDB, RabbitMQ, Redis) running containers
+1. Clone the repository.
+2. Navigate to the "protocol-server" directory.
+3. Run the command `sh setup.sh`.
+4. Go back to the home directory where you'll find a "docker-data" directory.
+5. Enter the "docker-data" directory and locate the "docker-compose" file, which aids in deploying MongoDB, RabbitMQ, and Redis containers.
+6. Modify the variables according to your needs (Note: these should be set in default.yaml files).
+7. Execute `docker-compose up -d` to start the MongoDB, RabbitMQ, and Redis containers.
 
 
-### Steps to setup the protocol server - BAP/BPP
+# Protocol Server Setup Guide
 
-Installation of the Protocol Server consists of installing the necessary dependencies and building the project as the project is written in TypeScript.
+## Cloning the GitHub Repository
 
-`cd protocol-server`
+Since the Protocol Server repository is public, you can clone it and switch to the main branch using the following commands:
 
-`npm i`
+```
+git clone https://github.com/beckn/protocol-server.git
+cd protocol-server
+git checkout master
+``` 
 
-`npm run build`
+## Installing Node.js and npm using nvm (Ubuntu Machine) 
+```bash 
+sudo apt update
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+source ~/.bashrc
+nvm install node
+nvm install 16
+nvm use 16
+nvm alias default 16
+node --version
+npm --version
+```
 
-### Key-Pair Generation
+# Docker Installation for RabbitMQ, MongoDB & Redis Deployment using docker-compose
 
-Beckn Protocol Server comes with key generation scripts for the Network participants. You can use the scripts to generate the keys for the Network participants.
+## Installing Docker and Docker-Compose
 
-NOTE: To generate the key pairs, the above steps must be completed.
+To install Docker and Docker-Compose, follow these steps:
 
-`npm run generate-keys`
+```bash
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo docker --version && docker-compose --version
+sudo usermod -aG docker $USER
+newgrp docker
+```
 
-Sample Output
+## Deploying MongoDB, RabbitMQ, and Redis Containers using Docker Compose
+
+In the "docker-data" directory, you'll find a "docker-compose" file facilitating the deployment of MongoDB, RabbitMQ, and Redis containers. Customize the variables as needed (Note: set these in the default.yaml files).
+
+```bash
+cd ~  # or go to the directory where you cloned the protocol-server repo.
+cd protocol-server
+sh setup.sh
+cd ~  # go back to the home directory where you find a docker-data directory.
+cd docker-data
+
+docker-compose up -d  # execute to start the MongoDB, RabbitMQ, Redis containers
+docker ps  # check running containers (MongoDB, RabbitMQ, Redis)
+```
+
+# Protocol Server Setup Guide for BAP/BPP
+
+## Installing Protocol Server
+
+Setting up the Protocol Server involves installing the necessary dependencies and building the project since it is written in TypeScript.
+
+```bash
+cd protocol-server
+npm i
+npm run build
+```
+
+## Key-Pair Generation
+The Beckn Protocol Server provides key generation scripts for network participants. Follow these steps after completing the installation:
+
+```bash
+npm run generate-keys
+```
+Sample Output:
+
+``` vbnet
 Generating Key Pairs...
 
 Key Pairs Generated
@@ -161,213 +154,230 @@ taRF+XAJ3o2E3NDWPj5fPGq5HTVNqa/DKPx8VTpMvlg=
 Your Private Key :
 
 Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
+```
+**Note**: Ensure that the installation steps above are completed before generating key pairs. Save your keys in a secure location.
 
-Please save your keys in a secure location.
+# Protocol Server Setup for BAP & BPP (Client & Network) - Docker-based Setup on Cloud
 
+We tested this setup on an Ubuntu machine, and root access is required.
 
-## Steps to setup the protocol server - BAP & BPP (client & network) Docker-based setup on cloud :
+## System Preparation
 
-We have tested this setup in ubuntu machine, also we need to have root access.
+Ensure your operating system is up-to-date by following the steps for updating the OS. For setting up Docker and Docker-Compose, refer to the instructions in the section titled "Installation of Docker for RabbitMQ, MongoDB & Redis deployment using docker-compose."
 
+```bash
+cd ~  # Takes you to your home directory where protocol-server and other YAML files are present.
+``` 
+Follow these steps to set up the Protocol Server for both BAP and BPP (Client & Network) using a Docker-based setup on the cloud.
 
-For Updating the OS, Steps to set up docker, Steps to setup docker-compose follow the steps given in (Installation of docker for RabbitMQ, MongoDB & Redis deployment using docker-compose)
+# Configuring BAP Client and BAP Network
 
-`cd ~` it takes you to your home dir where protocol-server & othyer yaml files are present
+To deploy the BAP Client and BAP Network codebases, update the `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` files with the following values:
 
-### To deploy BAP Client and BAP Network codebases, update the ~/dfault-bap-client.yml and ~/dfault-bap-network.yml file with the following values:
+- **Port:** Enter the port where you want to run your application.
 
-o	port : enter the port you want to run your application
+- **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
 
-o cache: change the host and port where your radis is running, if you are running in same machine using docker-compose file then host = "0.0.0.0" port = 6379 
+- **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file.
 
-o responseCache: change the host and port where your MongoDB is running, if you are running in same machine using docker-compose file then host = "0.0.0.0" port = 27017 and set username, password and db as set in docker-compose file. 
+- **Private Key:** Copy the private key generated in the Key-Pair Generation step.
 
-o	Private Key: Copy the private key generated in step Key-Pair Generation.
+- **Public Key:** Copy the public key generated in the Key-Pair Generation step.
 
-o	Public Key: Copy the public key generated in step Key-Pair Generation.
+- **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
 
-o	Subscriber Id: Copy the subscriber ID from the respective Registry entry.
+- **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
 
-o	Subscriber Uri: Copy the subscriberUri from the Registry entry.
+- **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
 
-o	Unique Key: Copy the participant-key from the Registry entry (participant key tab).
+# Configuring BPP Client and BPP Network
 
-### In the BPP Client and BPP Network codebases, update the ~/dfault-bpp-client.yml and ~/dfault-bpp-network.yml file with the following values:
+For the BPP Client and BPP Network codebases, update the `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` files with the following values:
 
-o	port : enter the port you want to run your 
+- **Port:** Enter the port where you want to run your application.
 
-o cache: change the host and port where your radis is running, if you are running in same machine using docker-compose file then host = "0.0.0.0" port = 6379 
+- **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
 
-o responseCache: change the host and port where your MongoDB is running, if you are running in same machine using docker-compose file then host = "0.0.0.0" port = 27017 and set username, password and db as set in docker-compose file. 
+- **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file.
 
-o	Private Key: Copy the private key generated in step Key-Pair Generation.
+- **Private Key:** Copy the private key generated in the Key-Pair Generation step.
 
-o	Public Key: Copy the public key generated in step Key-Pair Generation.
+- **Public Key:** Copy the public key generated in the Key-Pair Generation step.
 
-o	Subscriber Id: Copy the subscriber ID from the respective Registry entry.
+- **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
 
-o	Subscriber Uri: Copy the subscriberUri from the Registry entry.
+- **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
 
-o	Unique Key: Copy the participant-key from the Registry entry (participant key tab).
+- **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
 
-o	WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook 
+- **Webhook URL:** Copy and paste the URL generated by running localtunnel for sandbox-webhook.
 
-### Exposing BAP/BPP API over LOCAL tunnel
+# Exposing BAP/BPP API Over LocalTunnel
 
-•	Install localtunnel globally using `npm install -g localtunnel`.
+## Setting up LocalTunnel
 
-•	Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency). [EX: `lt --port 5001 --subdomain beckn-bap-network`]
+1. Install localtunnel globally using `npm install -g localtunnel`.
+2. Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency). 
+   [Example: `lt --port 5001 --subdomain beckn-bap-network`]
 
-### Step to setup Nginx/haproxy in cloud (ubuntu)
+## Setting up Nginx in Cloud (Ubuntu)
 
-`sudo apt update`
+### Step-by-Step Guide
 
-`sudo apt-get install nginx -y`
+1. Update your system: `sudo apt update`.
+2. Install Nginx: `sudo apt-get install nginx -y`.
+3. Navigate to the Nginx configuration directory: `cd /etc/nginx/conf.d`.
+4. Create a new configuration file: `sudo nano {enter-any-name.conf}`. Enter the configuration to map your DNS with the port.
 
-`cd /etc/nginx/conf.d`
+#### Example Configuration:
 
-`sudo nano {enter-any-name.conf}` create a conf file and enter the configuration to map your dns with port. ex :- 
+```nginx
+server {
+    listen 80;
+    listen [::]:80;
+    server_name example.domain.com;
 
-#### server {
-####     listen 80;
-####     listen [::]:80;
-####     server_name example.domin.com;
-#### 
-####     location / {
-####         proxy_set_header Host $http_host;
-####         proxy_set_header X-Real-IP $remote_addr;
-####         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#### 
-####         proxy_http_version 1.1;
-####         proxy_set_header Upgrade $http_upgrade;
-####         proxy_set_header Connection "upgrade";
-#### 
-####         proxy_pass http://localhost:port;
-####     }
-#### }
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-#### server {
-####     listen 443 ssl http2;
-####     listen [::]:443 ssl http2;
-####     server_name example.domin.com;
-#### 
-####     location / {
-####         proxy_set_header Host $http_host;
-####         proxy_set_header X-Real-IP $remote_addr;
-####         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-#### 
-####         proxy_http_version 1.1;
-####         proxy_set_header Upgrade $http_upgrade;
-####         proxy_set_header Connection "upgrade";
-#### 
-####         proxy_pass http://localhost:port;
-####     }
-#### 
-####     ssl_certificate /etc/letsencrypt/live/example.domin.com/fullchain.pem;
-####     ssl_certificate_key /etc/letsencrypt/live/example.domin.com/privkey.pem;
-#### 
-####     ssl_session_timeout 1d;
-####     ssl_session_cache shared:MozSSL:10m;
-####     ssl_session_tickets off;
-#### 
-####     ssl_protocols TLSv1.2 TLSv1.3;
-####     ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE- 
-####     ECDSA- 
-####     CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
-####     ssl_prefer_server_ciphers on;
-#### 
-####     add_header Strict-Transport-Security "max-age=63072000" always;
-#### 
-####     ssl_stapling on;
-####     ssl_stapling_verify on;
-#### 
-####     resolver 8.8.8.8;
-#### }
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
 
+        proxy_pass http://localhost:port;
+    }
+}
 
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name example.domain.com;
 
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-in the above example please change `example.domin.com` and `port` as your requirement in multiple places.
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
 
-get SSL certification done on your machine for your domain.
+        proxy_pass http://localhost:port;
+    }
 
-# Registering on BECKN registry
+    ssl_certificate /etc/letsencrypt/live/example.domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.domain.com/privkey.pem;
 
-•	Access the [Registry URL](https://registry.becknprotocol.io/login).
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:MozSSL:10m;
+    ssl_session_tickets off;
 
-•	Log in using your Gmail ID.
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE- 
+    ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers on;
 
-### Create Network Participants:
+    add_header Strict-Transport-Security "max-age=63072000" always;
 
-•	In the Registry, navigate to the admin tab and select "Network Participant."
+    ssl_stapling on;
+    ssl_stapling_verify on;
 
-•	Click the "+" icon to create entries for both the BAP and BPP networks.
+    resolver 8.8.8.8;
+}
+```
+Replace `example.domain.com` and `port` with your desired values in multiple places.
 
-•	Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will call this as "subscriberIDs" going further.)
+Obtain an SSL certificate for your domain and configure it on your machine.
 
-### Configure Network Roles:
 
-•	Edit the created entries for BAP and BPP networks.
+# Registering on BECKN Registry
 
-•	Select the "Network Role Tab."
+To register on the BECKN Registry, follow these steps:
 
-•	Choose the network domain (leave it blank for universal BAP/BPP).
+1. Access the [Registry URL](https://registry.becknprotocol.io/login).
 
-•	Set the Type as "BAP" for BAP network and "BPP" for BPP network.
+2. Log in using your Gmail ID.
 
-•	Enter the respective "SubscriberID" created in step Create Network Participants
+## Create Network Participants:
 
-•	Set the Status field to "subscribed."
+- In the Registry, go to the admin tab and choose "**Network Participant.**"
 
-### Update Registry URLs:
+- Click the **"+"** icon to create entries for both the BAP and BPP networks.
 
-•	Copy the generated URLs and paste them in the URL field on the respective network role tab in the Registry.
+- Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will refer to these as "subscriberIDs" going forward.)
 
-•	Save the changes.
+## Configure Network Roles:
 
-### Configure Participant Keys:
+- Edit the created entries for BAP and BPP networks.
 
-•	In the Registry, navigate to the participant key tab for both BAP and BPP networks.
+- Select the "Network Role Tab."
 
-•	Click the "+" icon to add a participant key entry.
+- Choose the network domain (leave it blank for universal BAP/BPP).
 
-•	Provide a key (used as uniqueKey in default.yml).
+- Set the Type as "BAP" for the BAP network and "BPP" for the BPP network.
 
-•	Copy the generated public keys in step Key-Pair Generation and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
+- Enter the respective "SubscriberID" created in the previous step (Create Network Participants).
 
-•	Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
+- Set the Status field to "subscribed."
 
-•	Check the "Verified" checkbox and save the entry.
+## Update Registry URLs:
 
-## Run
-### Docker deployment
+- Copy the generated URLs and paste them in the URL field on the respective network role tab in the Registry.
 
-Update the port number inside the deploy-bap.sh and deploy-bpp.sh which you have mentioned in the default.yml file.
+- Save the changes.
 
-Execute ~/deploy-bap.sh file to deploye the the BAP Client and Network.
+## Configure Participant Keys:
 
-Execute ~/deploy-bpp.sh file to deploye the the BPP Client and Network.
+- In the Registry, go to the participant key tab for both BAP and BPP networks.
 
-### PM2 deployment
+- Click the "+" icon to add a participant key entry.
 
-For PM2 deployment you need to git clone protocol-server four times to setup the BAP Client and Network and BPP Client and Network. 
-Then copy ~/dfault-bap-client.yml and ~/dfault-bap-network.yml to config directory in respective git clone directory of BAP Client and Network. 
+- Provide a key (used as uniqueKey in default.yml).
 
-Also copy ~/dfault-bpp-client.yml and ~/dfault-bpp-network.yml to config directory in respective git clone directory of BPP Client and Network.
+- Copy the generated public keys from the Key-Pair Generation step and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
 
-After configuration, Protocol Server can be run as below.
+- Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
+
+- Check the "Verified" checkbox and save the entry.
+
+# Running Protocol Server
+
+## Docker Deployment
+
+To deploy using Docker, follow these steps:
+
+1. Update the port number inside the `deploy-bap.sh` and `deploy-bpp.sh` mentioned in the `default.yml` file.
+   
+2. Execute `~/deploy-bap.sh` to deploy the BAP Client and Network.
+
+3. Execute `~/deploy-bpp.sh` to deploy the BPP Client and Network.
+
+## PM2 Deployment
+
+For PM2 deployment, clone the protocol-server repository four times to set up the BAP Client, BAP Network, BPP Client, and BPP Network. 
+
+Copy `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` to the config directory in the respective git clone directory of BAP Client and Network.
+
+Also, copy `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` to the config directory in the respective git clone directory of BPP Client and Network.
+
+After configuration, Protocol Server can be run as follows:
 
 ### To run the instance in Development Mode (For Debug Purposes):
 
-`npm run dev`
-### To run the instance in Production Mode:
+```bash
+npm run dev
+```
+## To run the instance in Production Mode:
+```bash
+npm i -g pm2
+pm2 start ecosystem.config.js
+```
 
-`npm i -g pm2`
+## Recording on Steps to Set up Protocol Server using Docker:
 
-`pm2 start ecosystem.config.js`
+[Video of Protocol Server - Local Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
 
-## Recoding on steps to set up Protocol Server using Docker:
 
-[Protocol Server - Local Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
-
-[Note: this setup is done on ubuntu server for setting up the protocol-server]
+**Note**: This setup is done on an Ubuntu server for setting up the protocol-server.
