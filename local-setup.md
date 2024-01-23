@@ -1,1 +1,227 @@
+# Protocol Server Setup Guide for Local System
 
+## Cloning the GitHub Repository
+
+Since the Protocol Server repository is public, you can clone it and switch to the main branch using the following commands:
+
+```
+git clone https://github.com/beckn/protocol-server.git
+cd protocol-server
+git checkout master
+```
+
+# Setups required for BAP/BPP
+
+<br>
+
+## BAP :
+
+1. Installing Protocol Server do git clone two times one for BAP-Client and one for BAP-Network.
+
+   ```
+   git clone https://github.com/beckn/protocol-server.git
+   ```
+
+   Rename the folders accordingly. And switch to master branch in both the folders and install Node dependencies.
+
+   ```
+   cd {folder_name}
+   git checkout master
+   npm i
+   ```
+
+2. Create default.yml file in both the folders at location `~/config/default.yml`
+3. Navigate to `~/docker` in your terminal to run the command to start the redis, mongodb and rabitmq.
+
+   ```
+   docker-compose up -d
+   ```
+
+4. Copy the content of `~/config/samples/bap-client.yaml` for BAP-Client and for BAP-Network copy `~/config/samples/bap-network.yaml`
+5. Now generate key pairs that will be used in registry entry and `default.yml` files.
+
+   ```bash
+   npm run generate-keys
+   ```
+
+   Sample Output:
+
+   ```vbnet
+   Generating Key Pairs...
+
+   Key Pairs Generated
+
+   Your Public Key :
+
+   taRF+XAJ3o2E3NDWPj5fPGq5HTVNqa/DKPx8VTpMvlg=
+
+   Your Private Key :
+
+   Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
+   ```
+
+6. Now Configure the `default.yml` of both BAP-Client and BAP-Network as per below specification.
+
+   - **Port:** Enter the port where you want to run your application.
+
+   - **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
+
+   - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file. This url will also be used in synchronous mode as `mongoURL`
+
+   - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
+
+   - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
+
+   - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
+
+   - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
+
+   - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
+     <br><br>
+
+## BPP :
+
+1. Installing Protocol Server do git clone two times one for BAP-Client and one for BAP-Network.
+
+   ```
+   git clone https://github.com/beckn/protocol-server.git
+   ```
+
+   Rename the folders accordingly. And switch to master branch in both the folders and install Node dependencies.
+
+   ```
+   cd {folder_name}
+   git checkout master
+   npm i
+   ```
+
+2. Create default.yml file in both the folders at location `~/config/default.yml`
+3. Navigate to `~/docker` in your terminal to run the command to start the redis, mongodb and rabitmq.
+
+   ```
+   docker-compose up -d
+   ```
+
+   Note: If you are doing setup for BAP and BPP both on the same system then please skip this step
+
+4. Copy the content of `~/config/samples/bap-client.yaml` for BAP-Client and for BAP-Network copy `~/config/samples/bap-network.yaml`
+5. Now generate key pairs that will be used in registry entry and `default.yml` files.
+
+   ```bash
+   npm run generate-keys
+   ```
+
+   Sample Output:
+
+   ```vbnet
+   Generating Key Pairs...
+
+   Key Pairs Generated
+
+   Your Public Key :
+
+   taRF+XAJ3o2E3NDWPj5fPGq5HTVNqa/DKPx8VTpMvlg=
+
+   Your Private Key :
+
+   Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
+   ```
+
+6. Now Configure the `default.yml` of both BAP-Client and BAP-Network as per below specification.
+
+   - **Port:** Enter the port where you want to run your application.
+
+   - **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
+
+   - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file.
+
+   - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
+
+   - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
+
+   - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
+
+   - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
+
+   - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
+
+   - **Webhook URL:** Copy the public URL generated by the local-tunnel for webhook.
+     <br><br>
+
+# Exposing BAP/BPP API Over LocalTunnel
+
+## Setting up LocalTunnel in Local System/Developer when there is no DNS Tools available
+
+1. Install localtunnel globally using `npm install -g localtunnel`.
+2. Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
+   [Example: `lt --port 5001 --subdomain beckn-bap-network`]
+
+## [NOTE]
+
+Whenever the system or LocalTunnel is restarted the the generated localtunnel DNS will be changed. We have to register the new generated localtunnel DNS after restart in Registry and default.yml files respectively.  
+<br>
+
+# Registering on BECKN Registry
+
+To register on the BECKN Registry, follow these steps:
+
+1. Access the [Registry URL](https://registry.becknprotocol.io/login).
+
+2. Create an account using signup flow.
+
+## Create Network Participants:
+
+- In the Registry, go to the admin tab and choose "**Network Participant.**"
+
+- Click the **"+"** icon to create entries for both the BAP and BPP networks.
+
+- Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will refer to these as "subscriberIDs" going forward.)
+
+## Configure Network Roles:
+
+- Edit the created entries for BAP and BPP networks.
+
+- Select the "Network Role Tab."
+
+- Choose the network domain (leave it blank for universal BAP/BPP).
+
+- Set the Type as "BAP" for the BAP network and "BPP" for the BPP network.
+
+- Enter the respective "SubscriberID" created in the previous step (Create Network Participants).
+
+- Set the Status field to "subscribed."
+
+## Update Registry URLs:
+
+- Copy the generated URLs (LocalTunnel) and paste them in the URL field on the respective network role tab in the Registry.
+
+- Save the changes.
+
+## Configure Participant Keys:
+
+- In the Registry, go to the participant key tab for both BAP and BPP networks.
+
+- Click the "+" icon to add a participant key entry.
+
+- Provide a key (used as uniqueKey in default.yml).
+
+- Copy the generated public keys from the Key-Pair Generation step and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
+
+- Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
+
+- Check the "Verified" checkbox and save the entry.
+
+<br>
+
+## Now go back to the terminal at each instance of the protocol-server to start the application.
+
+To run the instance in Development Mode (For Debug Purposes):
+
+```bash
+npm run dev
+```
+
+## Local Setup Tutorial Video:
+
+- Link for BAP-Setup
+- Link for BPP-setup
