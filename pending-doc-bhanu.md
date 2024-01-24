@@ -4,7 +4,7 @@ The Beckn Protocol Server is a service that helps applications in connecting to 
 
 # Architecture
 
-![image](https://github.com/beckn/protocol-server/assets/126443511/af9093a8-14d5-4d9d-a13d-c2bdfc267d78)
+![image](https://github.com/beckn/protocol-server/blob/devops/guides/images/general-architecture.png)
 
 # Parts of Protocol Server - Client/Network and Webhook in Case of BPP
 
