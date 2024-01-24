@@ -61,7 +61,7 @@ docker-compose up -d  # execute to start the MongoDB, RabbitMQ, Redis containers
 docker ps  # check running containers (MongoDB, RabbitMQ, Redis)
 ```
 
-# Setups required for BAP/BPP
+# Setups required for Protocol-Server
 
 ## Installing Protocol Server
 
@@ -99,7 +99,7 @@ Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxV
 
 **Note**: Ensure that the installation steps above are completed before generating key pairs. Save your keys in a secure location.
 
-# Setups required for BAP/BPP (Client & Network) - Docker-based Setup on Cloud
+# Setups required for Protocol-Server (Client & Network) - Docker-based Setup on Cloud
 
 We tested this setup on an Ubuntu machine, and root access is required.
 
@@ -113,9 +113,11 @@ cd ~  # Takes you to your home directory where protocol-server and other YAML fi
 
 Follow these steps to set up the Protocol Server for both BAP and BPP (Client & Network) using a Docker-based setup on the cloud.
 
-# Exposing BAP/BPP API Over LocalTunnel
+# Exposing local Protocol-server to Internet
 
-## Setting up LocalTunnel in Local System/Developer when there is no DNS Tools available
+## Setting up LocalTunnel when there is no DNS Tools available.
+
+Note: use this when you dont have any DNS URLS to assign 
 
 1. Install localtunnel globally using `npm install -g localtunnel`.
 2. Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
@@ -125,10 +127,8 @@ Follow these steps to set up the Protocol Server for both BAP and BPP (Client & 
 
 Whenever the system or LocalTunnel is restarted the the generated localtunnel DNS will be changed. We have to register the new generated localtunnel DNS after restart in Registry and default.yml files respectively.
 
-## Setting up Nginx in Cloud (Ubuntu) if you have DNS Tools
-
-### Step-by-Step Guide
-
+## Nginx in Production System (Ubuntu) if you have DNS Tools
+Nginx is used to 
 1. Update your system: `sudo apt update`.
 2. Install Nginx: `sudo apt-get install nginx -y`.
 3. Navigate to the Nginx configuration directory: `cd /etc/nginx/conf.d`.
