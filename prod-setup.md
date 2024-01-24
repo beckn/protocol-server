@@ -1,3 +1,7 @@
+# Protocol Server Setup Guide for Production.
+
+#### Note: The following setup/steps are for Ubuntu Machine. 
+
 ## Cloning the GitHub Repository
 
 Since the Protocol Server repository is public, you can clone it and switch to the main branch using the following commands:
@@ -305,12 +309,6 @@ Copy `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` to the config dire
 Also, copy `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` to the config directory in the respective git clone directory of BPP Client and Network.
 
 After configuration, Protocol Server can be run as follows:
-
-### To run the instance in Development Mode (For Debug Purposes):
-
-```bash
-npm run dev
-```
 
 ## To run the instance in Production Mode:
 
