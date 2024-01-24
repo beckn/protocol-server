@@ -52,19 +52,17 @@ _(Optional)_
 
 **Note:** It's recommended to set up Docker Desktop to use docker-compose for development environments (Windows/Mac). We suggest configuring MongoDB, RabbitMQ, and Redis using Docker.
 
-## Steps using Docker:
+## Steps to start MongoDB, RabbitMQ, and Redis using Docker:
 
 1. Clone the repository.
 2. Navigate to the "protocol-server" directory.
-3. Run the command `sh setup.sh`.
-4. Go back to the home directory where you'll find a "docker-data" directory.
-5. Enter the "docker-data" directory and locate the "docker-compose" file, which aids in deploying MongoDB, RabbitMQ, and Redis containers.
-6. Modify the variables according to your needs (Note: these should be set in default.yaml files).
+5. Enter the "docker" directory and locate the "docker-compose" file, which aids in deploying MongoDB, RabbitMQ, and Redis containers.
+6. Modify the variables according to your needs (Note: these variables should be set in default.yaml files).
 7. Execute `docker-compose up -d` to start the MongoDB, RabbitMQ, and Redis containers.
 
 # Protocol Server Setup Guide
 
 Protocol server can be setup in two env.
 
-1. Production env - Link to prod-setup.md
-2. Local System (Dev env) - Link to local-setup.md
+1. Production env - [Link to prod-setup.md](https://github.com/beckn/protocol-server/blob/devops/prod-setup.md)
+2. Local System (Dev env) - [Link to local-setup.md](https://github.com/beckn/protocol-server/blob/devops/local-setup.md)
