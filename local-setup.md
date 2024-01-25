@@ -229,4 +229,11 @@ npm run dev
 
 - [Link for Postman-collection testing for Protocol-server](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/EVwXRc6DIfJBiGiZR61avuYBiqIZh_rKrjC_g11AuVvQ5g?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=2WHIeV)
 
+To access the Postman collection please follow these steps:
+
+1. Navigate to the Beckn-Sandbox repository on GitHub, available at [github.com/beckn/beckn-sandbox](https://github.com/beckn/beckn-sandbox).
+2. Within the repository, locate and enter the `artifacts` directory.
+3. Inside the artifacts directory, find the `Industry 4.0` collection.
+4. Once you have located the Industry 4.0 collection, open it and copy the URL directly from your browser's address bar.
+5. Paste this URL into Postman to begin working with the collection.
 
