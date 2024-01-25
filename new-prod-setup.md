@@ -9,6 +9,22 @@
 2. Installations required for Protocol-Server
    1. Cloning the GitHub Repository
    2. Installing Protocol Server Dependencies
+   3. Key-Pair Generation 
+   4. Deploying MongoDB, RabbitMQ, and Redis Containers using Docker Compose (Ubuntu Machine)
+3. Exposing local Protocol-server to Internet.
+   1. Setting up LocalTunnel when there is no DNS Tools available.
+   2. Nginx in Production System (Ubuntu) if you have DNS Tools.
+4. Registering on BECKN Registry
+   1. Create Network Participants.
+   2. Configure Network Roles.
+   3. Update Registry URLs.
+   4. Configure Participant Keys.
+5. Configuring BAP Client and BAP Network.
+6. Configuring BPP Client and BPP Network.
+7. Steps to Start the Protocol Server
+   1. Docker Deployment
+   2. PM2 Deployment
+8. Step-by-Step Video tutorials to setup Protocol Server using Docker.
 
 # Installations of Pre-requisites
 
@@ -309,9 +325,9 @@ To deploy using Docker, follow these steps:
 
 For PM2 deployment, clone the protocol-server repository four times to set up the BAP Client, BAP Network, BPP Client, and BPP Network.
 
-Copy `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` to the config directory in the respective git clone directory of BAP Client and Network.
+Copy `~/default-bap-client.yml` and `~/default-bap-network.yml` to the config directory in the respective git clone directory of BAP Client and Network.
 
-Also, copy `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` to the config directory in the respective git clone directory of BPP Client and Network.
+Also, copy `~/default-bpp-client.yml` and `~/default-bpp-network.yml` to the config directory in the respective git clone directory of BPP Client and Network.
 
 After configuration, Protocol Server can be run as follows:
 
@@ -322,7 +338,7 @@ npm i -g pm2
 pm2 start ecosystem.config.js
 ```
 
-## Step-by-Step Video tutorials to setup Protocol Server using Docker:
+# Step-by-Step Video tutorials to setup Protocol Server using Docker:
 
 | **No.** | **Video Title**                                 | **Video Description**                                                                                                                     | **Video URL**                                                                                                                                                                                                                                                                                                                                            |
 |---------|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
