@@ -100,7 +100,8 @@ sh setup.sh #  This command not only copies the Follow file to your home directo
 
 ## Deploying MongoDB, RabbitMQ, and Redis Containers using Docker Compose (Ubuntu Machine)
 
-In the "docker-data" directory, you'll find a "docker-compose" file facilitating the deployment of MongoDB, RabbitMQ, and Redis containers. Customize the variables as needed (Note: set these in the default.yaml files).
+In the "docker-data" directory, you'll find a "docker-compose" file facilitating the deployment of MongoDB, RabbitMQ, and Redis containers. Modify  the variables in 'docker-compose.yml' like MongoDB (username, password & database), RabitMQ (username,password).
+(Note: set these in the default.yaml files).
 
 ```bash
 cd ~  # go back to the home directory where you find a docker-data directory.
@@ -313,26 +314,15 @@ npm i -g pm2
 pm2 start ecosystem.config.js
 ```
 
-## Recording on Steps to Set up Protocol Server using Docker:
+## Step-by-Step Video tutorials to setup Protocol Server using Docker:
 
-[Basic Pre-requists Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBasic%20Setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)
-
-The above video shows how to clone the repository, how to use docker-compose file to start containers of RabbitMQ, MongoDB and Radis.
-
-[Registry Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FRegisty%20Setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)
-
-The above video shows how to configure the Protocol-Server in the Registry
-
-[BAP Client and Network Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBAP%20setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)
-
-The above video shows how and what to edit in BAP Client and Network yaml files and how to deploy using docker
-
-[BPP Client and Network Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBPP%20setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)
-
-The above video shows how and what to edit in BPP Client and Network yaml files and how to deploy using docker
-
-[Video of Protocol Server - Server Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
-
+| **No.** | **Video Title**                                 | **Video Description**                                                                                                                     | **Video URL**                                                                                                                                                                                                                                                                                                                                            |
+|---------|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1       | Basic Prerequisites Video                      | Learn how to clone the repository and use the docker-compose file to start containers for RabbitMQ, MongoDB, and Radis.                   | [Basic Setup Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBasic%20Setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)                                |
+| 2       | Registry Setup Video                            | Configure the Protocol-Server in the Registry through step-by-step guidance.                                                           | [Registry Setup Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FRegisty%20Setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)                                   |
+| 3       | BAP Client and Network Setup Video             | Understand the editing process of BAP Client and Network yaml files and deploying them using Docker.                                   | [BAP Setup Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts/15/stream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBAP%20setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)                                        |
+| 4       | BPP Client and Network Setup Video             | Walkthrough the process of editing BPP Client and Network yaml files and deploying them using Docker.                                  | [BPP Setup Video](https://mindsenterprise-my.sharepoint.com/personal/bhanuprakash_reddy_eminds_ai/_layouts%2F15%2Fstream.aspx?id=%2Fpersonal%2Fbhanuprakash%5Freddy%5Feminds%5Fai%2FDocuments%2FVideos%2FPS%2DSetup%2FBPP%20setup%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview)                                      |
+| 5       | Protocol Server - Server Setup Video           | A comprehensive guide for the entire Protocol-Server deployment process.                                                                  | [Server Setup Video](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D) |
 The above video is a complete video for Protocol-Server deployment.
 
 **Note**: This setup is done on an Ubuntu server for setting up the protocol-server. Download the supporting Applications (Node, Npm, Docker) as per your System/Machine
