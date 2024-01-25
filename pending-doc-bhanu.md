@@ -57,4 +57,4 @@ _(Optional)_
 Protocol server can be setup in two env.
 
 1. Local System (Dev env) - [Link to local-setup.md](https://github.com/beckn/protocol-server/blob/devops/local-setup.md)
-2. Production env - [Link to prod-setup.md](https://github.com/beckn/protocol-server/blob/devops/prod-setup.md)
+2. Production env - [Link to prod-setup.md](https://github.com/beckn/protocol-server/blob/devops/new-prod-setup.md)
