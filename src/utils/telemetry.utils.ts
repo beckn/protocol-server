@@ -39,14 +39,14 @@ export function createTelemetryEvent(message: any) {
             uri: getConfig().app.subscriberUri
         },
         source: {
-            id: getConfig().app.subscriberId,
-            type: getConfig().app.mode === "bap" ? "seeker" : "provider",
-            uri: getConfig().app.subscriberUri
+            id: message.context.action.includes("on_") ? message.context.bpp_id : message.context.bap_id,
+            type: message.context.action.includes("on_") ? "provider" : "seeker",
+            uri: message.context.action.includes("on_") ? message.context.bpp_uri : message.context.bap_uri
         },
         target: {
-            id: getConfig().app.mode === "bap" ? message.context.bpp_id : message.context.bap_id,
-            type: getConfig().app.mode === "bap" ? "provider" : "seeker",
-            uri: getConfig().app.mode === "bap" ? message.context.bpp_uri : message.context.bap_uri
+            id: message.context.action.includes("on_") ? message.context.bap_id : message.context.bpp_id,
+            type: message.context.action.includes("on_") ? "seeker" : "provider",
+            uri: message.context.action.includes("on_") ? message.context.bap_uri : message.context.bpp_uri
         },
         cdata: constructCdata(message)
     };
