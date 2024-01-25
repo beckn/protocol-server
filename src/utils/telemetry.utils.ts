@@ -117,9 +117,9 @@ export async function processTelemetry() {
         settled_messages.bpp_client_settled.length + 
         settled_messages.bpp_request_settled.length;
     logger.info(`Telemetry events count - ${events_count}`)
-    // If last sync time is more than syncInterval(minutes) thens sync
+    // If last sync time is more than syncInterval(minutes) then sync
     if (now - last_sync_time > getConfig().app.telemetry.syncInterval * 60 * 1000 || events_count >= getConfig().app.telemetry.batchSize) {
-        logger.info("Pushing telemetry to server")
+        logger.info("Pushing telemetry to server...")
         const payload_data = Object.values(settled_messages).flat();
         const client = new RedisClient(getConfig().app.telemetry.redis_db, true);
         try {
