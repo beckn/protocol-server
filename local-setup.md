@@ -60,9 +60,9 @@
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BAP-Network to Internet follow [Exposing local Protocol-server to Internet]
+8. To expose local PS-BAP-Network to Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#exposing-local-protocol-server-to-internet)
 
-9. After generating URL follow [Registering on BECKN Registry] to register the PS-BAP-Network.
+9. After generating URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#registering-on-beckn-registry) to register the PS-BAP-Network.
 
 10. After Registering, Now Configure the `default.yml` of both PS-BAP-Client and PS-BAP-Network as per below specification.
 
@@ -148,9 +148,9 @@
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BPP-Network to Internet follow [Exposing local Protocol-server to Internet]
+8. To expose local PS-BPP-Network to Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#exposing-local-protocol-server-to-internet)
 
-9. After generating URL follow [Registering on BECKN Registry] to register the PS-BPP-Network.
+9. After generating URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#registering-on-beckn-registry) to register the PS-BPP-Network.
 
 10. After Registering, Now Configure the `default.yml` of both PS-BPP-Client and PS-BPP-Network as per below specification.
 
