@@ -42,6 +42,11 @@ This server listens to the Message Queue, forwards requests to the client-side a
 
 This server listens to the Message Queue, forwards requests to the respective Participant or BG, and validates incoming requests from Participants & BG based on the Standard Beckn Open API schema. It also verifies the signature sent from clients to ensure data integrity.
 
+### Webhook 
+
+This is a Node.js application designed to function as an intermediary layer between the BPP client and the actual data source application. The application's workflow involves receiving requests from the BPP client, responding with an acknowledgment (ACK) to the BPP client, forwarding the original request to the actual data source application, receiving the response from the data source, and finally, initiating the reverse flow. The reverse flow includes triggering the 'on_action' routes of the BPP client, and the response then flows backward in the opposite direction.
+
+[URL for Webhook-Sandbox](https://github.com/beckn/beckn-sandbox-webhook)
 # Prerequisites
 
 To run the application, make sure you have the following installed:
