@@ -1,18 +1,18 @@
 # Protocol Server Setup Guide for Local System
 
-# pre-requisites 
+## prerequisites 
 
 [Node](https://nodejs.org/en/download)
 
 [Docker](https://www.docker.com/products/docker-desktop/)
 
-# Setting up Protocol-server BAP-Client and BAP-Network
+## Setting up Protocol-server BAP-Client and BAP-Network instance
 
 <br>
 
-## BAP
-
-1.To Install Protocol Server : BAP-Client and BAP-Network. Clone the protocol-server repository two times and rename as PS-BAP-Client and PS-BAP-Network.
+1. Clone the protocol-server repository twice and rename the project folders to
+   1. PS-BAP-Client
+   2. PS-BAP-Network
 
    ```
    git clone https://github.com/beckn/protocol-server.git
@@ -21,22 +21,22 @@
    npm i
    ```
 
-2. Create default.yml file in PS-BAP-Client dir at location `~/config/default.yml`. 
+2. Create default.yml file in PS-BAP-Client directory at location `~/config/default.yml`. 
 
-3. Create default.yml file in PS-BAP-Network dir at location `~/config/default.yml`
+3. Create default.yml file in PS-BAP-Network directory at location `~/config/default.yml`
 
-4. Navigate to `docker` dir in PS-BAP-Client/PS-BAP-Network for `docker-compose.yml` file to run dockeer containers of redis, mongodb and rabbitmq.
+4. To install Redis, MongoDB and RabbitMQ on docker, navigate to `docker` directory in either PS-BAP-Client or PS-BAP-Network and run docker-compose using below command.
 
-[NOTE]This step required only once. These containers can be used same for the BAP-Client, BAP-Network & BPP-Client, BPP-Network
+__NOTE: The same instance of Redis, MongoDB, and RabbitMQ can be used for the BAP-Client, BAP-Network & BPP-Client, BPP-Network__ 
 
    ```
    cd docker
    docker-compose up -d
    ```
 
-5. Copy the content of `~/config/samples/bap-client.yaml` and paste it to `~/config/default.yml` in BAP-client.  
+5. Copy the content of `PS-BAP-Client/config/samples/bap-client.yaml` and paste it to `PS-BAP-Client/config/default.yml`.  
 
-6. copy the content of `~/config/samples/bap-network.yaml` and paste it to `~/config/default.yml` in BAP-network.  
+6. copy the content of `PS-BAP-Network/config/samples/bap-network.yaml` and paste it to `PS-BAP-Network/config/default.yml`.  
 
 7. To generate key pairs that will be used in registry entry and `default.yml` files, go into PS-BAP-Network dir and run
 
@@ -60,36 +60,38 @@
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BAP-Network to Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#exposing-local-protocol-server-to-internet)
+8. To expose local PS-BAP-Network to the Internet follow [Exposing local Protocol-server to Internet]
 
-9. After generating URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#registering-on-beckn-registry) to register the PS-BAP-Network.
+9. After generating the public URL follow [Registering on BECKN Registry] to register the PS-BAP-Network on Beckn registry.
 
-10. After Registering, Now Configure the `default.yml` of both PS-BAP-Client and PS-BAP-Network as per below specification.
+10. After Registration, configure the `default.yml` of both PS-BAP-Client and PS-BAP-Network as per the details provided below.
 
-   - **Port:** Enter the port where you want to run your application.
 
-   - **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
+      - **Port:** Enter the port where you want to run your application.
+      
+      - **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
+      
+      - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file. This url will also be used in synchronous mode as `mongoURL`
+      
+      - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
+      
+      - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
+      
+      - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
+      
+      - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
+      
+      - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
 
-   - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file. This url will also be used in synchronous mode as `mongoURL`
+     
 
-   - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
-
-   - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
-
-   - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
-
-   - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
-
-   - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
-     <br><br>
-
-11. To run the `BAP-Client` in Development Mode (For Debug Purposes) :
+11. Run the `BAP-Client` in Development Mode :
 
       ```bash
       cd PS-BAP-Client
       npm run dev
       ```
-12. To run the `BAP-Network` in Development Mode (For Debug Purposes) :
+12. Run the `BAP-Network` in Development Mode :
 
 
       ```bash
@@ -97,10 +99,13 @@
       npm run dev
       ```
 
-## BPP :
+## Setting up Protocol-server BPP-Client and BPP-Network instance
 
 
-1. To Install Protocol Server : BPP-Client and BPP-Network. Clone the protocol-server repository two times and rename as PS-BPP-Client and PS-BPP-Network.
+
+1. Clone the protocol-server repository twice and rename the project folders to
+   1. PS-BPP-Client
+   2. PS-BPP-Network
 
    ```
    git clone https://github.com/beckn/protocol-server.git
@@ -109,24 +114,24 @@
    npm i
    ```
 
-2. Create default.yml file in PS-BPP-Client dir at location `~/config/default.yml`. 
+2. Create default.yml file in PS-BPP-Client directory at location `~/config/default.yml`. 
 
-3. Create default.yml file in PS-BPP-Network dir at location `~/config/default.yml`
+3. Create default.yml file in PS-BPP-Network directory at location `~/config/default.yml`
 
-4. Navigate to `docker` dir in PS-BPP-Client/PS-BPP-Network for `docker-compose.yml` file to run dockeer containers of redis, mongodb and rabbitmq.
+4. To install Redis, MongoDB and RabbitMQ on docker, navigate to `docker` directory in either PS-BPP-Client or PS-BPP-Network and run docker-compose using the below command.
 
-      [NOTE] This step required only once if executed earlier for `BAP` skip this. These containers can be used same for the BPP-Client, BPP-Network & BPP-Client, BPP-Network
+__NOTE: The same instance of Redis, MongoDB, and RabbitMQ can be used for the BAP-Client, BAP-Network & BPP-Client, BPP-Network__ 
 
    ```
    cd docker
    docker-compose up -d
    ```
 
-5. Copy the content of `~/config/samples/BPP-client.yaml` and paste it to `~/config/default.yml` in BPP-client.  
+5. Copy the content of `BPP-client/config/samples/BPP-client.yaml` and paste it to `BPP-client/config/default.yml`.  
 
-6. copy the content of `~/config/samples/BPP-network.yaml` and paste it to `~/config/default.yml` in BPP-network.  
+6. copy the content of `BPP-network/config/samples/BPP-network.yaml` and paste it to `BPP-network/config/default.yml`.  
 
-7. To generate key pairs that will be used in registry entry and `default.yml` files, go into PS-BPP-Network dir and run
+7. To generate key pairs that will be used in registry entry and `default.yml` files, go into PS-BPP-Network directory and run
 
    ```bash
    npm run generate-keys
@@ -148,37 +153,37 @@
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BPP-Network to Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#exposing-local-protocol-server-to-internet)
+8. To expose local PS-BPP-Network to the Internet follow [Exposing local Protocol-server to Internet]
 
-9. After generating URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/devops/local-setup.md#registering-on-beckn-registry) to register the PS-BPP-Network.
+9. After generating the public URL follow [Registering on BECKN Registry] to register the PS-BPP-Network on Beckn registry.
 
-10. After Registering, Now Configure the `default.yml` of both PS-BPP-Client and PS-BPP-Network as per below specification.
+10. After registration, configure the `default.yml` of both PS-BPP-Client and PS-BPP-Network as per the details provided below.
 
-   - **Port:** Enter the port where you want to run your application.
-
-   - **Cache:** Change the host and port where your Redis is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
-
-   - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file.
-
-   - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
-
-   - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
-
-   - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
-
-   - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
-
-   - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
-
-   - **Webhook URL:** Copy the public URL generated by the local-tunnel for webhook.
+      - **Port:** Enter the port where you want to run your application.
+   
+      - **Cache:** Change the host and port where your Redis is running. If running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0" and `port` to 6379.
+   
+      - **Response Cache:** Change the host and port where your MongoDB is running. If you are running it on the same machine using a Docker Compose file, set `host` to "0.0.0.0," `port` to 27017, and provide the username, password, and database as set in the Docker Compose file.
+   
+      - **Private Key:** Copy the private key generated in the Key-Pair Generation step.
+   
+      - **Public Key:** Copy the public key generated in the Key-Pair Generation step.
+   
+      - **Subscriber Id:** Copy the subscriber ID from the respective Registry entry.
+   
+      - **Subscriber Uri:** Copy the subscriberUri from the Registry entry.
+   
+      - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
+   
+      - **Webhook URL:** Copy the public URL generated by the local-tunnel for webhook.
      <br><br>
- 11. To run the `BPP-Client` in Development Mode (For Debug Purposes) :
+ 11. Run the `BPP-Client` in Development Mode :
 
       ```bash
       cd PS-BPP-Client
       npm run dev
       ```
-12. To run the `BPP-Network` in Development Mode (For Debug Purposes) :
+12. Run the `BPP-Network` in Development Mode :
 
 
       ```bash
@@ -194,9 +199,8 @@
 2. Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
    [Example: `lt --port 5001 --subdomain beckn-bap-network`]
 
-## [NOTE]
-
-Whenever the system or LocalTunnel is restarted the the generated localtunnel DNS will be changed. We have to register the new generated localtunnel DNS after restart in Registry and default.yml files respectively.  
+__NOTE:
+Whenever the system or LocalTunnel is restarted the the generated localtunnel DNS will be changed. We have to register the newly generated local tunnel DNS after restarting the registry and default.yml files respectively.__  
 <br>
 
 # Registering on BECKN Registry
