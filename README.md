@@ -1,237 +1,71 @@
-# Beckn Protocol Server
+# Introduction
 
-## Introduction
+The Beckn Protocol Server is a service that helps applications in connecting to the Beckn Network. It follows the Beckn Protocol, making it easier for applications to begin using Beckn Protocol. Any network participant can run this server and connect with the Beckn Network.
 
-### Overview
+# Use of Protocol Server
 
-Beckn Protocol Server is a service that helps the application connect to Beckn Network. It follows the [Beckn Protocol](https://beckn.network/protocol) and makes it more accessible for the applications to get started with Beckn implementation. Any network participant can run this server and connect to Beckn Network.
+The Protocol Server is the application that facilitates interaction between BAP and BPP with the network. Besides network interaction, it also validates network participants and keeps track of requests and responses made to the network or any network participant.
 
-### Features
+# Architecture
 
-- Connects a client application with the Beckn network.
-- Acts as BAP Adaptor in case of Beckn Application Platform.
-- Acts as BPP Adaptor in case of Beckn Provider Platform.
-- Validates each request as per the Beckn Network’s Open API schema.
-- Generates signatures for the outgoing requests and validates signatures for the incoming requests.
-- Stores log for each process.
-- Comes with key generation scripts for the Network participants.
+![image](https://github.com/beckn/protocol-server/blob/devops/guides/images/general-architecture.png)
 
-## Architecture
+# Components of protocol server
+In the case of BAP
+1. Protocol server - Client-Facing
+2. Protocol server - Network-Facing
+   
+In the case of BPP
+1. Protocol server - Client-Facing
+2. Protocol server - Network-Facing
+3. Webhook
 
-![Alt text](guides/images/general-architecture.png)
+*__\* Client and Network run the same codebase. For running the protocol server in BAP or BPP mode only change needed is at the configuration level.\*__*
 
-There would 2 instances of Protocol Server that is running. One is `Client` facing and the other is `Network` facing.
+## BAP Scenario
 
-#### In the case of BAP
+### Client-Facing Protocol Server
 
-`Client` facing Protocol Server manages building the context, validating the request body as per the Standard Beckn Open API schema, listens to the Message Queue, Aggregates the results in the case of Synchronous mode and forwards the results to the client side application as a webhook callback.
+This server manages context building, validates request bodies based on the Standard Beckn Open API schema, listens to the Message Queue, aggregates results in Synchronous mode, and forwards the results to the client-side application as a webhook callback.
 
-`Network` facing Protocol Server manages forwarding the request to the respective Participant or Beckn Gateway (BG). Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
+### Network-Facing Protocol Server
 
-#### In the case of BPP
+This server forwards requests to the respective Participant or Beckn Gateway (BG). It validates incoming requests from Participants & BG according to the Standard Beckn Open API schema and verifies the signature sent from clients to ensure data integrity.
 
-`Client` facing Protocol Server listens to the Message Queue and forwards the request to client side application, exposes an endpoint where the client side application can send the results to the network which is again validated against the Standard Beckn Open API schema and pushed to the network facing Protocol Server.
+## BPP Scenario
 
-`Network` facing Protocol Server also listens to the Message Queue and forwards the request to the respective Participant or BG. Also it validates the incoming requests from Participants & BG as per the Standard Beckn Open API schema and then validates the signature sent from the clients to ensure the data integrity.
+### Client-Facing Protocol Server
 
-## Installation
+This server listens to the Message Queue, forwards requests to the client-side application, exposes an endpoint for the client-side application to send results to the network. The received data is validated against the Standard Beckn Open API schema and pushed to the network-facing Protocol Server.
 
-### Requirements
+### Network-Facing Protocol Server
 
-- Node.js version 16 or above
-- npm version 8 or above
-- MongoDB version 4.4 or above
-- RabbitMQ version 3.8 or above
-- Redis version 6.2 or above
+This server listens to the Message Queue, forwards requests to the respective Participant or BG, and validates incoming requests from Participants & BG based on the Standard Beckn Open API schema. It also verifies the signature sent from clients to ensure data integrity.
 
-(Optional)
+### Webhook 
 
-- Docker version 20.10 or above
+This is a Node.js application designed to function as an intermediary layer between the BPP client and the actual data source application. The application's workflow involves receiving requests from the BPP client, responding with an acknowledgment (ACK) to the BPP client, forwarding the original request to the actual data source application, receiving the response from the data source, and finally, initiating the reverse flow. The reverse flow includes triggering the 'on_action' routes of the BPP client, and the response then flows backward in the opposite direction.
 
+[URL for Webhook-Sandbox](https://github.com/beckn/beckn-sandbox-webhook)
+# Prerequisites
 
-### Download
+To run the application, make sure you have the following installed:
 
-As the Protocol Server repository is Public, clone the repository and checkout to v2 branch.
+- [Node.js](https://nodejs.org/) version 16 or above
+- [npm](https://www.npmjs.com/) version 8 or above
+- [MongoDB](https://www.mongodb.com/) version 4.4 or above
+- [RabbitMQ](https://www.rabbitmq.com/) version 3.8 or above
+- [Redis](https://redis.io/) version 6.2 or above
 
-```bash
-git clone https://github.com/beckn/protocol-server.git
-```
+_(Optional)_
 
-```bash
-cd protocol-server
-```
+- [Docker](https://www.docker.com/) version 20.10 or above
 
-```bash
-git checkout master
-```
+**Note:** It's recommended to set up Docker Desktop to use docker-compose for development environments (Windows/Mac). We suggest configuring MongoDB, RabbitMQ, and Redis using Docker.
 
-### Install
+# Protocol Server Setup Guide
 
-You can utilize Docker to deploy the MongoDB, RabbitMQ and Redis services. We've included an illustrative docker-compose file located in `docker/docker-compose.yaml`.
+The protocol server can be set up in two env.
 
-To set things up effortlessly, run the `setup.sh` command. This command not only copies the Follow file to your home directory but also generates a `docker_data` directory. Within this directory, you'll find the `docker-compose.yaml` file for configuring the aforementioned services.
-
-Additionally, here's a list of files included for your reference:
-
- - `deploy-bap.sh`
- - `deploy-bpp.sh`
- - `dfault-bap-client.yml`
- - `dfault-bap-network.yml`
- - `dfault-bpp-client.yml`
- - `dfault-bpp-network.yml`
-
-Feel free to explore and use these resources as needed for your setup.
-
-Please set the user name and password as per requirement in docker-compose.yaml file inside docker_data directory. 
-
-```bash
-bash setup.sh
-```
-
-Installation of the Protocol Server consists of installing the necessary dependencies and building the project as the project is written in TypeScript.
-
-```bash
-npm i
-```
-
-```bash
-npm run build
-```
-
-### Key-Pair Generation
-
-Beckn Protocol Server comes with key generation scripts for the Network participants. You can use the scripts to generate the keys for the Network participants.
-
-**NOTE:** To generate the key pairs, the above steps must be completed.
-
-```bash
-npm run generate-keys
-```
-
-#### Sample Output
-
-```
-Generating Key Pairs...
-
-Key Pairs Generated
-
-Your Public Key :
-
-taRF+XAJ3o2E3NDWPj5fPGq5HTVNqa/DKPx8VTpMvlg=
-
-Your Private Key :
-
-Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
-
-Please save your keys in a secure location.
-```
-
-## Configure
-
-### Register Local BAP and BPP Networks:
-- Access the [Registry URL](https://registry.becknprotocol.io/login).
-- Log in using your Gmail ID.
-
-### Create Network Participants:
-- In the Registry, navigate to the admin tab and select "Network Participant."
-- Click the "+" icon to create entries for both the BAP and BPP networks.
-- Enter ParticipantIDs for each network, for BAP Network and BPP Network. (Note: We will call this as "subscriberIDs" going further.)
-
-### Configure Network Roles:
-- Edit the created entries for BAP and BPP networks.
-- Select the "Network Role Tab."
-- Choose the network domain (leave it blank for universal BAP/BPP).
-- Set the Type as "BAP" for BAP network and "BPP" for BPP network.
-- Enter the respective "SubscriberID" created in step [Create Network Participants](https://github.com/beckn/protocol-server/tree/devops#create-network-participants)
-- Set the Status field to "subscribed."
-
-### Set Up Local Tunneling:
-- Install `localtunnel` globally using `npm install -g localtunnel`.
-- Run `lt --port <BAP/BPP network port> --subdomain <any subdomain>` for both BAP and BPP networks (use the same subdomain each time for consistency).
-
-### Update Registry URLs:
-- Copy the generated URLs and paste them in the URL field on the respective network role tab in the Registry.
-- Save the changes.
-
-### Configure Participant Keys:
-- In the Registry, navigate to the participant key tab for both BAP and BPP networks.
-- Click the "+" icon to add a participant key entry.
-- Provide a key (used as uniqueKey in default.yml).
-- Copy the generated public keys in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation) and paste them in the "Signing Public Key" and "Encryption Public Key" fields.
-- Set the Valid from date to the current date and the Valid until date to a date at least one year ahead.
-- Check the "Verified" checkbox and save the entry.
-
-### Update Configuration Files which we have copied at home directory
--   In the BAP Client and BAP Network codebases, update the `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` file with the following values:
-    -   Private Key: Copy the private key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Public Key: Copy the public key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
-    -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
-    -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
--   In the BPP Client and BPP Network codebases, update the `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` file with the following values:
-    -   Private Key: Copy the private key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Public Key: Copy the public key generated in step [Key-Pair Generation](https://github.com/beckn/protocol-server/blob/master/README.md#key-pair-generation).
-    -   Subscriber Id: Copy the subscriber ID from the respective Registry entry.
-    -   Subscriber Uri: Copy the subscriberUri from the Registry entry.
-    -   Unique Key: Copy the participant-key from the Registry entry (participant key tab).
-    -   WebhookURL: Copy paste the URL that you generate by running localtunnel for sandbox-webhook
-
-### Configure Telemetry
--   In the BAP Client and BAP Network codebases, update the:
-    - `~/dfault-bap-client.yml`
-    - `~/dfault-bap-network.yml`
-    - `~/dfault-bpp-client.yml` 
-    - `~/dfault-bpp-network.yml`
-- To enable to telemetry, set the `telemetry.enabled` to `true` and update the following fields:
-    -   `url`: Populate the telemetry server URL, which accepts data in a `POST` request.
-        -  Example Payload for telemetry server:
-        ```json
-            {
-                "data": {
-                    "id": "UUID",
-                    "events": []
-                }
-            }
-        ```
-    -   `redis_db`: Redis db to write telemetry data if the telemetry server is not reachable
-    -   `batchCount`: No. of events to be batched before sending to telemetry server
-    -   `syncInterval`: Interval in minutes to send telemetry data to telemetry server
-
-### Run
-
-##### Docker deployment
-Update the port number inside the deploy-bap.sh and deploy-bpp.sh which you have mentioned in the default.yml file.
-Execute `~/deploy-bap.sh` file to deploye the the BAP Client and Network. 
-
-Execute `~/deploy-bpp.sh` file to deploye the the BPP Client and Network.
-
-
-##### PM2 deployment
-
-For PM2 deployment you need to git clone protocol-server four times to setup the BAP Client and Network and BPP Client and Network. Then copy `~/dfault-bap-client.yml` and `~/dfault-bap-network.yml` to config directory in respective git clone directory of BAP Client and Network. 
-Also copy `~/dfault-bpp-client.yml` and `~/dfault-bpp-network.yml` to config directory in respective git clone directory of BPP Client and Network. 
-
-After configuration, Protocol Server can be run as below.
-
-To run the instance in Development Mode (For Debug Purposes):
-
-```bash
-npm run dev
-```
-
-To run the instance in Production Mode:
-
-```bash
-npm i -g pm2
-pm2 start ecosystem.config.js
-```
-
-## Recoding on steps to set up Protocol Server using Docker:
-
-[Protocol Server - Local Setup](https://mindsenterprise-my.sharepoint.com/:v:/g/personal/bhanuprakash_reddy_eminds_ai/ETpBtz75kFhAg4pxXn0t8VYB5g_Y0lum6Ln7bGyjYlJSNQ?e=yT46uj&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D)
-
-**NOTE:** If the same server is used to host both the instances of Protocol Server, then make sure to edit the app name in ecosystem.config.js file as per the instance.
-
-### License
-
-This project is maintained under an MIT License
+1. Local System (Dev env) - [Link to local-setup.md](https://github.com/beckn/protocol-server/blob/devops/local-setup.md)
+2. Production env - [Link to prod-setup.md](https://github.com/beckn/protocol-server/blob/devops/new-prod-setup.md)
