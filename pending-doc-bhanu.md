@@ -2,15 +2,25 @@
 
 The Beckn Protocol Server is a service that helps applications in connecting to the Beckn Network. It follows the Beckn Protocol, making it easier for applications to begin using Beckn Protocol. Any network participant can run this server and connect with the Beckn Network.
 
+# Use of Protocol Server
+
+The Protocol Server is the application that facilitates interaction between BAP and BPP with the network. Besides network interaction, it also validates network participants and keeps track of requests and responses made to the network or any network participant.
+
 # Architecture
 
 ![image](https://github.com/beckn/protocol-server/blob/devops/guides/images/general-architecture.png)
 
-# Parts of Protocol Server - Client/Network and Webhook in Case of BPP
+# Components of protocol server
+In the case of BAP
+1. Protocol server - Client-Facing
+2. Protocol server - Network-Facing
+   
+In the case of BPP
+1. Protocol server - Client-Facing
+2. Protocol server - Network-Facing
+3. Webhook
 
-## Client and Network Roles
-
-There are two instances of the Protocol Server running: one for the client side and the other for the network side.
+*__\* Client and Network run the same codebase. For running the protocol server in BAP or BPP mode only change needed is at the configuration level.\*__*
 
 ## BAP Scenario
 
@@ -32,11 +42,7 @@ This server listens to the Message Queue, forwards requests to the client-side a
 
 This server listens to the Message Queue, forwards requests to the respective Participant or BG, and validates incoming requests from Participants & BG based on the Standard Beckn Open API schema. It also verifies the signature sent from clients to ensure data integrity.
 
-# Use of Protocol Server
-
-The Protocol Server is the application that facilitates interaction between BAP and BPP with the network. Besides network interaction, it also validates network participants and keeps track of requests and responses made to the network or any network participant.
-
-# Requirements
+# Prerequisites
 
 To run the application, make sure you have the following installed:
 
@@ -54,7 +60,7 @@ _(Optional)_
 
 # Protocol Server Setup Guide
 
-Protocol server can be setup in two env.
+The protocol server can be set up in two env.
 
 1. Local System (Dev env) - [Link to local-setup.md](https://github.com/beckn/protocol-server/blob/devops/local-setup.md)
 2. Production env - [Link to prod-setup.md](https://github.com/beckn/protocol-server/blob/devops/new-prod-setup.md)
