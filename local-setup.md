@@ -1,44 +1,44 @@
 # Protocol Server Setup Guide for Local System
 
-## Cloning the GitHub Repository
+# pre-requisites 
 
-Since the Protocol Server repository is public, you can clone it and switch to the main branch using the following commands:
+[Node](https://nodejs.org/en/download)
 
-```
-git clone https://github.com/beckn/protocol-server.git
-cd protocol-server
-git checkout master
-```
+[Docker](https://www.docker.com/products/docker-desktop/)
 
-# Setups required for BAP/BPP
+# Setting up Protocol-server BAP-Client and BAP-Network
 
 <br>
 
-## BAP :
+## BAP
 
-1. Installing Protocol Server do git clone two times one for BAP-Client and one for BAP-Network.
+1.To Install Protocol Server : BAP-Client and BAP-Network. Clone the protocol-server repository two times and rename as PS-BAP-Client and PS-BAP-Network.
 
    ```
    git clone https://github.com/beckn/protocol-server.git
-   ```
-
-   Rename the folders accordingly. And switch to master branch in both the folders and install Node dependencies.
-
-   ```
    cd {folder_name}
    git checkout master
    npm i
    ```
 
-2. Create default.yml file in both the folders at location `~/config/default.yml`
-3. Navigate to `~/docker` in your terminal to run the command to start the redis, mongodb and rabitmq.
+2. Create default.yml file in PS-BAP-Client dir at location `~/config/default.yml`. 
+
+3. Create default.yml file in PS-BAP-Network dir at location `~/config/default.yml`
+
+4. Navigate to `docker` dir in PS-BAP-Client/PS-BAP-Network for `docker-compose.yml` file to run dockeer containers of redis, mongodb and rabbitmq.
+
+[NOTE]This step required only once. These containers can be used same for the BAP-Client, BAP-Network & BPP-Client, BPP-Network
 
    ```
+   cd docker
    docker-compose up -d
    ```
 
-4. Copy the content of `~/config/samples/bap-client.yaml` for BAP-Client and for BAP-Network copy `~/config/samples/bap-network.yaml` and paste it to `~/config/default.yml` of respective BAP-client and BAP-network.  
-5. Now generate key pairs that will be used in registry entry and `default.yml` files.
+5. Copy the content of `~/config/samples/bap-client.yaml` and paste it to `~/config/default.yml` in BAP-client.  
+
+6. copy the content of `~/config/samples/bap-network.yaml` and paste it to `~/config/default.yml` in BAP-network.  
+
+7. To generate key pairs that will be used in registry entry and `default.yml` files, go into PS-BAP-Network dir and run
 
    ```bash
    npm run generate-keys
@@ -60,7 +60,11 @@ git checkout master
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-6. Now Configure the `default.yml` of both BAP-Client and BAP-Network as per below specification.
+8. To expose local PS-BAP-Network to Internet follow [Exposing local Protocol-server to Internet]
+
+9. After generating URL follow [Registering on BECKN Registry] to register the PS-BAP-Network.
+
+10. After Registering, Now Configure the `default.yml` of both PS-BAP-Client and PS-BAP-Network as per below specification.
 
    - **Port:** Enter the port where you want to run your application.
 
@@ -79,33 +83,50 @@ git checkout master
    - **Unique Key:** Copy the participant-key from the Registry entry (participant key tab).
      <br><br>
 
+11. To run the `BAP-Client` in Development Mode (For Debug Purposes) :
+
+      ```bash
+      cd PS-BAP-Client
+      npm run dev
+      ```
+12. To run the `BAP-Network` in Development Mode (For Debug Purposes) :
+
+
+      ```bash
+      cd PS-BAP-Network
+      npm run dev
+      ```
+
 ## BPP :
 
-1. Installing Protocol Server do git clone two times one for BAP-Client and one for BAP-Network.
+
+1. To Install Protocol Server : BPP-Client and BPP-Network. Clone the protocol-server repository two times and rename as PS-BPP-Client and PS-BPP-Network.
 
    ```
    git clone https://github.com/beckn/protocol-server.git
-   ```
-
-   Rename the folders accordingly. And switch to master branch in both the folders and install Node dependencies.
-
-   ```
    cd {folder_name}
    git checkout master
    npm i
    ```
 
-2. Create default.yml file in both the folders at location `~/config/default.yml`
-3. Navigate to `~/docker` in your terminal to run the command to start the redis, mongodb and rabitmq.
+2. Create default.yml file in PS-BPP-Client dir at location `~/config/default.yml`. 
+
+3. Create default.yml file in PS-BPP-Network dir at location `~/config/default.yml`
+
+4. Navigate to `docker` dir in PS-BPP-Client/PS-BPP-Network for `docker-compose.yml` file to run dockeer containers of redis, mongodb and rabbitmq.
+
+      [NOTE] This step required only once if executed earlier for `BAP` skip this. These containers can be used same for the BPP-Client, BPP-Network & BPP-Client, BPP-Network
 
    ```
+   cd docker
    docker-compose up -d
    ```
 
-   Note: If you are doing setup for BAP and BPP both on the same system then please skip this step
+5. Copy the content of `~/config/samples/BPP-client.yaml` and paste it to `~/config/default.yml` in BPP-client.  
 
-4. Copy the content of `~/config/samples/bap-client.yaml` for BAP-Client and for BAP-Network copy `~/config/samples/bap-network.yaml`
-5. Now generate key pairs that will be used in registry entry and `default.yml` files.
+6. copy the content of `~/config/samples/BPP-network.yaml` and paste it to `~/config/default.yml` in BPP-network.  
+
+7. To generate key pairs that will be used in registry entry and `default.yml` files, go into PS-BPP-Network dir and run
 
    ```bash
    npm run generate-keys
@@ -127,7 +148,11 @@ git checkout master
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-6. Now Configure the `default.yml` of both BAP-Client and BAP-Network as per below specification.
+8. To expose local PS-BPP-Network to Internet follow [Exposing local Protocol-server to Internet]
+
+9. After generating URL follow [Registering on BECKN Registry] to register the PS-BPP-Network.
+
+10. After Registering, Now Configure the `default.yml` of both PS-BPP-Client and PS-BPP-Network as per below specification.
 
    - **Port:** Enter the port where you want to run your application.
 
@@ -147,6 +172,19 @@ git checkout master
 
    - **Webhook URL:** Copy the public URL generated by the local-tunnel for webhook.
      <br><br>
+ 11. To run the `BPP-Client` in Development Mode (For Debug Purposes) :
+
+      ```bash
+      cd PS-BPP-Client
+      npm run dev
+      ```
+12. To run the `BPP-Network` in Development Mode (For Debug Purposes) :
+
+
+      ```bash
+      cd PS-BPP-Network
+      npm run dev
+      ```
 
 # Exposing local Protocol-server to Internet
 
@@ -212,14 +250,6 @@ To register on the BECKN Registry, follow these steps:
 - Check the "Verified" checkbox and save the entry.
 
 <br>
-
-## Now go back to the terminal at each instance of the protocol-server to start the application.
-
-To run the instance in Development Mode (For Debug Purposes):
-
-```bash
-npm run dev
-```
 
 ## Local Setup Tutorial Video:
 
