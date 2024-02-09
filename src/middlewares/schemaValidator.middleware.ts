@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import * as OpenApiValidator from "express-openapi-validator";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
+import { getConfig } from "../utils/config.utils";
+
+const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const schemaErrorHandler = (
   err: any,
@@ -14,7 +17,7 @@ export const schemaErrorHandler = (
   } else {
     const errorData = new Exception(
       ExceptionType.OpenApiSchema_ParsingError,
-      "OpenApiValidator Error",
+      `OpenApiValidator Error at ${protocolServerLevel}`,
       err.status,
       err
     );

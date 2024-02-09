@@ -27,6 +27,7 @@ import {
   createTelemetryEvent,
   processTelemetry
 } from "../utils/telemetry.utils";
+const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const bapClientTriggerHandler = async (
   req: Request,
@@ -44,8 +45,7 @@ export const bapClientTriggerHandler = async (
       acknowledgeNACK(res, req.body.context, {
         // TODO: change the error code.
         code: 6781616,
-        message:
-          "All triggers other than search requires bpp_id and bpp_uri. \nMissing bpp_id or bpp_uri",
+        message: `All triggers other than search requires bpp_id and bpp_uri. \nMissing bpp_id or bpp_uri at ${protocolServerLevel}`,
         type: BecknErrorType.contextError
       });
       return;
@@ -65,7 +65,9 @@ export const bapClientTriggerHandler = async (
       getConfig().app.actions.requests[action]?.ttl!
     );
 
-    logger.info("sending message to outbox queue \n\n");
+    logger.info(
+      `Sending message to outbox queue at ${protocolServerLevel}\n\n`
+    );
     logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
 

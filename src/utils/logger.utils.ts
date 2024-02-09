@@ -2,6 +2,14 @@ import * as winston from "winston";
 import "winston-daily-rotate-file";
 import { getLogsConfig } from "./env.utils";
 
+export enum LogLevelEnum {
+  HTTP = "http",
+  ERROR = "error",
+  INFO = "info",
+  WARN = "warn",
+  DEBUG = "debug"
+}
+
 const myFormat = winston.format.printf(
   ({ level, message, label, timestamp }) => {
     return `${timestamp} [${label}] ${level}: ${message}`;
@@ -36,15 +44,6 @@ const logger = winston.createLogger({
       silent: !getLogsConfig().includes("error")
     }),
     new winston.transports.DailyRotateFile({
-      level: "http",
-      filename: "logs/http/%DATE%.log",
-      datePattern: "YYYY-MM-DD-HH",
-      zippedArchive: true,
-      maxSize: "20m",
-      maxFiles: "30d",
-      silent: !getLogsConfig().includes("http")
-    }),
-    new winston.transports.DailyRotateFile({
       level: "warn",
       filename: "logs/warn/%DATE%.log",
       datePattern: "YYYY-MM-DD-HH",
@@ -52,6 +51,16 @@ const logger = winston.createLogger({
       maxSize: "20m",
       maxFiles: "30d",
       silent: !getLogsConfig().includes("warn")
+    }),
+
+    new winston.transports.DailyRotateFile({
+      level: "http",
+      filename: "logs/http/%DATE%.log",
+      datePattern: "YYYY-MM-DD-HH",
+      zippedArchive: true,
+      maxSize: "20m",
+      maxFiles: "30d",
+      silent: !getLogsConfig().includes("http")
     }),
     new winston.transports.DailyRotateFile({
       level: "debug",
