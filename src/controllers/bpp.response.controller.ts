@@ -22,6 +22,12 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
+import { telemetryCache } from "../schemas/cache/telemetry.cache";
+import {
+  createTelemetryEvent,
+  processTelemetry
+} from "../utils/telemetry.utils";
+import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 
 export const bppClientResponseHandler = async (
   req: Request,
@@ -110,6 +116,16 @@ export const bppClientResponseSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
+      // Generate Telemetry if enabled
+      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+        telemetryCache.get("bpp_client_settled")?.push(
+          createTelemetryEvent({
+            context: responseBody.context,
+            data: response
+          })
+        );
+        await processTelemetry();
+      }
       return;
     }
 
@@ -127,13 +143,15 @@ export const bppClientResponseSettler = async (
         break;
       }
       case ClientConfigType.webhook: {
-        errorCallback(context, {
-          // TODO: change the error code.
-          code: 354845,
-          message: "Network call failed",
-          type: BecknErrorType.coreError,
-          data: [response]
-        });
+        if (getConfig().app.gateway.mode !== GatewayMode.network) {
+          errorCallback(context, {
+            // TODO: change the error code.
+            code: 354845,
+            message: "Network call failed",
+            type: BecknErrorType.coreError,
+            data: [response]
+          });
+        }
         break;
       }
     }

@@ -4,8 +4,8 @@ import { getConfig } from "./config.utils";
 import logger from "./logger.utils";
 
 export class RedisClient {
-    constructor(db: number=0) {
-        this.cacheEnabled = false;
+    constructor(db: number = 0, cacheEnabled: boolean = false) {
+        this.cacheEnabled = cacheEnabled;
         try {
             this.redis=new IORedis({
                 host: getConfig().cache.host,
@@ -67,5 +67,13 @@ export class RedisClient {
         else{
             throw new Exception(ExceptionType.Cache_NotIntialized, "Cache is not intialized.", 500);
         }
+    }
+
+    getKeys(pattern: string = "*", count = 100) {
+        const stream = this.redis?.scanStream({
+            match: pattern,
+            count: count
+        });
+        return stream;
     }
 }
