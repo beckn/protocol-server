@@ -15,65 +15,95 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import { createTelemetryEvent, processTelemetry } from "../utils/telemetry.utils";
+import {
+  createTelemetryEvent,
+  processTelemetry
+} from "../utils/telemetry.utils";
 
-export const bppNetworkRequestHandler = async (req: Request, res: Response<{}, Locals>, next: NextFunction, action: RequestActions) => {
-    try {
-        acknowledgeACK(res, req.body.context);
+export const bppNetworkRequestHandler = async (
+  req: Request,
+  res: Response<{}, Locals>,
+  next: NextFunction,
+  action: RequestActions
+) => {
+  try {
+    acknowledgeACK(res, req.body.context);
 
-        const message_id = req.body.context.message_id;
-        const transaction_id = req.body.context.transaction_id;
-        const ttl = moment.duration(req.body.context.ttl).asMilliseconds();
+    const message_id = req.body.context.message_id;
+    const transaction_id = req.body.context.transaction_id;
+    const ttl = moment.duration(req.body.context.ttl).asMilliseconds();
 
-        await RequestCache.getInstance().cache(parseRequestCache(transaction_id, message_id, action, res.locals.sender!), ttl);
-
-        await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
+    await RequestCache.getInstance().cache(
+      parseRequestCache(transaction_id, message_id, action, res.locals.sender!),
+      ttl
+    );
+    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+      telemetryCache
+        .get("bpp_request_handled")
+        ?.push(createTelemetryEvent({ context: req?.body?.context }));
+      await processTelemetry();
     }
-    catch (err) {
-        let exception: Exception | null = null;
-        if (err instanceof Exception) {
-            exception = err;
-        }
-        else {
-            exception = new Exception(ExceptionType.Request_Failed, "BPP Request Failed at bppNetworkRequestHandler", 500, err);
-        }
-
-        logger.error(exception);
+    await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
+  } catch (err) {
+    let exception: Exception | null = null;
+    if (err instanceof Exception) {
+      exception = err;
+    } else {
+      exception = new Exception(
+        ExceptionType.Request_Failed,
+        "BPP Request Failed at bppNetworkRequestHandler",
+        500,
+        err
+      );
     }
+
+    logger.error(exception);
+  }
 };
 
-export const bppNetworkRequestSettler = async (msg: AmqbLib.ConsumeMessage | null) => {
-    try {
-        const requestBody = JSON.parse(msg?.content.toString()!);
-        // Generate Telemetry if enabled
-        if(getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-            telemetryCache.get("bpp_request_settled")?.push(createTelemetryEvent({context: requestBody.context}));
-            await processTelemetry();
-        }
-        switch (getConfig().client.type) {
-            case ClientConfigType.synchronous: {
-                throw new Exception(ExceptionType.Config_ClientConfig_Invalid, "Synchronous mode is not available for BPP.", 500);
-                break;
-            }
-            case ClientConfigType.webhook: {
-                requestCallback(requestBody);
-                break;
-            }
-            case ClientConfigType.messageQueue: {
-                // TODO: implement message queue
-                break;
-            }
-        }
+export const bppNetworkRequestSettler = async (
+  msg: AmqbLib.ConsumeMessage | null
+) => {
+  try {
+    const requestBody = JSON.parse(msg?.content.toString()!);
+    // Generate Telemetry if enabled
+    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+      telemetryCache
+        .get("bpp_request_settled")
+        ?.push(createTelemetryEvent({ context: requestBody.context }));
+      await processTelemetry();
     }
-    catch (err) {
-        let exception: Exception | null = null;
-        if (err instanceof Exception) {
-            exception = err;
-        }
-        else {
-            exception = new Exception(ExceptionType.Request_Failed, "BPP Request Failed at bppNetworkRequestSettler", 500, err);
-        }
-        
-        logger.error(exception)
+    switch (getConfig().client.type) {
+      case ClientConfigType.synchronous: {
+        throw new Exception(
+          ExceptionType.Config_ClientConfig_Invalid,
+          "Synchronous mode is not available for BPP.",
+          500
+        );
+        break;
+      }
+      case ClientConfigType.webhook: {
+        requestCallback(requestBody);
+        break;
+      }
+      case ClientConfigType.messageQueue: {
+        // TODO: implement message queue
+        break;
+      }
     }
-}
+  } catch (err) {
+    let exception: Exception | null = null;
+    if (err instanceof Exception) {
+      exception = err;
+    } else {
+      exception = new Exception(
+        ExceptionType.Request_Failed,
+        "BPP Request Failed at bppNetworkRequestSettler",
+        500,
+        err
+      );
+    }
+
+    logger.error(exception);
+  }
+};
