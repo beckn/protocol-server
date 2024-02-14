@@ -52,7 +52,7 @@ export const bapContextBuilder = async (
       key: context?.key,
       transaction_id: context.transaction_id
         ? context.transaction_id
-        : uuid_v4()
+        : uuid_v4(),
     }
   );
   logger.info(`BAP Context:\n ${JSON.stringify(bapContext)}\n\n`);
@@ -114,7 +114,7 @@ export const bppContextBuilder = (context: any, action: string): any => {
     message_id: context.message_id,
 
     ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
   return bppContext;
 };
