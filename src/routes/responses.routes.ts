@@ -19,6 +19,10 @@ import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 
+// @ts-ignore
+import { telemetryMiddleware } from 'open-network-telemetry-sdk';
+
+
 export const responsesRouter = Router();
 
 // BAP Network-Side Gateway Configuration.
@@ -42,7 +46,8 @@ if (
             next,
             action as ResponseActions
           );
-        }
+        },
+        telemetryMiddleware(getTelemetryConfig())
       );
     } else {
       responsesRouter.post(
@@ -78,7 +83,8 @@ if (
             next,
             action as ResponseActions
           );
-        }
+        },
+        telemetryMiddleware(getTelemetryConfig())
       );
     } else {
       responsesRouter.post(
@@ -89,4 +95,31 @@ if (
       );
     }
   });
+}
+
+function getTelemetryConfig() {
+  const telemetryConfig: any = {
+    "participantId": getConfig().app.subscriberId,
+    "participantUri": getConfig().app.subscriberUri,
+    "role": getConfig().app.mode,
+    "telemetry": {
+      "batchSize": getConfig().app.telemetry.batchSize,
+      "syncInterval": getConfig().app.telemetry.syncInterval,
+      "retry": getConfig().app.httpRetryCount,
+      "storageType": getConfig().app.telemetry.storageType,
+      "backupFilePath": getConfig().app.telemetry.backupFilePath,
+      "redis": {
+        "host": getConfig().cache.host,
+        "port": getConfig().cache.port,
+        "db": getConfig().app.telemetry.redis.db
+      },
+      "network": {
+        "url": getConfig().app.telemetry.network.url
+      },
+      "raw": {
+        "url": getConfig().app.telemetry.raw.url
+      }
+    }
+  }
+  return telemetryConfig;
 }

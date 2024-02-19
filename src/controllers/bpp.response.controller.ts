@@ -22,11 +22,6 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 
 export const bppClientResponseHandler = async (
@@ -38,6 +33,7 @@ export const bppClientResponseHandler = async (
   try {
     acknowledgeACK(res, req.body.context);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
+    next();
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
@@ -116,17 +112,6 @@ export const bppClientResponseSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
-      // Generate Telemetry if enabled
-      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-        console.log("121========>");
-        telemetryCache.get("bpp_client_settled")?.push(
-          createTelemetryEvent({
-            context: responseBody.context,
-            data: response
-          })
-        );
-        await processTelemetry();
-      }
       return;
     }
 

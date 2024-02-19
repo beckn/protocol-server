@@ -22,11 +22,6 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
 
 export const bapClientTriggerHandler = async (
   req: Request,
@@ -150,16 +145,6 @@ export const bapClientTriggerSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
-      // Generate Telemetry if enabled
-      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-        telemetryCache.get("bap_client_settled")?.push(
-          createTelemetryEvent({
-            context: requestBody.context,
-            data: response
-          })
-        );
-        await processTelemetry();
-      }
       return;
     }
 
