@@ -32,12 +32,6 @@ export const bppNetworkRequestHandler = async (
       parseRequestCache(transaction_id, message_id, action, res.locals.sender!),
       ttl
     );
-    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      telemetryCache
-        .get("bpp_request_handled")
-        ?.push(createTelemetryEvent({ context: req?.body?.context }));
-      await processTelemetry();
-    }
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
   } catch (err) {
     let exception: Exception | null = null;
