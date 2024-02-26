@@ -78,6 +78,7 @@ export const bapClientTriggerHandler = async (
       );
     }
   } catch (err) {
+    console.log("Error Occured at bapClientTriggerHandler===>", err);
     let exception: Exception | null = null;
     if (err instanceof Exception) {
       exception = err;
