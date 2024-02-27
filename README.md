@@ -1,3 +1,8 @@
+| Name                          | Version | Release Note                              |
+|-------------------------------|---------|-------------------------------------------|
+| Protocol Server               | v2.0.0  | Enhanced logging                          |
+
+
 # Introduction
 
 The Beckn Protocol Server is a service that helps applications in connecting to the Beckn Network. It follows the Beckn Protocol, making it easier for applications to begin using Beckn Protocol. Any network participant can run this server and connect with the Beckn Network.
