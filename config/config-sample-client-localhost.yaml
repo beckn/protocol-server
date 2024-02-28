@@ -117,4 +117,9 @@ app:
     storageType: "LOCAL"
     backupFilePath: "backups"
     redis:
-      db: 4 
+      db: 4
+  service: 
+    name: "client_service"
+    version: "1.0.0"
+  resource:
+    attributes: {}  

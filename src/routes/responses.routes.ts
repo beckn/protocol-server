@@ -20,11 +20,16 @@ import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 
 // @ts-ignore
-import telemetry from 'open-network-telemetry-sdk-kit';
+import TelemetrySDK from 'beckn-telemetry-sdk';
 
 
 export const responsesRouter = Router();
-responsesRouter.use(telemetry.init(getTelemetryConfig()));
+responsesRouter.use(TelemetrySDK.init(getTelemetryConfig()));
+
+const onAPI = (request: Request, response: Response, next: NextFunction) => {
+  const mode = request.get('mode');
+  TelemetrySDK.onApi({data: { attributes: { mode }}})(request, response, next)
+}
 
 // BAP Network-Side Gateway Configuration.
 if (
@@ -48,7 +53,7 @@ if (
             action as ResponseActions
           );
         },
-        telemetry.onApi({})
+        onAPI
       );
     } else {
       responsesRouter.post(
@@ -85,7 +90,7 @@ if (
             action as ResponseActions
           );
         },
-        telemetry.onApi({})
+        onAPI
       );
     } else {
       responsesRouter.post(
