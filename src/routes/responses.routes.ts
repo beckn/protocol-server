@@ -20,10 +20,11 @@ import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
 
 // @ts-ignore
-import { telemetryMiddleware } from 'open-network-telemetry-sdk';
+import telemetry from 'open-network-telemetry-sdk-kit';
 
 
 export const responsesRouter = Router();
+responsesRouter.use(telemetry.init(getTelemetryConfig()));
 
 // BAP Network-Side Gateway Configuration.
 if (
@@ -47,7 +48,7 @@ if (
             action as ResponseActions
           );
         },
-        telemetryMiddleware(getTelemetryConfig())
+        telemetry.onApi({})
       );
     } else {
       responsesRouter.post(
@@ -84,7 +85,7 @@ if (
             action as ResponseActions
           );
         },
-        telemetryMiddleware(getTelemetryConfig())
+        telemetry.onApi({})
       );
     } else {
       responsesRouter.post(
@@ -119,6 +120,10 @@ function getTelemetryConfig() {
       "raw": {
         "url": getConfig().app.telemetry.raw.url
       }
+    },
+    "service": {
+      "name": getConfig().app.service.name,
+      "version": getConfig().app.service.version
     }
   }
   return telemetryConfig;

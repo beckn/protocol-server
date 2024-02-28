@@ -58,6 +58,12 @@ export const appConfigSchema = z.object({
             db: z.number()
         })
     }),
+
+    service: z.object({
+        name: z.string(),
+        version: z.string()
+    }),
+
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
