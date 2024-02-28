@@ -21,6 +21,7 @@ import { unConfigureActionHandler } from "../controllers/unconfigured.controller
 import * as OpenApiValidator from "express-openapi-validator";
 import fs from "fs";
 import path from "path";
+import { onAPI } from "../utils/telemetry.utils";
 
 export const requestsRouter = Router();
 
@@ -94,7 +95,8 @@ if (
             next,
             action as RequestActions
           );
-        }
+        },
+        onAPI
       );
     } else {
       requestsRouter.post(

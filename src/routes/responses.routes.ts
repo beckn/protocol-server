@@ -18,18 +18,9 @@ import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
-
-// @ts-ignore
-import TelemetrySDK from 'beckn-telemetry-sdk';
-
+import { onAPI } from "../utils/telemetry.utils";
 
 export const responsesRouter = Router();
-responsesRouter.use(TelemetrySDK.init(getTelemetryConfig()));
-
-const onAPI = (request: Request, response: Response, next: NextFunction) => {
-  const mode = request.get('mode');
-  TelemetrySDK.onApi({data: { attributes: { mode }}})(request, response, next)
-}
 
 // BAP Network-Side Gateway Configuration.
 if (
@@ -89,8 +80,7 @@ if (
             next,
             action as ResponseActions
           );
-        },
-        onAPI
+        }
       );
     } else {
       responsesRouter.post(
@@ -101,35 +91,4 @@ if (
       );
     }
   });
-}
-
-function getTelemetryConfig() {
-  const telemetryConfig: any = {
-    "participantId": getConfig().app.subscriberId,
-    "participantUri": getConfig().app.subscriberUri,
-    "role": getConfig().app.mode,
-    "telemetry": {
-      "batchSize": getConfig().app.telemetry.batchSize,
-      "syncInterval": getConfig().app.telemetry.syncInterval,
-      "retry": getConfig().app.httpRetryCount,
-      "storageType": getConfig().app.telemetry.storageType,
-      "backupFilePath": getConfig().app.telemetry.backupFilePath,
-      "redis": {
-        "host": getConfig().cache.host,
-        "port": getConfig().cache.port,
-        "db": getConfig().app.telemetry.redis.db
-      },
-      "network": {
-        "url": getConfig().app.telemetry.network.url
-      },
-      "raw": {
-        "url": getConfig().app.telemetry.raw.url
-      }
-    },
-    "service": {
-      "name": getConfig().app.service.name,
-      "version": getConfig().app.service.version
-    }
-  }
-  return telemetryConfig;
 }
