@@ -11,24 +11,25 @@ export const bapContextBuilder = async (
   context: any,
   action: string
 ): Promise<any> => {
+  const protocolServerlLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
   if (!context) {
     throw new Exception(
       ExceptionType.Context_NotFound,
-      "Context not found",
+      `Context not found in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.domain) {
     throw new Exception(
       ExceptionType.Context_DomainNotFound,
-      "Domain not found in the context",
+      `Domain not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.version && !context?.core_version) {
     throw new Exception(
       ExceptionType.Context_CoreVersionNotFound,
-      "Core version not found in the context",
+      `Core version not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
@@ -52,46 +53,52 @@ export const bapContextBuilder = async (
       key: context?.key,
       transaction_id: context.transaction_id
         ? context.transaction_id
-        : uuid_v4(),
+        : uuid_v4()
     }
   );
-  logger.info(`BAP Context:\n ${JSON.stringify(bapContext)}\n\n`);
+  logger.info(
+    `BAP Context created at ${protocolServerlLevel} :==>\n${JSON.stringify(
+      bapContext
+    )}\n`
+  );
   return bapContext;
 };
 
 export const bppContextBuilder = (context: any, action: string): any => {
+  const protocolServerlLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
+
   if (!context) {
     throw new Exception(
       ExceptionType.Context_NotFound,
-      "Context not found",
+      `Context not found in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.domain) {
     throw new Exception(
       ExceptionType.Context_DomainNotFound,
-      "Domain not found in the context",
+      `Domain not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.core_version && !context.version) {
     throw new Exception(
       ExceptionType.Context_CoreVersionNotFound,
-      "Core version not found in the context",
+      `Core version not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.transaction_id) {
     throw new Exception(
       ExceptionType.Context_TransactionIdNotFound,
-      "transaction_id not found in the context",
+      `transaction_id not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
   if (!context.message_id) {
     throw new Exception(
       ExceptionType.Context_MessageIdNotFound,
-      "message_id not found in the context",
+      `message_id not found in the context in request to ${protocolServerlLevel}`,
       404
     );
   }
@@ -114,7 +121,7 @@ export const bppContextBuilder = (context: any, action: string): any => {
     message_id: context.message_id,
 
     ttl: moment.duration(getConfig().app.ttl, "ms").toISOString(),
-    timestamp: new Date().toISOString(),
+    timestamp: new Date().toISOString()
   };
   return bppContext;
 };

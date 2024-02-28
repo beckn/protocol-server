@@ -17,7 +17,10 @@ import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { responseCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import { createTelemetryEvent, processTelemetry } from "../utils/telemetry.utils";
+import {
+  createTelemetryEvent,
+  processTelemetry
+} from "../utils/telemetry.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -37,17 +40,20 @@ export const bapNetworkResponseHandler = async (
       acknowledgeNACK(res, req.body.context, {
         // TODO: change the error code.
         code: 6781616,
-        message: "Response timed out",
+        message: `Response timed out for ${message_id} and action:${requestAction}, as requestCache not found`,
         type: BecknErrorType.coreError
       });
       return;
     }
 
-    logger.info(`\nsending ack to bpp\n\n`);
-    logger.info(`request to bpp ${JSON.stringify(req.body.context)}`);
+    logger.info(
+      `\nSending ACK to BPP for Context: ${JSON.stringify(
+        req.body.context
+      )}\n\n`
+    );
     acknowledgeACK(res, req.body.context);
 
-    logger.info(`sending response to inbox queue`);
+    logger.info(`Sending response from BPP to inbox queue`);
     logger.info(`response: ${JSON.stringify(req.body)}`);
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
@@ -58,7 +64,9 @@ export const bapNetworkResponseHandler = async (
     } else {
       exception = new Exception(
         ExceptionType.Response_Failed,
-        "BAP Response Failed at bapNetworkResponseHandler",
+        `BAP Response Failed at bapNetworkResponseHandler at ${
+          getConfig().app.mode
+        } ${getConfig().app.gateway.mode}`,
         500,
         err
       );
@@ -87,8 +95,10 @@ export const bapNetworkResponseSettler = async (
       responseBody.context.action
     );
     // Generate telemetry if enabled
-    if(getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      telemetryCache.get("bap_response_settled")?.push(createTelemetryEvent({context: responseBody.context}));
+    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+      telemetryCache
+        .get("bap_response_settled")
+        ?.push(createTelemetryEvent({ context: responseBody.context }));
       await processTelemetry();
     }
     switch (getConfig().client.type) {
@@ -101,7 +111,6 @@ export const bapNetworkResponseSettler = async (
         break;
       }
       case ClientConfigType.webhook: {
-        console.log("S");
         responseCallback(responseBody);
         break;
       }
