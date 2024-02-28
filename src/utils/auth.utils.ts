@@ -41,7 +41,10 @@ export const createSigningString = async (
   const signing_string = `(created): ${created}
 (expires): ${expires}
 digest: BLAKE-512=${digest_base64}`;
-  logger.info(`Signing String:==>\n${signing_string}\n\n`);
+  logger.info(
+    `\n*********************************-----***********************************
+    Signing String:==>\n${signing_string}\n*********************************-----***********************************\n`
+  );
   return { signing_string, expires, created };
 };
 
@@ -200,6 +203,10 @@ export const createAuthHeaderConfig = async (request: any) => {
     },
     timeout: getConfig().app.httpTimeout
   };
-  logger.info(`Axios Config for Request:\n${JSON.stringify(axios_config)}\n\n`);
+  logger.info(
+    `Axios Config for Request from ${
+      getConfig().app.mode + " " + getConfig().app.gateway.mode
+    }:==>\n${JSON.stringify(axios_config)}\n\n`
+  );
   return axios_config;
 };

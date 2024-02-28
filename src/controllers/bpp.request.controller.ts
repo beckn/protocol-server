@@ -38,6 +38,9 @@ export const bppNetworkRequestHandler = async (
       ttl
     );
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+      if (!telemetryCache.get("bpp_request_handled")) {
+        telemetryCache.set("bpp_request_handled", []);
+      }
       telemetryCache
         .get("bpp_request_handled")
         ?.push(createTelemetryEvent({ context: req?.body?.context }));

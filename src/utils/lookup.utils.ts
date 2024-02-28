@@ -16,22 +16,26 @@ export function combineURLs(baseURL: string, relativeURL: string) {
 }
 
 export const registryLookup = async (lookupParameter: LookupParameter) => {
+  const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
   try {
     const lookupCache = LookupCache.getInstance();
     const cachedResponse = await lookupCache.check(lookupParameter);
     if (cachedResponse && cachedResponse!.length > 0) {
-      logger.info(`returning response from cache`);
-      logger.info(`cachedResponse: ${JSON.stringify(cachedResponse)}`);
-
+      logger.info(
+        `\nReturning response from Cache at ${protocolServerLevel}\n`
+      );
+      logger.info(
+        `CachedResponse at ${protocolServerLevel}: ${JSON.stringify(
+          cachedResponse
+        )}`
+      );
       return cachedResponse;
     }
-
-    console.log("\nLooking Up in registry...!\n");
     logger.info(
-      `\nLooking Up in registry...!\nWith URL:${combineURLs(
+      `\nLooking Up in registry from ${protocolServerLevel}...! to URL:${combineURLs(
         getConfig().app.registryUrl,
         "/lookup"
-      )}\n Payload:${JSON.stringify(lookupParameter)}`
+      )}\nPayload:${JSON.stringify(lookupParameter)}\n\n`
     );
 
     const response = await axios.post(
@@ -50,7 +54,11 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
     });
 
     lookupCache.cache(lookupParameter, subscribers);
-    logger.info(`subscribers: ${JSON.stringify(subscribers)}`);
+    logger.info(
+      `Subscriber list at ${protocolServerLevel}: ${JSON.stringify(
+        subscribers
+      )}`
+    );
 
     return subscribers;
   } catch (error: any) {
@@ -60,7 +68,7 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
 
     throw new Exception(
       ExceptionType.Registry_LookupError,
-      "Error in registry lookup",
+      `Error in registry lookup at ${protocolServerLevel} as ${error.message}`,
       500,
       error
     );
@@ -71,6 +79,7 @@ export async function getSubscriberDetails(
   subscriber_id: string,
   unique_key_id: string
 ) {
+  const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
   try {
     const subsribers = await registryLookup({
       subscriber_id: subscriber_id,
@@ -80,7 +89,12 @@ export async function getSubscriberDetails(
     if (subsribers!.length == 0) {
       throw new Exception(
         ExceptionType.Registry_NoSubscriberFound,
-        "No subscriber found",
+        `No subscriber found at ${protocolServerLevel} for payload===> ${JSON.stringify(
+          {
+            subscriber_id: subscriber_id,
+            unique_key_id: unique_key_id
+          }
+        )}`,
         404
       );
     }
@@ -93,7 +107,7 @@ export async function getSubscriberDetails(
 
     throw new Exception(
       ExceptionType.Registry_LookupError,
-      "Error in registry lookup",
+      `Error in registry lookup at ${protocolServerLevel} with error message=>"${error.message}" `,
       500,
       error
     );

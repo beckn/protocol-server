@@ -21,20 +21,29 @@ import { unConfigureActionHandler } from "../controllers/unconfigured.controller
 import * as OpenApiValidator from "express-openapi-validator";
 import fs from "fs";
 import path from "path";
-
+import { LogLevelEnum } from "../utils/logger.utils";
 export const requestsRouter = Router();
 
 requestsRouter.get("/logs", (req, res) => {
-  const files = fs.readdirSync(path.join(__dirname + "../../../logs/info"));
-
-  return res.sendFile(
-    path.join(__dirname + `../../../logs/info/${files[files.length - 1]}`),
-    (err) => {
-      if (err) {
-        res.json({ success: false, message: err.message });
+  try {
+    const logLevel: LogLevelEnum = req?.query?.type as LogLevelEnum;
+    const files = fs.readdirSync(
+      path.join(__dirname + `../../../logs/${logLevel}`)
+    );
+    return res.sendFile(
+      path.join(
+        __dirname + `../../../logs/${logLevel}/${files[files.length - 1]}`
+      ),
+      (err) => {
+        if (err) {
+          res.json({ success: false, message: err.message });
+        }
       }
-    }
-  );
+    );
+  } catch (error: any) {
+    logger.error(error.message);
+    throw new Error("Some Error Occured");
+  }
 });
 
 // BAP Client-Side Gateway Configuration.
