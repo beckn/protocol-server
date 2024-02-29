@@ -23,6 +23,8 @@ import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
+import { telemetrySDK } from "../utils/telemetry.utils";
+
 
 export const bppClientResponseHandler = async (
   req: Request,
@@ -112,6 +114,7 @@ export const bppClientResponseSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
+      telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status } } })(responseBody, response);
       return;
     }
 

@@ -98,3 +98,8 @@ app:
     backupFilePath: "backups"
     redis:
       db: 4   
+  service: 
+    name: "network_service"
+    version: "1.0.0"
+  resource:
+    attributes: {}  

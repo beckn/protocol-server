@@ -22,6 +22,7 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
 
 export const bapClientTriggerHandler = async (
   req: Request,
@@ -145,6 +146,7 @@ export const bapClientTriggerSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
+      telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status } } })(requestBody, response);
       return;
     }
 
