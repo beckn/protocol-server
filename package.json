@@ -21,7 +21,7 @@
     "@types/request-ip": "0.0.41",
     "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.16",
-    "beckn-telemetry-sdk": "1.0.0",
+    "beckn-telemetry-sdk": "1.0.1",
     "ts-node": "^10.8.1",
     "typescript": "^4.7.3"
   },
