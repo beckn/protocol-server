@@ -5,7 +5,7 @@ import { NetworkPaticipantType } from "../schemas/subscriberDetails.schema";
 import {
   createAuthHeaderConfig,
   getSenderDetails,
-  verifyHeader
+  verifyHeader,
 } from "../utils/auth.utils";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
@@ -19,7 +19,13 @@ export const authValidatorMiddleware = async (
 ) => {
   try {
     logger.info(`\nNew Request txn_id ${req.body?.context?.transaction_id}`);
-    logger.info(`Response from BPP ${JSON.stringify(req.body)}`);
+    logger.info(
+      `Request from ${
+        req?.body?.context?.bpp_id && req?.body?.context?.bpp_uri
+          ? "BAP NETWORK"
+          : "BG"
+      } ${JSON.stringify(req.body)}`
+    );
     console.log("\nNew Request txn_id", req.body?.context?.transaction_id);
     if (req.body?.context?.bap_id) {
       console.log(
@@ -57,12 +63,12 @@ export const authValidatorMiddleware = async (
       res.status(401).json({
         message: {
           ack: {
-            status: "NACK"
-          }
+            status: "NACK",
+          },
         },
         error: {
-          message: "Authentication failed"
-        }
+          message: "Authentication failed",
+        },
       });
     }
   } catch (err) {

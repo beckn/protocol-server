@@ -20,19 +20,19 @@ export const makeBecknRequest = async (
 
     return {
       data: JSON.stringify(response.data),
-      status: response.status
+      status: response.status,
     };
   } catch (error) {
     let response: BecknResponse | undefined;
     if (axios.isAxiosError(error)) {
       response = {
         data: JSON.stringify(error.response?.data),
-        status: error.response?.status ? error.response?.status : 500
+        status: error.response?.status ? error.response?.status : 500,
       };
     } else {
       response = {
         data: "No Response",
-        status: 500
+        status: 500,
       };
     }
 
@@ -59,16 +59,14 @@ export async function callNetwork(
   if (subscribers.length == 0) {
     return {
       data: "No Subscribers found",
-      status: 500
+      status: 500,
     };
   }
 
   for (let i = 0; i < subscribers.length; i++) {
     logger.info(`Attempt Number: ${i + 1} \nAction : ${action}`);
-    logger.info(
-      `sending request to BG / BPP: ${subscribers[i].subscriber_url}`
-    );
-    logger.info(`Request Body: ${JSON.stringify(body)}`);
+    logger.info(`sending Response to BAP: ${subscribers[i].subscriber_url}`);
+    logger.info(`Response Body: ${JSON.stringify(body)}`);
     console.log(
       "\nHTTP Retry Count=====>=====>",
       getConfig().app.httpRetryCount,
@@ -100,6 +98,6 @@ export async function callNetwork(
 
   return {
     data: "No Response",
-    status: 500
+    status: 500,
   };
 }

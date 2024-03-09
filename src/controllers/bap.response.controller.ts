@@ -8,7 +8,7 @@ import { ActionUtils } from "../utils/actions.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
 import {
   acknowledgeACK,
-  acknowledgeNACK
+  acknowledgeNACK,
 } from "../utils/acknowledgement.utils";
 import { BecknErrorType } from "../schemas/becknError.schema";
 import { GatewayUtils } from "../utils/gateway.utils";
@@ -19,7 +19,7 @@ import { responseCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
 import {
   createTelemetryEvent,
-  processTelemetry
+  processTelemetry,
 } from "../utils/telemetry.utils";
 
 export const bapNetworkResponseHandler = async (
@@ -41,7 +41,7 @@ export const bapNetworkResponseHandler = async (
         // TODO: change the error code.
         code: 6781616,
         message: `Response timed out for ${message_id} and action:${requestAction}, as requestCache not found`,
-        type: BecknErrorType.coreError
+        type: BecknErrorType.coreError,
       });
       return;
     }
@@ -87,7 +87,7 @@ export const bapNetworkResponseSettler = async (
     const responseBody = JSON.parse(message?.content.toString()!);
 
     logger.info(
-      `Response from BAP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`
+      `Response from BPP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`
     );
 
     const message_id = responseBody.context.message_id;
