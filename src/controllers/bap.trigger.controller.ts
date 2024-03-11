@@ -22,11 +22,7 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const bapClientTriggerHandler = async (
@@ -153,16 +149,7 @@ export const bapClientTriggerSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
-      // Generate Telemetry if enabled
-      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-        telemetryCache.get("bap_client_settled")?.push(
-          createTelemetryEvent({
-            context: requestBody.context,
-            data: response
-          })
-        );
-        await processTelemetry();
-      }
+      telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status } } })(requestBody, response);
       return;
     }
 
