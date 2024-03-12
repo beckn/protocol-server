@@ -98,4 +98,4 @@ The protocol server can be set up in two env.
 
 ### Q.What is the format of these IDs and how are they being used at the infra level i.e - Redis / MongoDB / RabbitMQ.
 
-<b>Ans:</b> The IDs are strings. For message_id, it's important to be unique in each Beckn-specific API call to get new responses instead of cached ones. Meanwhile, transaction_id, used to identify the entire order lifecycle at the BAP or BPP level, can change in different order lifecycles. These IDs are created using the random_uuid npm package in the Protocol server.
+<b>Ans:</b> The IDs are strings. For message_id, it's important to be unique in each Beckn-specific API call to get new responses instead of cached ones. Meanwhile, transaction_id, used to identify the entire order lifecycle at the BAP or BPP level, can change in different order lifecycles. These IDs are created using the random_uuid npm package in the Protocol server and are used as a primary key to store every Beckn API response in the MongoDB.
