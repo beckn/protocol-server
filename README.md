@@ -79,14 +79,17 @@ The protocol server can be set up in two env.
 
 # FAQs:
 
-### Q. Use of transaction ID and message ID.
+### Q. What is the use of transaction ID and message ID in Beckn requests?.
 
-Ans: The Message ID and transaction ID serve as distinctive identifiers for API calls and the order lifecycle. The Transaction ID is employed at both BAP (Beckn Aggregator Platform) and BPP (Beckn Partner Platform) levels to monitor and identify the entire order lifecycle. On the other hand, the message_id is specifically utilized to identify individual Becknified API calls within the order lifecycle. It is also instrumental in caching the response on the BAP side by storing it in MongoDB, a dedicated system for caching responses on the BAP side.
+Ans: The Message ID and Transaction ID are like special labels that help keep track of API calls and the different stages an order goes through.
 
-### Q. Are these IDs mandatory or optional, if mandatory in specific cases need to mention those details.
+Transaction ID: It is used both at the Beckn Aggregator Platform (BAP) and Beckn Partner Platform (BPP) to keep an eye on and recognize the whole journey of an order.
+Message ID: Is used to indentify a specific Becknified API calls during the order process. It is also used as a primary key in storing the response on the BAP side by keeping it in MongoDB, a dedicated system used for saving responses for fast retreival of data on the BAP side.
 
-Ans: In all instances, it is imperative to include these IDs. Should you neglect to provide either of these two IDs, the protocol server will autonomously generate them, reconstruct the context using these values, and subsequently verify the response.
+### Q. Are these IDs mandatory or optional? If mandatory, please specify the specific cases in which they are required.
+
+Ans: These IDs are mandatory in the protocol server architecture. If you forget to provide them, the protocol server will create them on its own, use them to build the context object, and check the response.
 
 ### Q.What is the format of these IDs and how are they being used at the infra level i.e - Redis / MongoDB / RabbitMQ.
 
-Ans: The IDs follow a string format. For message_id, uniqueness is crucial for each Beckn-specific API call, ensuring the receipt of fresh responses rather than cached ones. Meanwhile, transaction_id, serving to identify the entire order lifecycle at the BAP or BPP level, can vary across different order lifecycles. In the Protocol server, these IDs are generated using the random_uuid npm package.
+Ans: The IDs are strings. For message_id, it's important to be unique in each Beckn-specific API call to get new responses instead of cached ones. Meanwhile, transaction_id, used to identify the entire order lifecycle at the BAP or BPP level, can change in different order lifecycles. These IDs are created using the random_uuid npm package in the Protocol server.
