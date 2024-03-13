@@ -83,7 +83,7 @@ The protocol server can be set up in two env.
 
 <b>Ans:</b> The Message ID and Transaction ID are like special labels that help keep track of API calls and the different stages an order goes through.
 
-<b>Transaction ID:</b> It is used both at the Beckn Aggregator Platform (BAP) and Beckn Partner Platform (BPP) to keep an eye on and recognize the whole journey of an order.
+<b>Transaction ID:</b> It is used both at the Beckn Application Platform (BAP) and Beckn Provider Platform (BPP) to keep an eye on and recognize the whole journey of an order.
 <br>
 
 <b>Message ID:</b> Is used to indentify a specific Becknified API calls during the order process. It is also used as a primary key in storing the response on the BAP side by keeping it in MongoDB, a dedicated system used for saving responses for fast retreival of data on the BAP side.
