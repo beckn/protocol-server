@@ -37,14 +37,16 @@ export const openApiValidatorMiddleware = async (
     : req?.body?.context?.version;
   let specFile: string;
   let isDomainSpecificExist = false;
-  try {
-    isDomainSpecificExist = (
-      await fs.promises.readdir(
-        `${path.join(path.resolve(__dirname, "../../"))}/schemas`
-      )
-    ).includes(`${req?.body?.context?.domain}_${version}.yaml`);
-  } catch (error) {
-    isDomainSpecificExist = false;
+  if (getConfig().app.useDomainSpecificYAML) {
+    try {
+      isDomainSpecificExist = (
+        await fs.promises.readdir(
+          `${path.join(path.resolve(__dirname, "../../"))}/schemas`
+        )
+      ).includes(`${req?.body?.context?.domain}_${version}.yaml`);
+    } catch (error) {
+      isDomainSpecificExist = false;
+    }
   }
   specFile = getConfig().app.useDomainSpecificYAML
     ? isDomainSpecificExist
