@@ -12,6 +12,7 @@ cache:
 
 # Optional.
 responseCache:
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/protocol-server-bpp-v2?authSource=admin"
   mongoURL: "mongodb://MONGO_USERNAME:MONGO_PASSWORD@0.0.0.0:27017/MONGO_DB_NAME?authSource=admin"
   ttl: "PT10M"
 

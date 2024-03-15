@@ -10,3 +10,4 @@ config/default.yml
 .DS_Store
 docker/data/
 data
+result
