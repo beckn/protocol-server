@@ -8,62 +8,71 @@ import { actionsAppConfigSchema } from "./actions.app.config.schema";
 import { gatewayAppConfigSchema } from "./gateway.app.config.schema";
 
 export enum AppMode {
-    bap = "bap",
-    bpp = "bpp",
+  bap = "bap",
+  bpp = "bpp"
 }
 
 export const appConfigSchema = z.object({
-    mode: z.nativeEnum(AppMode),
+  mode: z.nativeEnum(AppMode),
 
-    gateway: gatewayAppConfigSchema,
+  gateway: gatewayAppConfigSchema,
 
-    actions: actionsAppConfigSchema,
+  actions: actionsAppConfigSchema,
 
-    privateKey: z.string(),
-    publicKey: z.string(),
+  privateKey: z.string(),
+  publicKey: z.string(),
 
-    subscriberId: z.string(),
-    subscriberUri: z.string(),
+  subscriberId: z.string(),
+  subscriberUri: z.string(),
 
-    registryUrl: z.string(),
-    auth: z.boolean(),
-    uniqueKey: z.string(),
+  registryUrl: z.string(),
+  auth: z.boolean(),
+  uniqueKey: z.string(),
 
-    city: z.string(),
-    country: z.string(),
+  city: z.string(),
+  country: z.string(),
 
-    ttl: z.string().transform((value) => {
-        const duration = moment.duration(value);
-        return duration.asMilliseconds();
-    }),
+  ttl: z.string().transform((value) => {
+    const duration = moment.duration(value);
+    return duration.asMilliseconds();
+  }),
 
-    httpTimeout: z.string().transform((value) => {
-        const duration = moment.duration(value);
-        return duration.asMilliseconds();
-    }),
-    httpRetryCount: z.number(),
-    
-    telemetry: z.object({
-        enabled: z.boolean(),
-        url: z.string(),
-        batchSize: z.number(),
-        syncInterval: z.number(),
-        redis_db: z.number()
-    }),
+  httpTimeout: z.string().transform((value) => {
+    const duration = moment.duration(value);
+    return duration.asMilliseconds();
+  }),
+  httpRetryCount: z.number(),
+
+  telemetry: z.object({
+    enabled: z.boolean(),
+    url: z.string(),
+    batchSize: z.number(),
+    syncInterval: z.number(),
+    redis_db: z.number()
+  }),
+  useDomainSpecificYAML: z.boolean().optional()
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
 
 export const parseAppConfig = (config: any): AppConfigDataType => {
-    if (!config) {
-        throw new Exception(ExceptionType.Config_AppConfig_NotFound, "App config not found", 404);
-    }
+  if (!config) {
+    throw new Exception(
+      ExceptionType.Config_AppConfig_NotFound,
+      "App config not found",
+      404
+    );
+  }
 
-    try {
-        const appConfig = appConfigSchema.parse(config);
-        return appConfig;
-    }
-    catch (e) {
-        throw new Exception(ExceptionType.Config_AppConfig_Invalid, "Invalid app config", 400, e);
-    }
-}
+  try {
+    const appConfig = appConfigSchema.parse(config);
+    return appConfig;
+  } catch (e) {
+    throw new Exception(
+      ExceptionType.Config_AppConfig_Invalid,
+      "Invalid app config",
+      400,
+      e
+    );
+  }
+};

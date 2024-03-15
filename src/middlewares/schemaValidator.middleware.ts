@@ -3,7 +3,8 @@ import * as OpenApiValidator from "express-openapi-validator";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
-
+import fs from "fs";
+import path from "path";
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const schemaErrorHandler = (
@@ -34,8 +35,27 @@ export const openApiValidatorMiddleware = async (
   const version = req?.body?.context?.core_version
     ? req?.body?.context?.core_version
     : req?.body?.context?.version;
+  let specFile: string;
+  let isDomainSpecificExist = false;
+  if (getConfig().app.useDomainSpecificYAML) {
+    try {
+      isDomainSpecificExist = (
+        await fs.promises.readdir(
+          `${path.join(path.resolve(__dirname, "../../"))}/schemas`
+        )
+      ).includes(`${req?.body?.context?.domain}_${version}.yaml`);
+    } catch (error) {
+      isDomainSpecificExist = false;
+    }
+  }
+  specFile = getConfig().app.useDomainSpecificYAML
+    ? isDomainSpecificExist
+      ? `schemas/${req?.body?.context?.domain}_${version}.yaml`
+      : `schemas/core_${version}.yaml`
+    : `schemas/core_${version}.yaml`;
+
   const openApiValidator = OpenApiValidator.middleware({
-    apiSpec: `schemas/core_${version}.yaml`,
+    apiSpec: specFile,
     validateRequests: true,
     validateResponses: false,
     $refParser: {
