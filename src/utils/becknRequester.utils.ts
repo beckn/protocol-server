@@ -16,7 +16,10 @@ export const makeBecknRequest = async (
   try {
     const requestURL = combineURLs(subscriberUrl, `/${action}`);
 
-    const response = await axios.post(requestURL, body, axios_config);
+    const response = await axios.post(requestURL, body, {
+      ...axios_config,
+      timeout: 10000
+    });
 
     return {
       data: JSON.stringify(response.data),
