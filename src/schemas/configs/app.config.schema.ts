@@ -56,7 +56,11 @@ export const appConfigSchema = z.object({
         backupFilePath: z.string(),
         redis: z.object({
             db: z.number()
-        })
+        }),
+        messageProperties: z.array(z.object({
+          key: z.string(),
+          path: z.string()
+        })).default([])
     }),
     service: z.object({
         name: z.string(),
