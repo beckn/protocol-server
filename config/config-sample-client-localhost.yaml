@@ -118,6 +118,7 @@ app:
     backupFilePath: "backups"
     redis:
       db: 4
+    messageProperties: []
   service: 
     name: "client_service"
     version: "1.0.0"
