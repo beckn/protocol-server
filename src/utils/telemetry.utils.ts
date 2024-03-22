@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { getConfig } from "./config.utils";
 import TelemetrySDK from 'beckn-telemetry-sdk';
+import _ from 'lodash';
 
 export const telemetrySDK = TelemetrySDK
 
@@ -37,4 +38,37 @@ export const getTelemetryConfig = () => {
 export const onAPI = (request: Request, response: Response, next: NextFunction) => {
     const mode = request.get('mode');
     TelemetrySDK.onApi({ data: { attributes: { mode } } })(request, response, next)
+}
+
+export const customAttributes = (ctx: Record<string, any>, config: { key: string, path: string }[]) => {
+    const reducerFn = (prev: Record<string, any>, current: { key: string, path: string }) => {
+        const { key, path } = current;
+        if (_.includes(path, '[]')) {
+            const values = resolveArrayPath(ctx, path);
+            if (values) {
+                _.forEach(values, (value, index) => {
+                    const keyWithIndex = `${key}_${index}`;
+                    !_.get(prev, keyWithIndex) && value && (prev[keyWithIndex] = value);
+                })
+            }
+        } else {
+            const value = _.get(ctx, path);
+            !_.get(prev, key) && value && (prev[key] = value);
+        }
+        return prev;
+    }
+    return _.reduce(config, reducerFn, {});
+}
+
+const resolveArrayPath = (ctx: Record<string, any>, path: string) => {
+    const splits = _.split(path, '[]');
+    const reducerFn = (value: any, path: string) => {
+        if (_.startsWith(path, '.')) {
+            if (!value) return null
+            return _.flatten(_.map(value, payload => _.get(payload, _.replace(path, '.', ''))));
+        } else {
+            return _.get(ctx, path);
+        }
+    }
+    return _.reduce(splits, reducerFn, ctx);
 }
