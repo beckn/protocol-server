@@ -50,7 +50,7 @@ export const customAttributes = (ctx: Record<string, any>, config: { key: string
             const values = resolveArrayPath(ctx, path);
             if (values) {
                 _.forEach(values, (value, index) => {
-                    const keyWithIndex = `${key}_${index}`;
+                    const keyWithIndex = `${key}.${index}`;
                     !_.get(prev, keyWithIndex) && value && (prev[keyWithIndex] = value);
                 })
             }
