@@ -22,6 +22,8 @@ import * as OpenApiValidator from "express-openapi-validator";
 import fs from "fs";
 import path from "path";
 import { LogLevelEnum } from "../utils/logger.utils";
+import { onAPI } from "../utils/telemetry.utils";
+
 export const requestsRouter = Router();
 
 requestsRouter.get("/logs", (req, res) => {
@@ -103,7 +105,8 @@ if (
             next,
             action as RequestActions
           );
-        }
+        },
+        onAPI
       );
     } else {
       requestsRouter.post(
