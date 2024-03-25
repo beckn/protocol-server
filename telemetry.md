@@ -6,7 +6,7 @@ Following are the two types of telemetry can be enabled in the protocol server:
 
 **Telemetry Configuration**
 
-Add the below configuration in the `default-<bap/bpp>-client.yml` and `default-<bap/bpp>-network.yml` to enable telemetry. [Example](/config/samples/bap-client.yaml#L128)
+Add the below configuration in the `default-<bap/bpp>-client.yml` and `default-<bap/bpp>-network.yml` to enable telemetry. [example](/config/samples/bap-client.yaml#L128)
 
 To disable telemetry, provide empty value for the network and raw url.
 
