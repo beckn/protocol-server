@@ -141,5 +141,3 @@ app:
   service: 
     name: "bap_client_service"
     version: "1.0.0"
-  resource:
-    attributes: {}  

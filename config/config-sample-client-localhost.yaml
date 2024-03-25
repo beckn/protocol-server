@@ -122,5 +122,3 @@ app:
   service: 
     name: "client_service"
     version: "1.0.0"
-  resource:
-    attributes: {}  
