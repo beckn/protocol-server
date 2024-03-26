@@ -16,23 +16,27 @@ export const makeBecknRequest = async (
   try {
     const requestURL = combineURLs(subscriberUrl, `/${action}`);
 
-    const response = await axios.post(requestURL, body, axios_config);
+    const response = await axios.post(requestURL, body, {
+      ...axios_config,
+      timeout: 10000
+    });
 
     return {
       data: JSON.stringify(response.data),
-      status: response.status,
+      status: response.status
     };
   } catch (error) {
+    console.log("Error at Make Beckn Request=====>", error);
     let response: BecknResponse | undefined;
     if (axios.isAxiosError(error)) {
       response = {
         data: JSON.stringify(error.response?.data),
-        status: error.response?.status ? error.response?.status : 500,
+        status: error.response?.status ? error.response?.status : 500
       };
     } else {
       response = {
         data: "No Response",
-        status: 500,
+        status: 500
       };
     }
 
@@ -59,7 +63,7 @@ export async function callNetwork(
   if (subscribers.length == 0) {
     return {
       data: "No Subscribers found",
-      status: 500,
+      status: 500
     };
   }
 
@@ -98,6 +102,6 @@ export async function callNetwork(
 
   return {
     data: "No Response",
-    status: 500,
+    status: 500
   };
 }
