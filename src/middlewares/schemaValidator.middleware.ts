@@ -57,7 +57,7 @@ export const openApiValidatorMiddleware = async (
       if(getConfig().app.mandateLayer2Config){
         return next(new Exception(
           ExceptionType.Config_AppConfig_Layer2_Missing,
-          `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`,
+          "Config error :  Layer 2 config not found.",
           422,
         ))
       }
