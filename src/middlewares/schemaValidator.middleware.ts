@@ -35,24 +35,34 @@ export const openApiValidatorMiddleware = async (
   const version = req?.body?.context?.core_version
     ? req?.body?.context?.core_version
     : req?.body?.context?.version;
-  let specFile: string;
-  let isDomainSpecificExist = false;
-  if (getConfig().app.useDomainSpecificYAML) {
+  let specFile = `schemas/core_${version}.yaml`;
+  
+  if (getConfig().app.useLayer2Config) {
+    let doesLayer2ConfigExist = false;
+    let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
+    let specialCharsRe = /[:\/]/gi;
+    layer2ConfigFilename = layer2ConfigFilename.replace(specialCharsRe, "_");
     try {
-      isDomainSpecificExist = (
+      doesLayer2ConfigExist = (
         await fs.promises.readdir(
           `${path.join(path.resolve(__dirname, "../../"))}/schemas`
         )
-      ).includes(`${req?.body?.context?.domain}_${version}.yaml`);
+      ).includes(layer2ConfigFilename);
     } catch (error) {
-      isDomainSpecificExist = false;
+      doesLayer2ConfigExist = false;
+    }
+    if(doesLayer2ConfigExist) 
+      specFile = `schemas/${layer2ConfigFilename}`
+    else{
+      if(getConfig().app.mandateLayer2Config){
+        return next(new Exception(
+          ExceptionType.Config_AppConfig_Layer2_Missing,
+          `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`,
+          422,
+        ))
+      }
     }
   }
-  specFile = getConfig().app.useDomainSpecificYAML
-    ? isDomainSpecificExist
-      ? `schemas/${req?.body?.context?.domain}_${version}.yaml`
-      : `schemas/core_${version}.yaml`
-    : `schemas/core_${version}.yaml`;
 
   const openApiValidator = OpenApiValidator.middleware({
     apiSpec: specFile,
