@@ -37,21 +37,37 @@ export const appConfigSchema = z.object({
     return duration.asMilliseconds();
   }),
 
-  httpTimeout: z.string().transform((value) => {
-    const duration = moment.duration(value);
-    return duration.asMilliseconds();
-  }),
-  httpRetryCount: z.number(),
-
-  telemetry: z.object({
-    enabled: z.boolean(),
-    url: z.string(),
-    batchSize: z.number(),
-    syncInterval: z.number(),
-    redis_db: z.number()
-  }),
-  useLayer2Config: z.boolean().optional(),
-  mandateLayer2Config: z.boolean().optional()
+    httpTimeout: z.string().transform((value) => {
+        const duration = moment.duration(value);
+        return duration.asMilliseconds();
+    }),
+    httpRetryCount: z.number(),
+    
+    telemetry: z.object({
+        network: z.object({
+            url: z.string()
+        }),
+        raw: z.object({
+            url: z.string()
+        }),
+        batchSize: z.number(),
+        syncInterval: z.number(),
+        storageType: z.string(),
+        backupFilePath: z.string(),
+        redis: z.object({
+            db: z.number()
+        }),
+        messageProperties: z.array(z.object({
+          key: z.string(),
+          path: z.string()
+        })).default([])
+    }),
+    service: z.object({
+        name: z.string(),
+        version: z.string()
+    }),
+    useLayer2Config: z.boolean().optional(),
+    mandateLayer2Config: z.boolean().optional()
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
