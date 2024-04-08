@@ -3,7 +3,8 @@ import * as OpenApiValidator from "express-openapi-validator";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
-
+import fs from "fs";
+import path from "path";
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const schemaErrorHandler = (
@@ -34,8 +35,37 @@ export const openApiValidatorMiddleware = async (
   const version = req?.body?.context?.core_version
     ? req?.body?.context?.core_version
     : req?.body?.context?.version;
+  let specFile = `schemas/core_${version}.yaml`;
+  
+  if (getConfig().app.useLayer2Config) {
+    let doesLayer2ConfigExist = false;
+    let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
+    let specialCharsRe = /[:\/]/gi;
+    layer2ConfigFilename = layer2ConfigFilename.replace(specialCharsRe, "_");
+    try {
+      doesLayer2ConfigExist = (
+        await fs.promises.readdir(
+          `${path.join(path.resolve(__dirname, "../../"))}/schemas`
+        )
+      ).includes(layer2ConfigFilename);
+    } catch (error) {
+      doesLayer2ConfigExist = false;
+    }
+    if(doesLayer2ConfigExist) 
+      specFile = `schemas/${layer2ConfigFilename}`
+    else{
+      if(getConfig().app.mandateLayer2Config){
+        return next(new Exception(
+          ExceptionType.Config_AppConfig_Layer2_Missing,
+          "Config error :  Layer 2 config not found.",
+          422,
+        ))
+      }
+    }
+  }
+
   const openApiValidator = OpenApiValidator.middleware({
-    apiSpec: `schemas/core_${version}.yaml`,
+    apiSpec: specFile,
     validateRequests: true,
     validateResponses: false,
     $refParser: {

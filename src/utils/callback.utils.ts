@@ -77,8 +77,8 @@ export async function makeUnsolicitedWebhookCall(data: any) {
     }
     const callbackData = responseCallbackSchema.parse(data);
     const unsolicitedWebhook = getConfig().app?.unsolicitedWebhook;
-    logger.info(`\nWebhook Triggered on:==> ${unsolicitedWebhook.url}\n\n`);
-    const response = await axios.post(unsolicitedWebhook.url as string, callbackData);
+    logger.info(`\nWebhook Triggered on:==> ${unsolicitedWebhook?.url}\n\n`);
+    const response = await axios.post(unsolicitedWebhook?.url as string, callbackData);
     logger.info(
       `Response from Webhook:==>\n ${JSON.stringify(
         response.data

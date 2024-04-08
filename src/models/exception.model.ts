@@ -32,6 +32,7 @@ export enum ExceptionType {
     Config_ActionsAppConfig_Invalid = "Config_ActionsAppConfig_Invalid",
 
     Config_AppConfig_NotFound = "Config_AppConfig_NotFound",
+    Config_AppConfig_Layer2_Missing = "Config_AppConfig_Layer2_Missing",
     Config_AppConfig_Invalid = "Config_AppConfig_Invalid",
 
     Config_BPPConfigurationInvalid = "Config_BPPConfigurationInvalid",

@@ -34,7 +34,7 @@ export const bppNetworkRequestHandler = async (
     const ttl = moment.duration(req.body.context.ttl).asMilliseconds();
 
     await RequestCache.getInstance().cache(
-      parseRequestCache(transaction_id, message_id, action, res.locals.sender!),
+      parseRequestCache(transaction_id, message_id, action, res.locals.sender!, '', ttl),
       ttl
     );
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
