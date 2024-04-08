@@ -4,7 +4,7 @@ import { RedisClient } from "../redis.utils";
 import { RequestActions } from "../../schemas/configs/actions.app.config.schema";
 import logger from "../logger.utils";
 
-const requestCacheDB=getConfig().cache.db*10+2;
+const requestCacheDB = getConfig().cache.db * 10 + 2;
 
 export class RequestCache {
     public static getInstance(): RequestCache {
@@ -31,7 +31,7 @@ export class RequestCache {
         return key;
     }
 
-    public async cache(request: RequestCacheDataType, ttl:number): Promise<boolean> {
+    public async cache(request: RequestCacheDataType, ttl: number): Promise<boolean> {
         const key = this.createKey(request.message_id, request.action);
         const redisResponse = await this.redisClient.setWithExpiry(key, JSON.stringify(request), ttl);
         return redisResponse;

@@ -28,6 +28,7 @@ import {
   processTelemetry
 } from "../utils/telemetry.utils";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
+import moment from "moment";
 
 export const bppClientResponseHandler = async (
   req: Request,
@@ -72,36 +73,62 @@ export const bppClientResponseSettler = async (
       message_id,
       requestAction
     );
-    if (!requestCache) {
-      errorCallback(context, {
-        // TODO: change this error code.
-        code: 651641,
-        type: BecknErrorType.coreError,
-        message: "Request timed out"
-      });
-      return;
+    if (requestCache) {
+      const now = moment().valueOf();
+      const { timestamp = 0, ttl = 0 } = requestCache as any;
+
+      if (now - timestamp > ttl) {
+        errorCallback(context, {
+          // TODO: change this error code.
+          code: 651641,
+          type: BecknErrorType.coreError,
+          message: "Request timed out"
+        });
+        return;
+      }
     }
+    // if (!requestCache) {
+    //   errorCallback(context, {
+    //     // TODO: change this error code.
+    //     code: 651641,
+    //     type: BecknErrorType.coreError,
+    //     message: "Request timed out"
+    //   });
+    //   return;
+    // }
 
     const axios_config = await createAuthHeaderConfig(responseBody);
 
     let response: BecknResponse | null = null;
-    if (requestCache.sender.type == NetworkPaticipantType.BG) {
-      const subscribers = [requestCache.sender];
+    if (requestCache) {
+      if (requestCache.sender.type == NetworkPaticipantType.BG) {
+        const subscribers = [requestCache.sender];
 
-      response = await callNetwork(
-        subscribers,
-        responseBody,
-        axios_config,
-        action
-      );
+        response = await callNetwork(
+          subscribers,
+          responseBody,
+          axios_config,
+          action
+        );
+      } else {
+        const subscribers: Array<SubscriberDetail> = [
+          {
+            ...requestCache.sender,
+            subscriber_url: bap_uri
+          }
+        ];
+
+        response = await callNetwork(
+          subscribers,
+          responseBody,
+          axios_config,
+          action
+        );
+      }
     } else {
-      const subscribers: Array<SubscriberDetail> = [
-        {
-          ...requestCache.sender,
-          subscriber_url: bap_uri
-        }
-      ];
-
+      // Handling of unsolicited message
+      // @ts-ignore
+      const subscribers: Array<SubscriberDetail> = [{ type: NetworkPaticipantType.BAP, subscriber_url: bap_uri }];
       response = await callNetwork(
         subscribers,
         responseBody,

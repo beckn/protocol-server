@@ -42,7 +42,7 @@ export const appConfigSchema = z.object({
         return duration.asMilliseconds();
     }),
     httpRetryCount: z.number(),
-    
+
     telemetry: z.object({
         enabled: z.boolean(),
         url: z.string(),
@@ -50,6 +50,9 @@ export const appConfigSchema = z.object({
         syncInterval: z.number(),
         redis_db: z.number()
     }),
+    unsolicitedWebhook: z.object({
+        url: z.string().optional()
+    })
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;

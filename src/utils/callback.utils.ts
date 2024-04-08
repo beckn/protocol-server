@@ -66,6 +66,57 @@ async function makeClientCallback(data: any) {
   }
 }
 
+export async function makeUnsolicitedWebhookCall(data: any) {
+  try {
+    if (!getConfig().app?.unsolicitedWebhook?.url) {
+      throw new Exception(
+        ExceptionType.Client_InvalidCall,
+        "No unsolicited webhook found",
+        500
+      );
+    }
+    const callbackData = responseCallbackSchema.parse(data);
+    const unsolicitedWebhook = getConfig().app?.unsolicitedWebhook;
+    logger.info(`\nWebhook Triggered on:==> ${unsolicitedWebhook.url}\n\n`);
+    const response = await axios.post(unsolicitedWebhook.url as string, callbackData);
+    logger.info(
+      `Response from Webhook:==>\n ${JSON.stringify(
+        response.data
+      )}\nWith Data\n${JSON.stringify(data)}\n\n`
+    );
+  } catch (error: any) {
+    console.log("Error from makeClient");
+    console.log("====>", error);
+    if (error instanceof Exception) {
+      throw error;
+    }
+
+    if (error.response) {
+      console.log("\n\n", error, "\n\n");
+      throw new Exception(
+        ExceptionType.Client_CallbackFailed,
+        "Callback to client failed.",
+        error.response.status,
+        error.response.data
+      );
+    } else if (error.request) {
+      throw new Exception(
+        ExceptionType.Client_CallbackFailed,
+        "Callback to client failed.",
+        500,
+        error.request
+      );
+    } else {
+      throw new Exception(
+        ExceptionType.Client_CallbackFailed,
+        "Callback to client failed.",
+        500,
+        error
+      );
+    }
+  }
+}
+
 export async function responseCallback(data: any) {
   try {
     logger.info("Response cache SINoin");

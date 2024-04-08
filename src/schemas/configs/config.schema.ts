@@ -19,7 +19,7 @@ export const configSchema = z.object({
     cache: cacheConfigSchema,
     responseCache: responseCacheConfigSchema,
     client: clientConfigSchema,
-    app: appConfigSchema,
+    app: appConfigSchema
 });
 
 export type ConfigDataType = z.infer<typeof configSchema>;
