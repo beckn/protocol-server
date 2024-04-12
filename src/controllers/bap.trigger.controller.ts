@@ -55,14 +55,17 @@ export const bapClientTriggerHandler = async (
       acknowledgeACK(res, req.body.context);
     }
 
+    const ttl = (getConfig().app.actions.requests[action]?.ttl! / 1000);
     await RequestCache.getInstance().cache(
       parseRequestCache(
         req.body.context.transaction_id,
         req.body.context.message_id,
         action,
-        res.locals.sender!
+        res.locals.sender!,
+        '',
+        ttl
       ),
-      getConfig().app.actions.requests[action]?.ttl!
+      600 // Cache expiry time
     );
 
     logger.info(

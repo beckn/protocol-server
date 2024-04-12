@@ -31,11 +31,11 @@ export const bppNetworkRequestHandler = async (
 
     const message_id = req.body.context.message_id;
     const transaction_id = req.body.context.transaction_id;
-    const ttl = moment.duration(req.body.context.ttl).asMilliseconds();
+    const ttl = (moment.duration(req.body.context.ttl).asMilliseconds() / 1000);
 
     await RequestCache.getInstance().cache(
-      parseRequestCache(transaction_id, message_id, action, res.locals.sender!),
-      ttl
+      parseRequestCache(transaction_id, message_id, action, res.locals.sender!, '', ttl),
+      600 // Cache expiry time
     );
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
       if (!telemetryCache.get("bpp_request_handled")) {

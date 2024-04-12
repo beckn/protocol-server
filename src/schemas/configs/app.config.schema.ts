@@ -51,7 +51,10 @@ export const appConfigSchema = z.object({
     redis_db: z.number()
   }),
   useLayer2Config: z.boolean().optional(),
-  mandateLayer2Config: z.boolean().optional()
+  mandateLayer2Config: z.boolean().optional(),
+  unsolicitedWebhook: z.object({
+    url: z.string().optional()
+  }).optional()
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
@@ -67,7 +70,7 @@ export const parseAppConfig = (config: any): AppConfigDataType => {
 
   try {
     const appConfig = appConfigSchema.parse(config);
-    if(appConfig.mandateLayer2Config && !appConfig.useLayer2Config)
+    if (appConfig.mandateLayer2Config && !appConfig.useLayer2Config)
       throw new Error("If mandateLayer2Config value is true, useLayer2Config should also be true")
     return appConfig;
   } catch (e) {
