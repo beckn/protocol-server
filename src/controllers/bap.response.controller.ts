@@ -40,8 +40,11 @@ export const bapNetworkResponseHandler = async (
     console.log('Message expiry debugger - bapNetworkResponseHandler', JSON.stringify(requestCache), moment().valueOf());
     if (requestCache) {
       const now = moment().valueOf();
-      const { timestamp = 0, ttl = 0 } = requestCache as any;
+      const { timestamp = 0, ttl = 0, message_id } = requestCache as any;
       if (((now - timestamp) / 1000) > ttl) {
+        logger.info(
+          `\Delayed message received at BPP Network message id: ${message_id}\n\n`
+        );
         // Delayed message
         acknowledgeNACK(res, req.body.context, {
           // TODO: change the error code.
