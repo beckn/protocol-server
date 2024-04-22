@@ -37,10 +37,10 @@ export const bapNetworkResponseHandler = async (
       message_id,
       requestAction
     );
+    console.log('Message expiry debugger - bapNetworkResponseHandler', JSON.stringify(requestCache), moment().valueOf());
     if (requestCache) {
       const now = moment().valueOf();
       const { timestamp = 0, ttl = 0 } = requestCache as any;
-      console.log('Message expiry debugger', timestamp, ttl, now);
       if (((now - timestamp) / 1000) > ttl) {
         // Delayed message
         acknowledgeNACK(res, req.body.context, {
@@ -106,6 +106,7 @@ export const bapNetworkResponseSettler = async (
       message_id,
       action
     );
+    console.log('Message expiry debugger - bapNetworkResponseSettler', JSON.stringify(requestCache), unsolicitedWebhookUrl);
     if (!requestCache && unsolicitedWebhookUrl) {
       unsolicitedCallback(responseBody);
       return;
