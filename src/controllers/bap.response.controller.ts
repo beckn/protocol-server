@@ -40,6 +40,7 @@ export const bapNetworkResponseHandler = async (
     if (requestCache) {
       const now = moment().valueOf();
       const { timestamp = 0, ttl = 0 } = requestCache as any;
+      console.log('Message expiry debugger', timestamp, ttl, now);
       if (((now - timestamp) / 1000) > ttl) {
         // Delayed message
         acknowledgeNACK(res, req.body.context, {
