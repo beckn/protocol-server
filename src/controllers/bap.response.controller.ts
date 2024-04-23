@@ -42,6 +42,9 @@ export const bapNetworkResponseHandler = async (
       const { timestamp = 0, ttl = 0 } = requestCache as any;
       if (((now - timestamp) / 1000) > ttl) {
         // Delayed message
+        logger.info(
+          `\Delayed message received at BAP Network message id: ${message_id}\n\n`
+        );
         acknowledgeNACK(res, req.body.context, {
           // TODO: change the error code.
           code: 6781616,

@@ -79,6 +79,9 @@ export const bppClientResponseSettler = async (
       const { timestamp = 0, ttl = 0 } = requestCache as any;
       if (((now - timestamp) / 1000) > ttl) {
         // Delayed message
+        logger.info(
+          `\Delayed message received at BAP Network message id: ${message_id}\n\n`
+        );
         errorCallback(context, {
           // TODO: change this error code.
           code: 651641,
