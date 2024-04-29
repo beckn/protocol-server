@@ -26,7 +26,8 @@ export const requestsRouter = Router();
 
 requestsRouter.get("/logs", (req, res) => {
   try {
-    const logLevel: LogLevelEnum = req?.query?.type as LogLevelEnum;
+    const logLevel: LogLevelEnum =
+      (req?.query?.type as LogLevelEnum) || LogLevelEnum.DEBUG;
     const files = fs.readdirSync(
       path.join(__dirname + `../../../logs/${logLevel}`)
     );
