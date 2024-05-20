@@ -5,7 +5,23 @@ import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
 import fs from "fs";
 import path from "path";
+import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
+import YAML from 'yaml';
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
+
+// Cache object
+const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
+
+// Function to load and cache the API spec
+const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
+  if (!apiSpecCache[specFile]) {
+    console.log("Cache Not found. Loading....", specFile)
+    const apiSpecYAML = fs.readFileSync(specFile, 'utf8');
+    const apiSpec = YAML.parse(apiSpecYAML);
+    apiSpecCache[specFile] = apiSpec;
+  }
+  return apiSpecCache[specFile];
+};
 
 export const schemaErrorHandler = (
   err: any,
@@ -65,7 +81,7 @@ export const openApiValidatorMiddleware = async (
   }
 
   const openApiValidator = OpenApiValidator.middleware({
-    apiSpec: specFile,
+    apiSpec: loadApiSpec(specFile),
     validateRequests: true,
     validateResponses: false,
     $refParser: {
