@@ -29,7 +29,7 @@ export const bapClientTriggerHandler = async (
   req: Request,
   res: Response<{}, Locals>,
   next: NextFunction,
-  action: RequestActions,
+  action: RequestActions
 ) => {
   try {
     const bpp_id: string | undefined = req.body.context.bpp_id;
