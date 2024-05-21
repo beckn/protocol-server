@@ -131,7 +131,7 @@ export const bapClientTriggerSettler = async (
         axios_config,
         action
       ).then((response) => {
-        errorHandler(response, requestBody, action, context);
+        responseHandler(response, requestBody, action);
       });
     } else {
       const subscribers = await registryLookup({
@@ -145,7 +145,7 @@ export const bapClientTriggerSettler = async (
         axios_config,
         action
       ).then((response) => {
-        errorHandler(response, requestBody, action, context);
+        responseHandler(response, requestBody, action);
       });
     }
    
@@ -168,10 +168,14 @@ export const bapClientTriggerSettler = async (
 };
 
 
-const errorHandler = async(response:any, requestBody:any, action:any, context:any) => {
+const responseHandler = async(res:any, requestBody:any, action:any) => {
   try{
+    const response = {
+      data: JSON.stringify(res.data),
+      status: res.status
+    };
     logger.info(
-      `Result : Request Successful \nStatus: ${response.status} \nData : ${response.data}`
+      `Result : Request Successful \nStatus: ${response.status} \nData : ${JSON.stringify(response.data)}`
     );
     if (
       response.status == 200 ||
@@ -180,7 +184,7 @@ const errorHandler = async(response:any, requestBody:any, action:any, context:an
     ) {
       // Network Calls Succeeded.
       const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
-      const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);  
+      const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);
       telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(requestBody, response);
     } else {
       switch (getConfig().client.type) {
@@ -204,6 +208,7 @@ const errorHandler = async(response:any, requestBody:any, action:any, context:an
           break;
         }
         case ClientConfigType.webhook: {
+          const context = JSON.parse(JSON.stringify(requestBody.context));
           await errorCallback(context, {
             // TODO: change this error code.
             code: 651641,
