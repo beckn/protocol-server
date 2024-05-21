@@ -86,12 +86,14 @@ export const bppClientResponseSettler = async (
     if (requestCache.sender.type == NetworkPaticipantType.BG) {
       const subscribers = [requestCache.sender];
 
-      response = await callNetwork(
+      callNetwork(
         subscribers,
         responseBody,
         axios_config,
         action
-      );
+      ).then((response) => {
+        responseHandler(response, responseBody, action);
+      });
     } else {
       const subscribers: Array<SubscriberDetail> = [
         {
@@ -100,52 +102,16 @@ export const bppClientResponseSettler = async (
         }
       ];
 
-      response = await callNetwork(
+      callNetwork(
         subscribers,
         responseBody,
         axios_config,
         action
-      );
+      ).then((response) => {
+        responseHandler(response, responseBody, action);
+      });
     }
-
-    if (
-      response.status == 200 ||
-      response.status == 202 ||
-      response.status == 206
-    ) {
-      // Network Calls Succeeded.
-      const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
-      const additionalCustomAttrs = customAttributes(responseBody, additionalCustomAttrsConfig);  
-      telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(responseBody, response);
-      return;
-    }
-
-    switch (getConfig().client.type) {
-      case ClientConfigType.synchronous: {
-        throw new Exception(
-          ExceptionType.Config_ClientConfig_Invalid,
-          "Synchronous mode is not available for BPP.",
-          400
-        );
-        break;
-      }
-      case ClientConfigType.messageQueue: {
-        // TODO: implement message queue.
-        break;
-      }
-      case ClientConfigType.webhook: {
-        if (getConfig().app.gateway.mode !== GatewayMode.network) {
-          errorCallback(context, {
-            // TODO: change the error code.
-            code: 354845,
-            message: "Network call failed",
-            type: BecknErrorType.coreError,
-            data: [response]
-          });
-        }
-        break;
-      }
-    }
+    return;
   } catch (error) {
     let exception: Exception | null = null;
     if (error instanceof Exception) {
@@ -162,3 +128,64 @@ export const bppClientResponseSettler = async (
     logger.error(exception);
   }
 };
+
+const responseHandler = async(res:any, responseBody:any, action:any) => {
+  try{
+    const response = {
+      data: JSON.stringify(res.data),
+      status: res.status
+    };
+    if (
+      response.status == 200 ||
+      response.status == 202 ||
+      response.status == 206
+    ) {
+      // Network Calls Succeeded.
+      const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
+      const additionalCustomAttrs = customAttributes(responseBody, additionalCustomAttrsConfig);  
+      telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(responseBody, response);
+    } else {
+      switch (getConfig().client.type) {
+        case ClientConfigType.synchronous: {
+          throw new Exception(
+            ExceptionType.Config_ClientConfig_Invalid,
+            "Synchronous mode is not available for BPP.",
+            400
+          );
+          break;
+        }
+        case ClientConfigType.messageQueue: {
+          // TODO: implement message queue.
+          break;
+        }
+        case ClientConfigType.webhook: {
+          if (getConfig().app.gateway.mode !== GatewayMode.network) {
+            const context = JSON.parse(JSON.stringify(responseBody.context));
+            errorCallback(context, {
+              // TODO: change the error code.
+              code: 354845,
+              message: "Network call failed",
+              type: BecknErrorType.coreError,
+              data: [response]
+            });
+          }
+          break;
+        }
+      }
+    }
+  }catch (error) {
+    let exception: Exception | null = null;
+    if (error instanceof Exception) {
+      exception = error;
+    } else {
+      exception = new Exception(
+        ExceptionType.Request_Failed,
+        "BPP Response Failed at bppClientResponseSettler",
+        500,
+        error
+      );
+    }
+
+    logger.error(exception);
+  }
+}

@@ -70,7 +70,7 @@ if (
             req,
             res,
             next,
-            action as RequestActions
+            action as RequestActions,
           );
         }
       );

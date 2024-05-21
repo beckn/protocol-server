@@ -106,7 +106,6 @@ export const bapClientTriggerSettler = async (
 
     const context = JSON.parse(JSON.stringify(requestBody.context));
     const axios_config = await createAuthHeaderConfig(requestBody);
-
     const bpp_id = requestBody.context.bpp_id;
     const bpp_uri = requestBody.context.bpp_uri;
     const action = requestBody.context.action;
@@ -122,27 +121,58 @@ export const bapClientTriggerSettler = async (
       for (let i = 0; i < subscribers!.length; i++) {
         subscribers![i].subscriber_url = bpp_uri;
       }
-
-      response = await callNetwork(
+      callNetwork(
         subscribers!,
         requestBody,
         axios_config,
         action
-      );
+      ).then((response) => {
+        responseHandler(response, requestBody, action);
+      });
     } else {
       const subscribers = await registryLookup({
         type: NetworkPaticipantType.BG,
         domain: requestBody.context.domain
       });
 
-      response = await callNetwork(
+      callNetwork(
         subscribers!,
         requestBody,
         axios_config,
         action
+      ).then((response) => {
+        responseHandler(response, requestBody, action);
+      });
+    }
+   
+    return;
+  } catch (err) {
+    let exception: Exception | null = null;
+    if (err instanceof Exception) {
+      exception = err;
+    } else {
+      exception = new Exception(
+        ExceptionType.Request_Failed,
+        "BAP Request Failed at bapClientTriggerSettler",
+        500,
+        err
       );
     }
 
+    logger.error(exception);
+  }
+};
+
+
+const responseHandler = async(res:any, requestBody:any, action:any) => {
+  try{
+    const response = {
+      data: JSON.stringify(res.data),
+      status: res.status
+    };
+    logger.info(
+      `Result : Request Successful \nStatus: ${response.status} \nData : ${JSON.stringify(response.data)}`
+    );
     if (
       response.status == 200 ||
       response.status == 202 ||
@@ -150,44 +180,42 @@ export const bapClientTriggerSettler = async (
     ) {
       // Network Calls Succeeded.
       const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
-      const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);  
+      const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);
       telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(requestBody, response);
-      return;
-    }
-
-    switch (getConfig().client.type) {
-      case ClientConfigType.synchronous: {
-        const message_id = requestBody.context.message_id;
-        await SyncCache.getInstance().recordError(
-          message_id,
-          action as RequestActions,
-          {
+    } else {
+      switch (getConfig().client.type) {
+        case ClientConfigType.synchronous: {
+          const message_id = requestBody.context.message_id;
+          await SyncCache.getInstance().recordError(
+            message_id,
+            action as RequestActions,
+            {
+              // TODO: change this error code.
+              code: 651641,
+              type: BecknErrorType.coreError,
+              message: "Network Participant Request Failed...",
+              data: [response]
+            }
+          );
+          break;
+        }
+        case ClientConfigType.messageQueue: {
+          // TODO: Implement message queue.
+          break;
+        }
+        case ClientConfigType.webhook: {
+          const context = JSON.parse(JSON.stringify(requestBody.context));
+          await errorCallback(context, {
             // TODO: change this error code.
             code: 651641,
             type: BecknErrorType.coreError,
             message: "Network Participant Request Failed...",
             data: [response]
-          }
-        );
-        break;
-      }
-      case ClientConfigType.messageQueue: {
-        // TODO: Implement message queue.
-        break;
-      }
-      case ClientConfigType.webhook: {
-        await errorCallback(context, {
-          // TODO: change this error code.
-          code: 651641,
-          type: BecknErrorType.coreError,
-          message: "Network Participant Request Failed...",
-          data: [response]
-        });
-        break;
+          });
+          break;
+        }
       }
     }
-
-    return;
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
