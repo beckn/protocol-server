@@ -85,13 +85,14 @@ if (
           prevMWTime = currentTime;
           await authBuilderMiddleware(req, res, next);
         },
-        async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
-          currentTime = Date.now();
-          console.log(`### authBuilderMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
-          prevMWTime = currentTime;
-          // await openApiValidatorMiddleware(req, res, next);
-          next();
-        },
+        // async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+        //   currentTime = Date.now();
+        //   console.log(`### authBuilderMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
+        //   prevMWTime = currentTime;
+        //   // await openApiValidatorMiddleware(req, res, next);
+        //   next();
+        // },
+        openApiValidatorMiddleware,
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           currentTime = Date.now();
           console.log(`### openApiValidatorMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
