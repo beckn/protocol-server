@@ -17,7 +17,7 @@ const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
 // Function to load and cache the API spec
 const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   if (!apiSpecCache[specFile]) {
-    console.log("Cache Not found loadApiSpec file. Loading....", specFile)
+    logger.info(`Cache Not found loadApiSpec file. Loading.... ${specFile}`)
     const apiSpecYAML = fs.readFileSync(specFile, 'utf8');
     const apiSpec = YAML.parse(apiSpecYAML);
     apiSpecCache[specFile] = apiSpec;
@@ -30,7 +30,7 @@ let cachedOpenApiValidator: express.RequestHandler[] | null = null;
 // Function to initialize and cache the OpenAPI validator middleware
 const getOpenApiValidatorMiddleware = (specFile: string) => {
   if (!cachedOpenApiValidator) {
-    console.log("Cache Not found for OpenApiValidator middleware. Loading....", specFile)
+    logger.info(`Cache Not found for OpenApiValidator middleware. Loading.... ${specFile}`)
     const apiSpec = loadApiSpec(specFile);
     cachedOpenApiValidator = OpenApiValidator.middleware({
       apiSpec,
@@ -103,7 +103,6 @@ export const openApiValidatorMiddleware = async (
   }
 
   const openApiValidator = getOpenApiValidatorMiddleware(specFile)
-  logger.info("openApiValidator middleware initialized", openApiValidator)
 
   const walkSubstack = function (
     stack: any,
