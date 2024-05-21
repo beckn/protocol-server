@@ -23,8 +23,14 @@ import fs from "fs";
 import path from "path";
 import { LogLevelEnum } from "../utils/logger.utils";
 import { onAPI } from "../utils/telemetry.utils";
+import { start } from "repl";
 
 export const requestsRouter = Router();
+
+export async function executionTime(req: Request, res: Response<{}, Locals>, next: NextFunction, action: string, startTime: number, middlewareFn: Function) {
+  await middlewareFn
+  console.log(`### Time to process:`, Date.now() - startTime);
+}
 
 requestsRouter.get("/logs", (req, res) => {
   try {
@@ -57,20 +63,44 @@ if (
   Object.keys(RequestActions).forEach((action) => {
     if (requestActions[action as RequestActions]) {
       // requestsRouter.post(`/${action}`, jsonCompressorMiddleware, contextBuilderMiddleware, authBuilderMiddleware, openApiValidatorMiddleware, bapClientTriggerHandler);
+      let startTime = Date.now();
+      let prevMWTime = Date.now();
+      let currentTime = Date.now();
       requestsRouter.post(
         `/${action}`,
-        jsonCompressorMiddleware,
+        async(req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          startTime = currentTime = Date.now();
+          prevMWTime = currentTime;
+          await jsonCompressorMiddleware(req, res, next);
+        },
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          currentTime = Date.now();
+          console.log(`### jsonCompressorMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
+          prevMWTime = currentTime;
           await contextBuilderMiddleware(req, res, next, action);
         },
-        authBuilderMiddleware,
-        openApiValidatorMiddleware,
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          currentTime = Date.now();
+          console.log(`### contextBuilderMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
+          prevMWTime = currentTime;
+          await authBuilderMiddleware(req, res, next);
+        },
+        async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          currentTime = Date.now();
+          console.log(`### authBuilderMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
+          prevMWTime = currentTime;
+          // await openApiValidatorMiddleware(req, res, next);
+          next();
+        },
+        async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          currentTime = Date.now();
+          console.log(`### openApiValidatorMiddleware Processing Time:`, currentTime - prevMWTime, `ms`);
           await bapClientTriggerHandler(
             req,
             res,
             next,
-            action as RequestActions
+            action as RequestActions,
+            startTime
           );
         }
       );

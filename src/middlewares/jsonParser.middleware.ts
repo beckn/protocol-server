@@ -5,7 +5,8 @@ import logger from "../utils/logger.utils";
 export async function jsonCompressorMiddleware(
   req: Request,
   res: Response<{}, Locals>,
-  next: NextFunction
+  next: NextFunction,
+  startTime: number = Date.now()
 ) {
   // Here we are intentionally converting the raw body to req.body.
   // As we need to avoid the signature that can be caused due to the fact that

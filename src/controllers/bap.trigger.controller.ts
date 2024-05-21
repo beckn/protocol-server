@@ -29,7 +29,8 @@ export const bapClientTriggerHandler = async (
   req: Request,
   res: Response<{}, Locals>,
   next: NextFunction,
-  action: RequestActions
+  action: RequestActions,
+  startTime: number
 ) => {
   try {
     const bpp_id: string | undefined = req.body.context.bpp_id;
@@ -75,6 +76,9 @@ export const bapClientTriggerHandler = async (
         req.body.context
       );
     }
+    res.on("finish", async () => {
+      console.log(`### On res finish Processing Time: ${Date.now() - startTime} ms`);
+    });
   } catch (err) {
     console.log("Error Occured at bapClientTriggerHandler===>", err);
     let exception: Exception | null = null;
