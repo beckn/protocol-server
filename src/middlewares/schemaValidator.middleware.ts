@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response} from "express";
 import * as OpenApiValidator from "express-openapi-validator";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
@@ -8,6 +8,8 @@ import path from "path";
 import { OpenAPIV3 } from 'express-openapi-validator/dist/framework/types';
 import YAML from 'yaml';
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
+import express from 'express';
+import logger from "../utils/logger.utils";
 
 // Cache object
 const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
@@ -15,13 +17,33 @@ const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
 // Function to load and cache the API spec
 const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   if (!apiSpecCache[specFile]) {
-    console.log("Cache Not found. Loading....", specFile)
+    console.log("Cache Not found loadApiSpec file. Loading....", specFile)
     const apiSpecYAML = fs.readFileSync(specFile, 'utf8');
     const apiSpec = YAML.parse(apiSpecYAML);
     apiSpecCache[specFile] = apiSpec;
   }
   return apiSpecCache[specFile];
 };
+
+let cachedOpenApiValidator: express.RequestHandler[] | null = null;
+
+// Function to initialize and cache the OpenAPI validator middleware
+const getOpenApiValidatorMiddleware = (specFile: string) => {
+  if (!cachedOpenApiValidator) {
+    console.log("Cache Not found for OpenApiValidator middleware. Loading....", specFile)
+    const apiSpec = loadApiSpec(specFile);
+    cachedOpenApiValidator = OpenApiValidator.middleware({
+      apiSpec,
+      validateRequests: true,
+      validateResponses: false,
+      $refParser: {
+        mode: "dereference"
+      }
+    });
+  }
+  return cachedOpenApiValidator;
+};
+
 
 export const schemaErrorHandler = (
   err: any,
@@ -80,14 +102,8 @@ export const openApiValidatorMiddleware = async (
     }
   }
 
-  const openApiValidator = OpenApiValidator.middleware({
-    apiSpec: loadApiSpec(specFile),
-    validateRequests: true,
-    validateResponses: false,
-    $refParser: {
-      mode: "dereference"
-    }
-  });
+  const openApiValidator = getOpenApiValidatorMiddleware(specFile)
+  logger.info("openApiValidator middleware initialized", openApiValidator)
 
   const walkSubstack = function (
     stack: any,
