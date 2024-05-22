@@ -5,6 +5,7 @@ import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
 import fs from "fs";
 import path from "path";
+import logger from "../utils/logger.utils";
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const schemaErrorHandler = (
@@ -16,6 +17,7 @@ export const schemaErrorHandler = (
   if (err instanceof Exception) {
     next(err);
   } else {
+    logger.error(JSON.stringify(err));
     const errorData = new Exception(
       ExceptionType.OpenApiSchema_ParsingError,
       `OpenApiValidator Error at ${protocolServerLevel}`,
