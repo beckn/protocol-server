@@ -1,6 +1,4 @@
 FROM node:16.18-alpine3.15
-ARG port
-ARG default_yml
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -10,10 +8,11 @@ RUN npm install
 
 COPY . .
 
-RUN cp ${default_yml} config/default.yml
-
 RUN npm run build
 
 RUN npm i -g pm2
-EXPOSE "$port"
+EXPOSE 5001
+EXPOSE 5002
+EXPOSE 6001
+EXPOSE 6002
 CMD [ "pm2-runtime", "ecosystem.config.js" ]
