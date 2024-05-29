@@ -47,6 +47,8 @@ export const bppNetworkRequestHandler = async (
     }
 
     logger.error(exception);
+  } finally {
+    next()
   }
 };
 
