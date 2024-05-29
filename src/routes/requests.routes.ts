@@ -106,6 +106,10 @@ if (
             action as RequestActions
           );
         },
+        async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
+          console.log('======================came to next===================')
+          next()
+        },
         onAPI
       );
     } else {
