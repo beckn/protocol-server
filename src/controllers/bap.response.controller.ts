@@ -16,6 +16,7 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { responseCallback } from "../utils/callback.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -52,7 +53,13 @@ export const bapNetworkResponseHandler = async (
     logger.info(`response: ${JSON.stringify(req.body)}`);
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
-    next();
+
+    const response = {
+      data: JSON.stringify({}),
+      status: res.status
+    };
+    // generate telemetry
+    telemetrySDK.onApi({})(req.body, response);
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
