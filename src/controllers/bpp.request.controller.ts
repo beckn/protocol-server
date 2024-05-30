@@ -39,6 +39,7 @@ export const bppNetworkRequestHandler = async (
       data: JSON.stringify({}),
       status: res.status
     };
+    
     // generate telemetry
     telemetrySDK.onApi({})(req.body, response)
   } catch (err) {
@@ -55,8 +56,6 @@ export const bppNetworkRequestHandler = async (
     }
 
     logger.error(exception);
-  } finally {
-    next()
   }
 };
 

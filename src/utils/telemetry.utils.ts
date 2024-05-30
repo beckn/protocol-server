@@ -38,11 +38,9 @@ export const getTelemetryConfig = () => {
 export const onAPI = (request: Request, response: Response, next: NextFunction) => {
     const mode = request.get('mode');
     const requestBody = request.body || {};
-    console.log(`line 41 APP Mode: ${getConfig().app.mode} :: action: ${request.body.context.action}`)
     const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
     const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);
     TelemetrySDK.onApi({ data: { attributes: { mode, ...additionalCustomAttrs } } })(request, response, next)
-    console.log(`line 45 APP Mode: ${getConfig().app.mode} :: action: ${request.body.context.action}`)
 }
 
 export const customAttributes = (ctx: Record<string, any>, config: { key: string, path: string }[]) => {
