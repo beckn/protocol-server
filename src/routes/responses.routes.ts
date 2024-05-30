@@ -43,8 +43,7 @@ if (
             next,
             action as ResponseActions
           );
-        },
-        onAPI
+        }
       );
     } else {
       responsesRouter.post(

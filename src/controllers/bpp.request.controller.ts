@@ -14,6 +14,7 @@ import moment from "moment";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
 
 export const bppNetworkRequestHandler = async (
   req: Request,
@@ -33,6 +34,14 @@ export const bppNetworkRequestHandler = async (
       ttl
     );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
+
+    const response = {
+      data: JSON.stringify({}),
+      status: res.status
+    };
+    
+    // generate telemetry
+    telemetrySDK.onApi({})(req.body, response)
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {

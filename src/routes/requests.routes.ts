@@ -105,8 +105,7 @@ if (
             next,
             action as RequestActions
           );
-        },
-        onAPI
+        }
       );
     } else {
       requestsRouter.post(
