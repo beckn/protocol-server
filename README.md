@@ -8,6 +8,8 @@ The Protocol Server is the application that facilitates interaction between BAP 
 
 # Architecture
 
+> Important : The Protocol Server is a reference application only. It is not indended to be used in production currently. To make this reference application adhere to current production standards, contributions are welcome. 
+
 ![image](https://github.com/beckn/protocol-server/blob/devops/guides/images/general-architecture.png)
 
 # Components of protocol server
