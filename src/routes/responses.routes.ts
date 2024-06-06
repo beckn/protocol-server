@@ -29,11 +29,36 @@ if (
   const responseActions = getConfig().app.actions.responses;
   Object.keys(ResponseActions).forEach((action) => {
     if (responseActions[action as ResponseActions]) {
+      const timestampTracker = {
+        start: 0,
+        end: 0
+      };
+
       responsesRouter.post(
         `/${action}`,
         jsonCompressorMiddleware,
         authValidatorMiddleware,
+        async (req: Request, res: Response, next: NextFunction) => {
+          timestampTracker.start = new Date().valueOf();
+          next();
+        },
         openApiValidatorMiddleware,
+        async (req: Request, res: Response, next: NextFunction) => {
+          timestampTracker.end = new Date().valueOf();
+          console.log(
+            `############################################ ${
+              getConfig().app.mode
+            }-${getConfig().app.gateway.mode} OPENAPI Validator started at: ${
+              timestampTracker.start
+            } and ended at: ${timestampTracker.end}.
+             Total difference is ${
+               timestampTracker.end - timestampTracker.start
+             } milliseconds,
+              message ID is ${req?.body?.context?.message_id}
+              action is ${req?.body?.context?.action}`
+          );
+          next();
+        },
         async (req: Request, res: Response, next: NextFunction) => {
           logger.info(`response from bpp: ${JSON.stringify(req.body)}`);
           await bapNetworkResponseHandler(
@@ -63,6 +88,10 @@ if (
   const responseActions = getConfig().app.actions.responses;
   Object.keys(ResponseActions).forEach((action) => {
     if (responseActions[action as ResponseActions]) {
+      const timestampTracker = {
+        start: 0,
+        end: 0
+      };
       responsesRouter.post(
         `/${action}`,
         jsonCompressorMiddleware,
@@ -70,7 +99,27 @@ if (
           await contextBuilderMiddleware(req, res, next, action);
         },
         authBuilderMiddleware,
+        async (req: Request, res: Response, next: NextFunction) => {
+          timestampTracker.start = new Date().valueOf();
+          next();
+        },
         openApiValidatorMiddleware,
+        async (req: Request, res: Response, next: NextFunction) => {
+          timestampTracker.end = new Date().valueOf();
+          console.log(
+            `############################################ ${
+              getConfig().app.mode
+            }-${getConfig().app.gateway.mode} OPENAPI Validator started at: ${
+              timestampTracker.start
+            } and ended at: ${timestampTracker.end}.
+             Total difference is ${
+               timestampTracker.end - timestampTracker.start
+             } milliseconds,
+              message ID is ${req?.body?.context?.message_id}
+              action is ${req?.body?.context?.action}`
+          );
+          next();
+        },
         async (req: Request, res: Response, next: NextFunction) => {
           await bppClientResponseHandler(
             req,
