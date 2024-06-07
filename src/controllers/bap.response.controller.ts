@@ -108,7 +108,12 @@ export const bapNetworkResponseSettler = async (
     const action = ActionUtils.getCorrespondingRequestAction(
       responseBody.context.action
     );
-
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING REVERSE ENTRY BAP CLIENT started at: ${new Date().valueOf()},
+        message ID is ${message_id}
+        action is ${action}\n ############################################`
+    );
     const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
     const requestCache = await RequestCache.getInstance().check(
       message_id,
