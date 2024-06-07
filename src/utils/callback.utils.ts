@@ -27,6 +27,12 @@ async function makeClientCallback(data: any) {
     const clientConnectionConfig = getConfig().client
       .connection as WebhookClientConfigDataType;
     logger.info(`\nWebhook Triggered on:==> ${clientConnectionConfig.url}\n\n`);
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD EXIT BPP CLIENT started at: ${new Date().valueOf()},
+        message ID is ${data?.context?.message_id}
+        action is ${data?.context?.action}\n ############################################`
+    );
     const response = await axios.post(clientConnectionConfig.url, data);
     logger.info(
       `Response from Webhook:==>\n ${JSON.stringify(

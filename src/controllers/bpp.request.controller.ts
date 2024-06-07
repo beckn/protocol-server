@@ -75,6 +75,12 @@ export const bppNetworkRequestSettler = async (
 ) => {
   try {
     const requestBody = JSON.parse(msg?.content.toString()!);
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD ENTRY BPP CLIENT started at: ${new Date().valueOf()},
+        message ID is ${requestBody?.context?.message_id}
+        action is ${requestBody?.context?.action}\n ############################################`
+    );
     // Generate Telemetry if enabled
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
       telemetryCache
