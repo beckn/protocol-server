@@ -2,13 +2,16 @@
 
 The Beckn Protocol Server is a service that helps applications in connecting to the Beckn Network. It follows the Beckn Protocol, making it easier for applications to begin using Beckn Protocol. Any network participant can run this server and connect with the Beckn Network.
 
+# Change Log
+[Link to Change Log](change_log.md)
+
 # Use of Protocol Server
 
 The Protocol Server is the application that facilitates interaction between BAP and BPP with the network. Besides network interaction, it also validates network participants and keeps track of requests and responses made to the network or any network participant.
 
 # Architecture
 
-> Important : The Protocol Server is a reference application only. It is not indended to be used in production currently. To make this reference application adhere to current production standards, contributions are welcome. 
+> Important : The Protocol Server is a reference application only. It is not indended to be used in production currently. To make this reference application adhere to current production standards, contributions are welcome.
 
 ![image](https://github.com/beckn/protocol-server/blob/devops/guides/images/general-architecture.png)
 

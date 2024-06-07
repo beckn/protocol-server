@@ -26,10 +26,11 @@ const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
 };
 
 let cachedOpenApiValidator: express.RequestHandler[] | null = null;
+let cachedSpecFile: string | null = null;
 
 // Function to initialize and cache the OpenAPI validator middleware
 const getOpenApiValidatorMiddleware = (specFile: string) => {
-  if (!cachedOpenApiValidator) {
+  if (!cachedOpenApiValidator || cachedSpecFile !== specFile) {
     logger.info(
       `Cache Not found for OpenApiValidator middleware. Loading.... ${specFile}`
     );
@@ -42,6 +43,7 @@ const getOpenApiValidatorMiddleware = (specFile: string) => {
         mode: "dereference"
       }
     });
+    cachedSpecFile = specFile;
   }
   return cachedOpenApiValidator;
 };

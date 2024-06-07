@@ -41,10 +41,7 @@ export const bppClientResponseHandler = async (
     acknowledgeACK(res, req.body.context);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING REVERSE EXIT BPP CLIENT started at: ${new Date().valueOf()},
-        message ID is ${req?.body?.context?.message_id}
-        action is ${req?.body?.context?.action}\n ############################################`
+      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -71,10 +68,7 @@ export const bppClientResponseSettler = async (
     const context = JSON.parse(JSON.stringify(responseBody.context));
     const message_id = responseBody.context.message_id;
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING REVERSE ENTRY BPP NETWORK started at: ${new Date().valueOf()},
-        message ID is ${context?.message_id}
-        action is ${context?.action}\n ############################################`
+      `TMTR - ${context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
     );
     const requestAction = ActionUtils.getCorrespondingRequestAction(
       responseBody.context.action

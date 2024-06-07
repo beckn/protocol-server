@@ -41,10 +41,7 @@ if (
         `/${action}`,
         (req: Request, res: Response, next: NextFunction) => {
           console.log(
-            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } TIMETRACKING REVERSE ENTRY BAP NETWORK started at: ${new Date().valueOf()},
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}\n ############################################`
+            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
           );
           next();
         },
@@ -57,11 +54,7 @@ if (
         (req: any, res: Response, next: NextFunction) => {
           timestampAuthTracker.end = new Date().valueOf();
           console.log(
-            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } TIMETRACKING AUTH Validator started at: ${timestampAuthTracker.start} and ended at: ${timestampAuthTracker.end}.
-             Total difference is ${timestampAuthTracker.end - timestampAuthTracker.start} milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}\n ############################################`
+            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} AUTH: ${timestampAuthTracker.end - timestampAuthTracker.start} ms`
           );
           next();
         },
@@ -122,10 +115,7 @@ if (
         `/${action}`,
         (req: any, res: Response, next: NextFunction) => {
           console.log(
-            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } TIMETRACKING REVERSE ENTRY BPP CLIENT started at: ${new Date().valueOf()},
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}\n ############################################`
+            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
           );
           next();
         },
@@ -141,11 +131,7 @@ if (
         (req: Request, res: Response, next: NextFunction) => {
           timestampAuthTracker.end = new Date().valueOf();
           console.log(
-            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } TIMETRACKING AUTH Builder started at: ${timestampAuthTracker.start} and ended at: ${timestampAuthTracker.end}.
-             Total difference is ${timestampAuthTracker.end - timestampAuthTracker.start} milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}\n ############################################`
+            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} AUTH: ${timestampAuthTracker.end - timestampAuthTracker.start} ms`
           );
           next();
         },
@@ -157,11 +143,7 @@ if (
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.end = new Date().valueOf();
           console.log(
-            `############################################ ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } TIMETRACKING OPENAPI Validator started at: ${timestampTracker.start} and ended at: ${timestampTracker.end}.
-             Total difference is ${timestampTracker.end - timestampTracker.start} milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}`
+            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} OPENAPI Val: ${timestampTracker.end - timestampTracker.start} ms`
           );
           next();
         },

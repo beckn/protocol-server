@@ -47,10 +47,7 @@ export const bppNetworkRequestHandler = async (
       await processTelemetry();
     }
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING FORWARD EXIT BPP NETWORK started at: ${new Date().valueOf()},
-        message ID is ${req.body.context?.message_id}
-        action is ${action}\n ############################################`
+      `TMTR - ${req.body.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
   } catch (err) {
@@ -76,10 +73,7 @@ export const bppNetworkRequestSettler = async (
   try {
     const requestBody = JSON.parse(msg?.content.toString()!);
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING FORWARD ENTRY BPP CLIENT started at: ${new Date().valueOf()},
-        message ID is ${requestBody?.context?.message_id}
-        action is ${requestBody?.context?.action}\n ############################################`
+      `TMTR - ${requestBody?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
     // Generate Telemetry if enabled
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {

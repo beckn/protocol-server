@@ -60,10 +60,7 @@ export async function sendSyncResponses(
       return;
     }
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING REVERSE EXIT BAP CLIENT started at: ${new Date().valueOf()},
-        message ID is ${context?.message_id}
-        action is ${context?.action}\n ############################################`
+      `TMTR - ${context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
     );
     res.status(200).json({
       context,
