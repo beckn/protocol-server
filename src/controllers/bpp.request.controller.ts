@@ -46,6 +46,12 @@ export const bppNetworkRequestHandler = async (
         ?.push(createTelemetryEvent({ context: req?.body?.context }));
       await processTelemetry();
     }
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD EXIT BPP NETWORK started at: ${new Date().valueOf()},
+        message ID is ${req.body.context?.message_id}
+        action is ${action}\n ############################################`
+    );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
   } catch (err) {
     let exception: Exception | null = null;

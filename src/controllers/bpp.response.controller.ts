@@ -64,6 +64,12 @@ export const bppClientResponseSettler = async (
     const responseBody = JSON.parse(msg?.content.toString()!);
     const context = JSON.parse(JSON.stringify(responseBody.context));
     const message_id = responseBody.context.message_id;
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING REVERSE ENTRY BPP NETWORK started at: ${new Date().valueOf()},
+        message ID is ${context?.message_id}
+        action is ${context?.action}\n ############################################`
+    );
     const requestAction = ActionUtils.getCorrespondingRequestAction(
       responseBody.context.action
     );

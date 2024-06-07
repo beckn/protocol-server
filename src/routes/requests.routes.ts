@@ -55,10 +55,6 @@ if (
   const requestActions = getConfig().app.actions.requests;
   Object.keys(RequestActions).forEach((action) => {
     if (requestActions[action as RequestActions]) {
-      const timestampTracker = {
-        start: 0,
-        end: 0
-      };
       // requestsRouter.post(`/${action}`, jsonCompressorMiddleware, contextBuilderMiddleware, authBuilderMiddleware, openApiValidatorMiddleware, bapClientTriggerHandler);
       requestsRouter.post(
         `/${action}`,
@@ -67,27 +63,7 @@ if (
           await contextBuilderMiddleware(req, res, next, action);
         },
         authBuilderMiddleware,
-        async (req: Request, res: Response, next: NextFunction) => {
-          timestampTracker.start = new Date().valueOf();
-          next();
-        },
         openApiValidatorMiddleware,
-        async (req: Request, res: Response, next: NextFunction) => {
-          timestampTracker.end = new Date().valueOf();
-          console.log(
-            `############################################ ${
-              getConfig().app.mode
-            }-${getConfig().app.gateway.mode} OPENAPI Validator started at: ${
-              timestampTracker.start
-            } and ended at: ${timestampTracker.end}.
-             Total difference is ${
-               timestampTracker.end - timestampTracker.start
-             } milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}`
-          );
-          next();
-        },
         async (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           await bapClientTriggerHandler(
             req,
@@ -120,10 +96,38 @@ if (
         start: 0,
         end: 0
       };
+      const timestampAuthTracker = {
+        start: 0,
+        end: 0
+      };
       requestsRouter.post(
         `/${action}`,
+        (req: any, res: Response<{}, Locals>, next: NextFunction) => {
+          console.log(
+            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+            } TIMETRACKING FORWARD ENTRY BPP NETWORK started at: ${new Date().valueOf()},
+              message ID is ${req?.body?.context?.message_id}
+              action is ${req?.body?.context?.action}\n ############################################`
+          );
+          next();
+        },
         jsonCompressorMiddleware,
+        (req: any, res: Response<{}, Locals>, next: NextFunction) => {
+          timestampAuthTracker.start = new Date().valueOf();
+          next();
+        },
         authValidatorMiddleware,
+        (req: any, res: Response<{}, Locals>, next: NextFunction) => {
+          timestampAuthTracker.end = new Date().valueOf();
+          console.log(
+            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+            } AUTH Validator started at: ${timestampAuthTracker.start} and ended at: ${timestampAuthTracker.end}.
+             Total difference is ${timestampAuthTracker.end - timestampAuthTracker.start} milliseconds,
+              message ID is ${req?.body?.context?.message_id}
+              action is ${req?.body?.context?.action}\n ############################################`
+          );
+          next();
+        },
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.start = new Date().valueOf();
           next();
@@ -132,14 +136,9 @@ if (
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.end = new Date().valueOf();
           console.log(
-            `############################################ ${
-              getConfig().app.mode
-            }-${getConfig().app.gateway.mode} OPENAPI Validator started at: ${
-              timestampTracker.start
-            } and ended at: ${timestampTracker.end}.
-             Total difference is ${
-               timestampTracker.end - timestampTracker.start
-             } milliseconds,
+            `############################################ ${getConfig().app.mode}-${getConfig().app.gateway.mode
+            } OPENAPI Validator started at: ${timestampTracker.start} and ended at: ${timestampTracker.end}.
+             Total difference is ${timestampTracker.end - timestampTracker.start} milliseconds,
               message ID is ${req?.body?.context?.message_id}
               action is ${req?.body?.context?.action}`
           );
