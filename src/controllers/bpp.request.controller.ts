@@ -46,6 +46,12 @@ export const bppNetworkRequestHandler = async (
         ?.push(createTelemetryEvent({ context: req?.body?.context }));
       await processTelemetry();
     }
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD EXIT BPP NETWORK started at: ${new Date().valueOf()},
+        message ID is ${req.body.context?.message_id}
+        action is ${action}\n ############################################`
+    );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
   } catch (err) {
     let exception: Exception | null = null;
@@ -69,6 +75,12 @@ export const bppNetworkRequestSettler = async (
 ) => {
   try {
     const requestBody = JSON.parse(msg?.content.toString()!);
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD ENTRY BPP CLIENT started at: ${new Date().valueOf()},
+        message ID is ${requestBody?.context?.message_id}
+        action is ${requestBody?.context?.action}\n ############################################`
+    );
     // Generate Telemetry if enabled
     if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
       telemetryCache

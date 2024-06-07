@@ -67,13 +67,17 @@ export const bapClientTriggerHandler = async (
       ),
       600 // Cache expiry time
     );
-
     logger.info(
       `Sending message to outbox queue at ${protocolServerLevel}\n\n`
     );
     logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
-
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD EXIT BAP CLIENT started at: ${new Date().valueOf()},
+        message ID is ${req?.body?.context?.message_id}
+        action is ${req?.body?.context?.action}\n ############################################`
+    );
     if (getConfig().client.type == ClientConfigType.synchronous) {
       sendSyncResponses(
         res,
@@ -104,6 +108,13 @@ export const bapClientTriggerSettler = async (
   message: AmqbLib.ConsumeMessage | null
 ) => {
   try {
+    const body = (JSON.parse(message?.content.toString()!) as any)
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD ENTRY BAP NETWORK: ${new Date().valueOf()},
+        message ID is ${body?.context?.message_id}
+        action is ${body?.context?.action}\n ############################################`
+    );
     logger.info(
       "Protocol Network Server (Client Settler) recieving message from outbox queue"
     );
