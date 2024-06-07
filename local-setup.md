@@ -60,9 +60,9 @@ __NOTE: The same instance of Redis, MongoDB, and RabbitMQ can be used for the BA
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BAP-Network to the Internet follow [Exposing local Protocol-server to Internet]
+8. To expose local PS-BAP-Network to the Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/master/Local-Setup.md#exposing-local-protocol-server-to-internet)
 
-9. After generating the public URL follow [Registering on BECKN Registry] to register the PS-BAP-Network on Beckn registry.
+9. After generating the public URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/master/Local-Setup.md#registering-on-beckn-registry) to register the PS-BAP-Network on Beckn registry.
 
 10. After Registration, configure the `default.yml` of both PS-BAP-Client and PS-BAP-Network as per the details provided below.
 
@@ -153,9 +153,9 @@ __NOTE: The same instance of Redis, MongoDB, and RabbitMQ can be used for the BA
    Uh/qEeDz5LrZapUKal2vY4fxffIONciN1JWMMSVvcwu1pEX5cAnejYTc0NY+Pl88arkdNU2pr8Mo/HxVOky+WA==
    ```
 
-8. To expose local PS-BPP-Network to the Internet follow [Exposing local Protocol-server to Internet]
+8. To expose local PS-BPP-Network to the Internet follow [Exposing local Protocol-server to Internet](https://github.com/beckn/protocol-server/blob/master/Local-Setup.md#exposing-local-protocol-server-to-internet)
 
-9. After generating the public URL follow [Registering on BECKN Registry] to register the PS-BPP-Network on Beckn registry.
+9. After generating the public URL follow [Registering on BECKN Registry](https://github.com/beckn/protocol-server/blob/master/Local-Setup.md#registering-on-beckn-registry) to register the PS-BPP-Network on Beckn registry.
 
 10. After registration, configure the `default.yml` of both PS-BPP-Client and PS-BPP-Network as per the details provided below.
 
