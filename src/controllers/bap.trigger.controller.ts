@@ -104,6 +104,13 @@ export const bapClientTriggerSettler = async (
   message: AmqbLib.ConsumeMessage | null
 ) => {
   try {
+    const body = (JSON.parse(message?.content.toString()!) as any)
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD ENTRY BAP NETWORK: ${new Date().valueOf()},
+        message ID is ${body?.context?.message_id}
+        action is ${body?.context?.action}\n ############################################`
+    );
     logger.info(
       "Protocol Network Server (Client Settler) recieving message from outbox queue"
     );

@@ -76,6 +76,12 @@ export async function callNetwork(
       getConfig().app.httpRetryCount,
       "\n"
     );
+    console.log(
+      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } TIMETRACKING FORWARD EXIT BAP NETWORK started at: ${new Date().valueOf()},
+        message ID is ${body?.context?.message_id}
+        action is ${action}\n ############################################`
+    );
     const response = await makeBecknRequest(
       subscribers[i].subscriber_url,
       body,
