@@ -67,10 +67,7 @@ export const bapNetworkResponseHandler = async (
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING REVERSE EXIT BAP NETWORK started at: ${new Date().valueOf()},
-        message ID is ${req?.body?.context?.message_id}
-        action is ${req?.body?.context?.action}\n ############################################`
+      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -109,10 +106,7 @@ export const bapNetworkResponseSettler = async (
       responseBody.context.action
     );
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING REVERSE ENTRY BAP CLIENT started at: ${new Date().valueOf()},
-        message ID is ${message_id}
-        action is ${action}\n ############################################`
+      `TMTR - ${message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
     );
     const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
     const requestCache = await RequestCache.getInstance().check(

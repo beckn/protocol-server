@@ -73,10 +73,7 @@ export const bapClientTriggerHandler = async (
     logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING FORWARD EXIT BAP CLIENT started at: ${new Date().valueOf()},
-        message ID is ${req?.body?.context?.message_id}
-        action is ${req?.body?.context?.action}\n ############################################`
+      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     if (getConfig().client.type == ClientConfigType.synchronous) {
       sendSyncResponses(
@@ -110,10 +107,7 @@ export const bapClientTriggerSettler = async (
   try {
     const body = (JSON.parse(message?.content.toString()!) as any)
     console.log(
-      `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } TIMETRACKING FORWARD ENTRY BAP NETWORK: ${new Date().valueOf()},
-        message ID is ${body?.context?.message_id}
-        action is ${body?.context?.action}\n ############################################`
+      `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
     logger.info(
       "Protocol Network Server (Client Settler) recieving message from outbox queue"

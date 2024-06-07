@@ -78,17 +78,11 @@ export async function callNetwork(
     );
     if (getConfig().app.mode.toLowerCase() === 'bap') {
       console.log(
-        `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-        } TIMETRACKING FORWARD EXIT BAP NETWORK started at: ${new Date().valueOf()},
-          message ID is ${body?.context?.message_id}
-          action is ${action}\n ############################################`
+        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
       );
     } else {
       console.log(
-        `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-        } TIMETRACKING REVERSE EXIT BPP NETWORK started at: ${new Date().valueOf()},
-          message ID is ${body?.context?.message_id}
-          action is ${body?.context?.action}\n ############################################`
+        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
       );
     }
 
