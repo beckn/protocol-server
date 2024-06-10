@@ -18,8 +18,6 @@ let cachedOpenApiValidator: {
   [filename: string]: express.RequestHandler[];
 } = {};
 
-let cachedSpecFile: { [filename: string]: string } = {};
-
 // Function to load and cache the API spec
 const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   if (!apiSpecCache[specFile]) {
@@ -33,10 +31,7 @@ const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
 
 // Function to initialize and cache the OpenAPI validator middleware
 const getOpenApiValidatorMiddleware = (specFile: string) => {
-  if (
-    !cachedOpenApiValidator[specFile] ||
-    cachedSpecFile[specFile] !== specFile
-  ) {
+  if (!cachedOpenApiValidator[specFile]) {
     logger.info(
       `Cache Not found for OpenApiValidator middleware. Loading.... ${specFile}`
     );
@@ -49,9 +44,8 @@ const getOpenApiValidatorMiddleware = (specFile: string) => {
         mode: "dereference"
       }
     });
-    cachedSpecFile[specFile] = specFile;
   }
-  return cachedOpenApiValidator;
+  return cachedOpenApiValidator[specFile];
 };
 
 export const schemaErrorHandler = (
@@ -114,7 +108,6 @@ export const openApiValidatorMiddleware = async (
 
   console.log("apiSpecCache", apiSpecCache);
   console.log("cachedOpenApiValidator", cachedOpenApiValidator);
-  console.log("cachedSpecFile", cachedSpecFile);
 
   const openApiValidator = getOpenApiValidatorMiddleware(specFile);
 
@@ -138,5 +131,5 @@ export const openApiValidatorMiddleware = async (
     };
     walkStack(0);
   };
-  walkSubstack([...openApiValidator[specFile]], req, res, next);
+  walkSubstack([...openApiValidator], req, res, next);
 };
