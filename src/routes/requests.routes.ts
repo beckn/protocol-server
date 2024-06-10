@@ -23,6 +23,7 @@ import fs from "fs";
 import path from "path";
 import { LogLevelEnum } from "../utils/logger.utils";
 export const requestsRouter = Router();
+import { onAPI } from "../utils/telemetry.utils";
 
 requestsRouter.get("/logs", (req, res) => {
   try {

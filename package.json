@@ -22,7 +22,8 @@
     "@types/uuid": "^8.3.4",
     "nodemon": "^2.0.16",
     "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "@types/lodash": "^4.17.0"
   },
   "dependencies": {
     "amqplib": "^0.10.0",
@@ -41,6 +42,8 @@
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
     "winston-daily-rotate-file": "^4.7.1",
-    "zod": "^3.14.2"
+    "zod": "^3.14.2",
+    "beckn-telemetry-sdk": "1.0.3",
+    "lodash": "^4.17.21"
   }
 }
