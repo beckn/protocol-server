@@ -59,6 +59,9 @@ export async function sendSyncResponses(
       });
       return;
     }
+    console.log(
+      `TMTR - ${context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+    );
     res.status(200).json({
       context,
       responses: syncCacheData.responses || []

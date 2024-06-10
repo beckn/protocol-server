@@ -5,8 +5,48 @@ import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
 import fs from "fs";
 import path from "path";
-import logger from "../utils/logger.utils";
+import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+import YAML from "yaml";
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
+import express from "express";
+import logger from "../utils/logger.utils";
+
+// Cache object
+const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
+
+let cachedOpenApiValidator: {
+  [filename: string]: express.RequestHandler[];
+} = {};
+
+// Function to load and cache the API spec
+const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
+  if (!apiSpecCache[specFile]) {
+    logger.info(`Cache Not found loadApiSpec file. Loading.... ${specFile}`);
+    const apiSpecYAML = fs.readFileSync(specFile, "utf8");
+    const apiSpec = YAML.parse(apiSpecYAML);
+    apiSpecCache[specFile] = apiSpec;
+  }
+  return apiSpecCache[specFile];
+};
+
+// Function to initialize and cache the OpenAPI validator middleware
+const getOpenApiValidatorMiddleware = (specFile: string) => {
+  if (!cachedOpenApiValidator[specFile]) {
+    logger.info(
+      `Cache Not found for OpenApiValidator middleware. Loading.... ${specFile}`
+    );
+    const apiSpec = loadApiSpec(specFile);
+    cachedOpenApiValidator[specFile] = OpenApiValidator.middleware({
+      apiSpec,
+      validateRequests: true,
+      validateResponses: false,
+      $refParser: {
+        mode: "dereference"
+      }
+    });
+  }
+  return cachedOpenApiValidator[specFile];
+};
 
 export const schemaErrorHandler = (
   err: any,
@@ -17,7 +57,6 @@ export const schemaErrorHandler = (
   if (err instanceof Exception) {
     next(err);
   } else {
-    logger.error(JSON.stringify(err));
     const errorData = new Exception(
       ExceptionType.OpenApiSchema_ParsingError,
       `OpenApiValidator Error at ${protocolServerLevel}`,
@@ -37,33 +76,40 @@ export const openApiValidatorMiddleware = async (
   const version = req?.body?.context?.core_version
     ? req?.body?.context?.core_version
     : req?.body?.context?.version;
-  let specFile: string;
-  let isDomainSpecificExist = false;
-  if (getConfig().app.useDomainSpecificYAML) {
+  let specFile = `schemas/core_${version}.yaml`;
+
+  if (getConfig().app.useLayer2Config) {
+    let doesLayer2ConfigExist = false;
+    let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
+    let specialCharsRe = /[:\/]/gi;
+    layer2ConfigFilename = layer2ConfigFilename.replace(specialCharsRe, "_");
     try {
-      isDomainSpecificExist = (
+      doesLayer2ConfigExist = (
         await fs.promises.readdir(
           `${path.join(path.resolve(__dirname, "../../"))}/schemas`
         )
-      ).includes(`${req?.body?.context?.domain}_${version}.yaml`);
+      ).includes(layer2ConfigFilename);
     } catch (error) {
-      isDomainSpecificExist = false;
+      doesLayer2ConfigExist = false;
+    }
+    if (doesLayer2ConfigExist) specFile = `schemas/${layer2ConfigFilename}`;
+    else {
+      if (getConfig().app.mandateLayer2Config) {
+        return next(
+          new Exception(
+            ExceptionType.Config_AppConfig_Layer2_Missing,
+            `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`,
+            422
+          )
+        );
+      }
     }
   }
-  specFile = getConfig().app.useDomainSpecificYAML
-    ? isDomainSpecificExist
-      ? `schemas/${req?.body?.context?.domain}_${version}.yaml`
-      : `schemas/core_${version}.yaml`
-    : `schemas/core_${version}.yaml`;
 
-  const openApiValidator = OpenApiValidator.middleware({
-    apiSpec: specFile,
-    validateRequests: true,
-    validateResponses: false,
-    $refParser: {
-      mode: "dereference"
-    }
-  });
+  console.log("apiSpecCache", apiSpecCache);
+  console.log("cachedOpenApiValidator", cachedOpenApiValidator);
+
+  const openApiValidator = getOpenApiValidatorMiddleware(specFile);
 
   const walkSubstack = function (
     stack: any,

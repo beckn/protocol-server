@@ -55,22 +55,26 @@ export const bapClientTriggerHandler = async (
       acknowledgeACK(res, req.body.context);
     }
 
+    const ttl = (getConfig().app.actions.requests[action]?.ttl! / 1000);
     await RequestCache.getInstance().cache(
       parseRequestCache(
         req.body.context.transaction_id,
         req.body.context.message_id,
         action,
-        res.locals.sender!
+        res.locals.sender!,
+        '',
+        ttl
       ),
-      getConfig().app.actions.requests[action]?.ttl!
+      600 // Cache expiry time
     );
-
     logger.info(
       `Sending message to outbox queue at ${protocolServerLevel}\n\n`
     );
     logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
-
+    console.log(
+      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+    );
     if (getConfig().client.type == ClientConfigType.synchronous) {
       sendSyncResponses(
         res,
@@ -101,6 +105,10 @@ export const bapClientTriggerSettler = async (
   message: AmqbLib.ConsumeMessage | null
 ) => {
   try {
+    const body = (JSON.parse(message?.content.toString()!) as any)
+    console.log(
+      `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
+    );
     logger.info(
       "Protocol Network Server (Client Settler) recieving message from outbox queue"
     );

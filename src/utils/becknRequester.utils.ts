@@ -16,23 +16,27 @@ export const makeBecknRequest = async (
   try {
     const requestURL = combineURLs(subscriberUrl, `/${action}`);
 
-    const response = await axios.post(requestURL, body, axios_config);
+    const response = await axios.post(requestURL, body, {
+      ...axios_config,
+      timeout: 10000
+    });
 
     return {
       data: JSON.stringify(response.data),
-      status: response.status,
+      status: response.status
     };
   } catch (error) {
+    console.log("Error at Make Beckn Request=====>", error);
     let response: BecknResponse | undefined;
     if (axios.isAxiosError(error)) {
       response = {
         data: JSON.stringify(error.response?.data),
-        status: error.response?.status ? error.response?.status : 500,
+        status: error.response?.status ? error.response?.status : 500
       };
     } else {
       response = {
         data: "No Response",
-        status: 500,
+        status: 500
       };
     }
 
@@ -59,7 +63,7 @@ export async function callNetwork(
   if (subscribers.length == 0) {
     return {
       data: "No Subscribers found",
-      status: 500,
+      status: 500
     };
   }
 
@@ -72,6 +76,16 @@ export async function callNetwork(
       getConfig().app.httpRetryCount,
       "\n"
     );
+    if (getConfig().app.mode.toLowerCase() === 'bap') {
+      console.log(
+        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+      );
+    } else {
+      console.log(
+        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+      );
+    }
+
     const response = await makeBecknRequest(
       subscribers[i].subscriber_url,
       body,
@@ -98,6 +112,6 @@ export async function callNetwork(
 
   return {
     data: "No Response",
-    status: 500,
+    status: 500
   };
 }

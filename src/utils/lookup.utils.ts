@@ -77,7 +77,7 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
 
 export async function getSubscriberDetails(
   subscriber_id: string,
-  unique_key_id: string
+  unique_key_id?: string
 ) {
   const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
   try {

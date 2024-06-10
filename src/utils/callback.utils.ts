@@ -27,6 +27,9 @@ async function makeClientCallback(data: any) {
     const clientConnectionConfig = getConfig().client
       .connection as WebhookClientConfigDataType;
     logger.info(`\nWebhook Triggered on:==> ${clientConnectionConfig.url}\n\n`);
+    console.log(
+      `TMTR - ${data?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+    );
     const response = await axios.post(clientConnectionConfig.url, data);
     logger.info(
       `Response from Webhook:==>\n ${JSON.stringify(
@@ -120,5 +123,37 @@ export async function errorCallback(context: any, error: BecknErrorDataType) {
       500,
       error
     );
+  }
+}
+
+export async function unsolicitedCallback(data: any) {
+  try {
+    const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
+    if (!unsolicitedWebhookUrl) {
+      throw new Exception(
+        ExceptionType.Client_InvalidCall,
+        "Unsolicited Webhook URL not configured",
+        500
+      );
+    }
+
+    logger.info(`\nUnsolicited Webhook Triggered on:==> ${unsolicitedWebhookUrl}\n\n`);
+    const response = await axios.post(unsolicitedWebhookUrl, data);
+    logger.info(
+      `Response from Webhook:==>\n ${JSON.stringify(
+        response.data
+      )}\nWith Data\n${JSON.stringify(data)}\n\n`
+    );
+  } catch (error: any) {
+    console.log("Error from unsolicited call");
+
+    if (error.response) {
+      console.log("\n\n", error, "\n\n");
+      console.log(`Callback to client failed with status ${error.response.status} and data ${error.response.data}`);
+    } else if (error.request) {
+      console.log(`Callback to client failed with data ${error.request}`);
+    } else {
+      console.log(`Callback to client failed with data ${error}`);
+    }
   }
 }
