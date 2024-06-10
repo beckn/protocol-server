@@ -171,6 +171,7 @@ export const bppClientResponseSettler = async (
         break;
       }
     }
+  }
   } catch (error) {
     let exception: Exception | null = null;
     if (error instanceof Exception) {

@@ -195,6 +195,7 @@ export const bapClientTriggerSettler = async (
     }
 
     return;
+  }
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
