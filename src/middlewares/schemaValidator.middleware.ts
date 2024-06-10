@@ -14,6 +14,12 @@ import logger from "../utils/logger.utils";
 // Cache object
 const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
 
+let cachedOpenApiValidator: {
+  [filename: string]: express.RequestHandler[];
+} = {};
+
+let cachedSpecFile: { [filename: string]: string } = {};
+
 // Function to load and cache the API spec
 const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   if (!apiSpecCache[specFile]) {
@@ -25,17 +31,17 @@ const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   return apiSpecCache[specFile];
 };
 
-let cachedOpenApiValidator: express.RequestHandler[] | null = null;
-let cachedSpecFile: string | null = null;
-
 // Function to initialize and cache the OpenAPI validator middleware
 const getOpenApiValidatorMiddleware = (specFile: string) => {
-  if (!cachedOpenApiValidator || cachedSpecFile !== specFile) {
+  if (
+    !cachedOpenApiValidator[specFile] ||
+    cachedSpecFile[specFile] !== specFile
+  ) {
     logger.info(
       `Cache Not found for OpenApiValidator middleware. Loading.... ${specFile}`
     );
     const apiSpec = loadApiSpec(specFile);
-    cachedOpenApiValidator = OpenApiValidator.middleware({
+    cachedOpenApiValidator[specFile] = OpenApiValidator.middleware({
       apiSpec,
       validateRequests: true,
       validateResponses: false,
@@ -43,7 +49,7 @@ const getOpenApiValidatorMiddleware = (specFile: string) => {
         mode: "dereference"
       }
     });
-    cachedSpecFile = specFile;
+    cachedSpecFile[specFile] = specFile;
   }
   return cachedOpenApiValidator;
 };
@@ -106,6 +112,10 @@ export const openApiValidatorMiddleware = async (
     }
   }
 
+  console.log("apiSpecCache", apiSpecCache);
+  console.log("cachedOpenApiValidator", cachedOpenApiValidator);
+  console.log("cachedSpecFile", cachedSpecFile);
+
   const openApiValidator = getOpenApiValidatorMiddleware(specFile);
 
   const walkSubstack = function (
@@ -128,5 +138,5 @@ export const openApiValidatorMiddleware = async (
     };
     walkStack(0);
   };
-  walkSubstack([...openApiValidator], req, res, next);
+  walkSubstack([...openApiValidator[specFile]], req, res, next);
 };
