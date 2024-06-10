@@ -72,13 +72,7 @@ export const bppNetworkRequestSettler = async (
     console.log(
       `TMTR - ${requestBody?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
-    // Generate Telemetry if enabled
-    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      telemetryCache
-        .get("bpp_request_settled")
-        ?.push(createTelemetryEvent({ context: requestBody.context }));
-      await processTelemetry();
-    }
+
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
         throw new Exception(
