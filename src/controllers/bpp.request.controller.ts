@@ -14,11 +14,8 @@ import moment from "moment";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
+
 
 export const bppNetworkRequestHandler = async (
   req: Request,
@@ -37,19 +34,19 @@ export const bppNetworkRequestHandler = async (
       parseRequestCache(transaction_id, message_id, action, res.locals.sender!, '', ttl),
       600 // Cache expiry time
     );
-    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      if (!telemetryCache.get("bpp_request_handled")) {
-        telemetryCache.set("bpp_request_handled", []);
-      }
-      telemetryCache
-        .get("bpp_request_handled")
-        ?.push(createTelemetryEvent({ context: req?.body?.context }));
-      await processTelemetry();
-    }
+    
     console.log(
       `TMTR - ${req.body.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
+
+    const response = {
+      data: JSON.stringify({}),
+      status: res.status
+    };
+
+    // generate telemetry
+    telemetrySDK.onApi({})(req.body, response)
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
@@ -75,13 +72,7 @@ export const bppNetworkRequestSettler = async (
     console.log(
       `TMTR - ${requestBody?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
-    // Generate Telemetry if enabled
-    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      telemetryCache
-        .get("bpp_request_settled")
-        ?.push(createTelemetryEvent({ context: requestBody.context }));
-      await processTelemetry();
-    }
+
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
         throw new Exception(
