@@ -8,7 +8,7 @@ import { ActionUtils } from "../utils/actions.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
 import {
   acknowledgeACK,
-  acknowledgeNACK,
+  acknowledgeNACK
 } from "../utils/acknowledgement.utils";
 import { BecknErrorType } from "../schemas/becknError.schema";
 import { GatewayUtils } from "../utils/gateway.utils";
@@ -19,7 +19,7 @@ import { responseCallback, unsolicitedCallback } from "../utils/callback.utils";
 import { telemetryCache } from "../schemas/cache/telemetry.cache";
 import {
   createTelemetryEvent,
-  processTelemetry,
+  processTelemetry
 } from "../utils/telemetry.utils";
 import moment from "moment";
 
@@ -40,7 +40,7 @@ export const bapNetworkResponseHandler = async (
     if (requestCache) {
       const now = moment().valueOf();
       const { timestamp = 0, ttl = 0 } = requestCache as any;
-      if (((now - timestamp) / 1000) > ttl) {
+      if ((now - timestamp) / 1000 > ttl) {
         // Delayed message
         logger.info(
           `\Delayed message received at BAP Network message id: ${message_id}\n\n`
@@ -49,7 +49,7 @@ export const bapNetworkResponseHandler = async (
           // TODO: change the error code.
           code: 6781616,
           message: `Response timed out for ${message_id} and action:${requestAction}, as requestCache not found`,
-          type: BecknErrorType.coreError,
+          type: BecknErrorType.coreError
         });
         return;
       }
@@ -67,7 +67,9 @@ export const bapNetworkResponseHandler = async (
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
     console.log(
-      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${
+        getConfig().app.gateway.mode
+      } REV EXIT: ${new Date().valueOf()}`
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -76,7 +78,8 @@ export const bapNetworkResponseHandler = async (
     } else {
       exception = new Exception(
         ExceptionType.Response_Failed,
-        `BAP Response Failed at bapNetworkResponseHandler at ${getConfig().app.mode
+        `BAP Response Failed at bapNetworkResponseHandler at ${
+          getConfig().app.mode
         } ${getConfig().app.gateway.mode}`,
         500,
         err
@@ -95,7 +98,7 @@ export const bapNetworkResponseSettler = async (
       "Protocol Client Server (Network Settler) recieving message from inbox queue"
     );
 
-    const responseBody = JSON.parse(message?.content.toString()!);
+    let responseBody = JSON.parse(message?.content.toString()!);
 
     logger.info(
       `Response from BPP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`
@@ -106,7 +109,9 @@ export const bapNetworkResponseSettler = async (
       responseBody.context.action
     );
     console.log(
-      `TMTR - ${message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${message_id} - ${getConfig().app.mode}-${
+        getConfig().app.gateway.mode
+      } REV ENTRY: ${new Date().valueOf()}`
     );
     const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
     const requestCache = await RequestCache.getInstance().check(
@@ -114,6 +119,10 @@ export const bapNetworkResponseSettler = async (
       action
     );
     if (!requestCache && unsolicitedWebhookUrl) {
+      responseBody = {
+        context: responseBody.context,
+        responses: [responseBody]
+      };
       unsolicitedCallback(responseBody);
       return;
     }
