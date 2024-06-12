@@ -54,6 +54,9 @@ export const appConfigSchema = z.object({
   mandateLayer2Config: z.boolean().optional(),
   unsolicitedWebhook: z.object({
     url: z.string().optional()
+  }).optional(),
+  openAPIValidator: z.object({
+    cachedFileLimit: z.number().optional()
   }).optional()
 });
 

@@ -16,6 +16,7 @@ import { ClientUtils } from "./utils/client.utils";
 import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
+import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
 
 const app = Express();
 
@@ -120,6 +121,7 @@ const main = async () => {
   try {
     await ClientUtils.initializeConnection();
     await GatewayUtils.getInstance().initialize();
+    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
     if (getConfig().responseCache.enabled) {
       await ResponseCache.getInstance().initialize();
     }
@@ -131,8 +133,8 @@ const main = async () => {
       logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
       logger.info(
         "Gateway Type: " +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
       );
     });
   } catch (err) {
