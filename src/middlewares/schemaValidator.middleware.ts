@@ -46,6 +46,7 @@ export class OpenApiValidatorMiddleware {
       const files = fs.readdirSync(specFolder);
       const fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
       const cachedFileLimit: number = OpenApiValidatorMiddleware.cachedFileLimit;
+      logger.info(`OpenAPIValidator Cache count ${cachedFileLimit}`);
       for (let i = 0; (i < cachedFileLimit && fileNames[i]); i++) {
         const file = `${specFolder}/${fileNames[i]}`;
         if (!OpenApiValidatorMiddleware.cachedOpenApiValidator[file]) {
