@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { Locals } from "../interfaces/locals.interface";
-import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
-import logger from "../utils/logger.utils";
 import * as AmqbLib from "amqplib";
+import moment from "moment";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { ActionUtils } from "../utils/actions.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
@@ -21,7 +19,9 @@ import {
   createTelemetryEvent,
   processTelemetry,
 } from "../utils/telemetry.utils";
-import moment from "moment";
+import { Locals } from "../interfaces/locals.interface";
+import { ResponseActions } from "../schemas/configs/actions.app.config.schema";
+import logger from "../utils/logger.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -67,7 +67,8 @@ export const bapNetworkResponseHandler = async (
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
     console.log(
-      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } REV EXIT: ${new Date().valueOf()}`
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -94,8 +95,7 @@ export const bapNetworkResponseSettler = async (
     logger.info(
       "Protocol Client Server (Network Settler) recieving message from inbox queue"
     );
-
-    const responseBody = JSON.parse(message?.content.toString()!);
+    let responseBody = JSON.parse(message?.content.toString()!);
 
     logger.info(
       `Response from BPP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`
@@ -106,7 +106,8 @@ export const bapNetworkResponseSettler = async (
       responseBody.context.action
     );
     console.log(
-      `TMTR - ${message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${message_id} - ${action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode
+      } REV ENTRY: ${new Date().valueOf()}`
     );
     const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
     const requestCache = await RequestCache.getInstance().check(
@@ -114,6 +115,10 @@ export const bapNetworkResponseSettler = async (
       action
     );
     if (!requestCache && unsolicitedWebhookUrl) {
+      responseBody = {
+        context: responseBody.context,
+        responses: [responseBody]
+      };
       unsolicitedCallback(responseBody);
       return;
     }

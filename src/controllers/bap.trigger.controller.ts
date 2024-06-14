@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import * as AmqbLib from "amqplib";
 import { Locals } from "../interfaces/locals.interface";
 import { RequestActions } from "../schemas/configs/actions.app.config.schema";
 import logger from "../utils/logger.utils";
-import * as AmqbLib from "amqplib";
 import {
   acknowledgeACK,
   acknowledgeNACK
@@ -27,6 +27,7 @@ import {
   createTelemetryEvent,
   processTelemetry
 } from "../utils/telemetry.utils";
+
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
 export const bapClientTriggerHandler = async (
@@ -73,7 +74,7 @@ export const bapClientTriggerHandler = async (
     logger.info(`Request from client:\n ${JSON.stringify(req.body)}\n`);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     console.log(
-      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     if (getConfig().client.type == ClientConfigType.synchronous) {
       sendSyncResponses(
@@ -107,7 +108,7 @@ export const bapClientTriggerSettler = async (
   try {
     const body = (JSON.parse(message?.content.toString()!) as any)
     console.log(
-      `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${body?.context?.message_id} - ${body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
     logger.info(
       "Protocol Network Server (Client Settler) recieving message from outbox queue"

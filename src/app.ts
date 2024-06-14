@@ -3,19 +3,16 @@ import cors from "cors";
 import { Exception } from "./models/exception.model";
 import {
   BecknErrorDataType,
-  becknErrorSchema,
   BecknErrorType,
 } from "./schemas/becknError.schema";
-import { RequestActions } from "./schemas/configs/actions.app.config.schema";
 import { LookupCache } from "./utils/cache/lookup.cache.utils";
 import { RequestCache } from "./utils/cache/request.cache.utils";
 import { ResponseCache } from "./utils/cache/response.cache.utils";
-import { SyncCache } from "./utils/cache/sync.cache.utils";
 import { ClientUtils } from "./utils/client.utils";
-
 import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
+import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
 
 const app = Express();
 
@@ -27,6 +24,15 @@ app.use(
 
 const initializeExpress = async (successCallback: Function) => {
   const app = Express();
+
+  app.use(
+    require("express-status-monitor")({
+      path: "/process"
+    })
+  );
+  app.get("/status", async (req: Request, res: Response, next: NextFunction) => {
+    res.status(200).send('Added logic to cache OpenAPI validator spec on app load');
+  });
 
   // Enabling Cors
   app.options(
@@ -127,10 +133,11 @@ const main = async () => {
       logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
       logger.info(
         "Gateway Type: " +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
       );
     });
+    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());

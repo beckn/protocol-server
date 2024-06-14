@@ -28,7 +28,7 @@ async function makeClientCallback(data: any) {
       .connection as WebhookClientConfigDataType;
     logger.info(`\nWebhook Triggered on:==> ${clientConnectionConfig.url}\n\n`);
     console.log(
-      `TMTR - ${data?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+      `TMTR - ${data?.context?.message_id} - ${data?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     const response = await axios.post(clientConnectionConfig.url, data);
     logger.info(
