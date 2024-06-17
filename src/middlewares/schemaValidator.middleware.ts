@@ -17,26 +17,6 @@ const apiSpecCache: { [filename: string]: OpenAPIV3.Document } = {};
 let cachedOpenApiValidator: {
   [filename: string]: express.RequestHandler[];
 } = {};
-const walkSubstack = function (
-  stack: any,
-  req: any,
-  res: any,
-  next: NextFunction
-) {
-  if (typeof stack === "function") {
-    stack = [stack];
-  }
-  const walkStack = function (i: any, err?: any) {
-    if (err) {
-      return schemaErrorHandler(err, req, res, next);
-    }
-    if (i >= stack.length) {
-      return next();
-    }
-    stack[i](req, res, walkStack.bind(null, i + 1));
-  };
-  walkStack(0);
-};
 // Function to load and cache the API spec
 const loadApiSpec = (specFile: string): OpenAPIV3.Document => {
   if (!apiSpecCache[specFile]) {
@@ -129,6 +109,27 @@ export const openApiValidatorMiddleware = async (
   console.log("cachedOpenApiValidator", cachedOpenApiValidator);
 
   const openApiValidator = getOpenApiValidatorMiddleware(specFile);
+
+  const walkSubstack = function (
+    stack: any,
+    req: any,
+    res: any,
+    next: NextFunction
+  ) {
+    if (typeof stack === "function") {
+      stack = [stack];
+    }
+    const walkStack = function (i: any, err?: any) {
+      if (err) {
+        return schemaErrorHandler(err, req, res, next);
+      }
+      if (i >= stack.length) {
+        return next();
+      }
+      stack[i](req, res, walkStack.bind(null, i + 1));
+    };
+    walkStack(0);
+  };
 
   walkSubstack([...openApiValidator], req, res, next);
 };
