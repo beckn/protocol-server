@@ -4,7 +4,7 @@ import { Exception } from "./models/exception.model";
 import {
   BecknErrorDataType,
   becknErrorSchema,
-  BecknErrorType,
+  BecknErrorType
 } from "./schemas/becknError.schema";
 import { RequestActions } from "./schemas/configs/actions.app.config.schema";
 import { LookupCache } from "./utils/cache/lookup.cache.utils";
@@ -16,12 +16,13 @@ import { ClientUtils } from "./utils/client.utils";
 import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
+import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
 
 const app = Express();
 
 app.use(
   Express.json({
-    limit: "200kb",
+    limit: "200kb"
   })
 );
 
@@ -35,13 +36,13 @@ const initializeExpress = async (successCallback: Function) => {
       origin: "*",
       optionsSuccessStatus: 200,
       credentials: true,
-      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
     })
   );
   app.use(
     cors({
       origin: "*",
-      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
     })
   );
 
@@ -50,10 +51,10 @@ const initializeExpress = async (successCallback: Function) => {
     Express.json({
       verify: (req: Request, res: Response, buf: Buffer) => {
         res.locals = {
-          rawBody: buf.toString(),
+          rawBody: buf.toString()
         };
       },
-      limit: "200kb",
+      limit: "200kb"
     })
   );
 
@@ -83,24 +84,24 @@ const initializeExpress = async (successCallback: Function) => {
         code: err.code,
         message: err.message,
         data: err.errorData,
-        type: BecknErrorType.domainError,
+        type: BecknErrorType.domainError
       } as BecknErrorDataType;
       res.status(err.code).json({
         message: {
           ack: {
-            status: "NACK",
-          },
+            status: "NACK"
+          }
         },
-        error: errorData,
+        error: errorData
       });
     } else {
       res.status(err.code || 500).json({
         message: {
           ack: {
-            status: "NACK",
-          },
+            status: "NACK"
+          }
         },
-        error: err,
+        error: err
       });
     }
   });
@@ -116,6 +117,7 @@ const main = async () => {
   try {
     await ClientUtils.initializeConnection();
     await GatewayUtils.getInstance().initialize();
+    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
     if (getConfig().responseCache.enabled) {
       await ResponseCache.getInstance().initialize();
     }
