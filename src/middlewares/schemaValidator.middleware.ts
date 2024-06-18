@@ -12,7 +12,7 @@ import {
   RequestActions,
   ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
-import * as httpMocks from "node-mocks-http";
+const httpMocks = require("node-mocks-http");
 import { v4 as uuid_v4 } from "uuid";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
