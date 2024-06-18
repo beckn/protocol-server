@@ -78,7 +78,7 @@ const initializeExpress = async (successCallback: Function) => {
 
   // Error Handler.
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    console.log(err);
+    console.log("In Error Handler---->middleware", err);
     if (err instanceof Exception) {
       const errorData = {
         code: err.code,
