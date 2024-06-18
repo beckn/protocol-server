@@ -78,7 +78,7 @@ export class OpenApiValidatorMiddleware {
             count: 0,
             requestHandler: requestHandler
           };
-          await initializeOpenApiValidatorCache(requestHandler, file);
+          // await initializeOpenApiValidatorCache(requestHandler, file);
         }
       }
     } catch (err) {
