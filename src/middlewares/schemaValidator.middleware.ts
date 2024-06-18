@@ -215,6 +215,7 @@ const walkSubstack = function (
   }
   const walkStack = function (i: any, err?: any) {
     if (err) {
+      console.log(err);
       return schemaErrorHandler(err, req, res, next);
     }
     if (i >= stack.length) {
