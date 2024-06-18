@@ -78,7 +78,7 @@ export class OpenApiValidatorMiddleware {
             count: 0,
             requestHandler: requestHandler
           };
-          // await initializeOpenApiValidatorCache(requestHandler, file);
+          await initializeOpenApiValidatorCache(requestHandler, file);
         }
       }
     } catch (err) {
@@ -174,6 +174,7 @@ const initializeOpenApiValidatorCache = async (
     }
 
     actions.slice(0, 2).forEach((action) => {
+      console.log("Action is:", action);
       const mockRequest = (body: any) => {
         const req = httpMocks.createRequest({
           method: "POST",
@@ -198,12 +199,12 @@ const initializeOpenApiValidatorCache = async (
         } as any;
         return req;
       };
+
       const reqObj = mockRequest({
         context: { action: `${action}` },
         message: {}
       });
-      console.log("This is for specfile: ", specFile);
-
+      console.log(`Mock created for action ${action} and domain ${specFile}`);
       walkSubstack(
         stack,
         reqObj,
@@ -211,7 +212,7 @@ const initializeOpenApiValidatorCache = async (
         () => {
           return;
         },
-        false
+        true
       );
     });
   } catch (error: any) {
@@ -231,9 +232,11 @@ const walkSubstack = function (
   }
   const walkStack = function (i: any, err?: any) {
     if (err && showError) {
+      console.log(`Walk Stack Error at ${i}`);
       return schemaErrorHandler(err, req, res, next);
     }
     if (i >= stack.length) {
+      console.log("Going out of this walkstack");
       return next();
     }
     stack[i](req, res, walkStack.bind(null, i + 1));
