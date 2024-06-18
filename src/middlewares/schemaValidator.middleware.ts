@@ -47,7 +47,7 @@ export class OpenApiValidatorMiddleware {
     return apiSpec;
   }
 
-  public initOpenApiMiddleware(): void {
+  public async initOpenApiMiddleware() {
     try {
       const files = fs.readdirSync(specFolder);
       const fileNames = files.filter(
@@ -78,7 +78,7 @@ export class OpenApiValidatorMiddleware {
             count: 0,
             requestHandler: requestHandler
           };
-          initializeOpenApiValidatorCache(requestHandler);
+          await initializeOpenApiValidatorCache(requestHandler);
         }
       }
     } catch (err) {
@@ -194,7 +194,10 @@ const initializeOpenApiValidatorCache = async (stack: any) => {
         } as any;
         return req;
       };
-      const reqObj = mockRequest({ context: {}, message: {} });
+      const reqObj = mockRequest({
+        context: { action: `${action}` },
+        message: {}
+      });
       walkSubstack(stack, reqObj, {}, () => {
         return;
       });

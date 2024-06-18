@@ -118,6 +118,7 @@ const main = async () => {
     await ClientUtils.initializeConnection();
     await GatewayUtils.getInstance().initialize();
     await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+    console.log("After Open API middleware");
     if (getConfig().responseCache.enabled) {
       await ResponseCache.getInstance().initialize();
     }
