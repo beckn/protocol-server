@@ -173,7 +173,7 @@ const initializeOpenApiValidatorCache = async (
       actions = Object.keys(ResponseActions);
     }
 
-    actions.slice(0, 10).forEach((action) => {
+    actions.slice(0, 2).forEach((action) => {
       const mockRequest = (body: any) => {
         const req = httpMocks.createRequest({
           method: "POST",
