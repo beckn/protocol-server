@@ -157,47 +157,51 @@ export class OpenApiValidatorMiddleware {
 }
 
 const initializeOpenApiValidatorCache = async (stack: any) => {
-  let actions: string[] = [];
-  if (
-    (getConfig().app.mode === AppMode.bap &&
-      getConfig().app.gateway.mode === GatewayMode.client) ||
-    (getConfig().app.mode === AppMode.bpp &&
-      getConfig().app.gateway.mode === GatewayMode.network)
-  ) {
-    actions = Object.keys(RequestActions);
-  } else {
-    actions = Object.keys(ResponseActions);
-  }
-  actions.forEach((action) => {
-    const mockRequest = (body: any) => {
-      const req = httpMocks.createRequest({
-        method: "POST",
-        url: `/${action}`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: uuid_v4()
-        },
-        body: body
-      });
+  try {
+    let actions: string[] = [];
+    if (
+      (getConfig().app.mode === AppMode.bap &&
+        getConfig().app.gateway.mode === GatewayMode.client) ||
+      (getConfig().app.mode === AppMode.bpp &&
+        getConfig().app.gateway.mode === GatewayMode.network)
+    ) {
+      actions = Object.keys(RequestActions);
+    } else {
+      actions = Object.keys(ResponseActions);
+    }
+    actions.forEach((action) => {
+      const mockRequest = (body: any) => {
+        const req = httpMocks.createRequest({
+          method: "POST",
+          url: `/${action}`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: uuid_v4()
+          },
+          body: body
+        });
 
-      req.app = {
-        enabled: (setting: any) => {
-          if (
-            setting === "strict routing" ||
-            setting === "case sensitive routing"
-          ) {
-            return true;
+        req.app = {
+          enabled: (setting: any) => {
+            if (
+              setting === "strict routing" ||
+              setting === "case sensitive routing"
+            ) {
+              return true;
+            }
+            return false;
           }
-          return false;
-        }
-      } as any;
-      return req;
-    };
-    const reqObj = mockRequest({ context: {}, message: {} });
-    walkSubstack(stack, reqObj, {}, () => {
-      return;
+        } as any;
+        return req;
+      };
+      const reqObj = mockRequest({ context: {}, message: {} });
+      walkSubstack(stack, reqObj, {}, () => {
+        return;
+      });
     });
-  });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const walkSubstack = function (
