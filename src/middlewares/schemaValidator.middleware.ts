@@ -78,7 +78,7 @@ export class OpenApiValidatorMiddleware {
             count: 0,
             requestHandler: requestHandler
           };
-          await initializeOpenApiValidatorCache(requestHandler);
+          await initializeOpenApiValidatorCache(requestHandler, file);
         }
       }
     } catch (err) {
@@ -156,7 +156,10 @@ export class OpenApiValidatorMiddleware {
   }
 }
 
-const initializeOpenApiValidatorCache = async (stack: any) => {
+const initializeOpenApiValidatorCache = async (
+  stack: any,
+  specFile: string
+) => {
   try {
     let actions: string[] = [];
     if (
@@ -169,7 +172,8 @@ const initializeOpenApiValidatorCache = async (stack: any) => {
     } else {
       actions = Object.keys(ResponseActions);
     }
-    actions.forEach((action) => {
+
+    actions.slice(0, 10).forEach((action) => {
       const mockRequest = (body: any) => {
         const req = httpMocks.createRequest({
           method: "POST",
@@ -198,12 +202,20 @@ const initializeOpenApiValidatorCache = async (stack: any) => {
         context: { action: `${action}` },
         message: {}
       });
-      walkSubstack(stack, reqObj, {}, () => {
-        return;
-      });
+      console.log("This is for specfile: ", specFile);
+
+      walkSubstack(
+        stack,
+        reqObj,
+        {},
+        () => {
+          return;
+        },
+        false
+      );
     });
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    console.log(error.message);
   }
 };
 
@@ -211,14 +223,14 @@ const walkSubstack = function (
   stack: any,
   req: any,
   res: any,
-  next: NextFunction
+  next: NextFunction,
+  showError = true
 ) {
   if (typeof stack === "function") {
     stack = [stack];
   }
   const walkStack = function (i: any, err?: any) {
-    if (err) {
-      console.log(err);
+    if (err && showError) {
       return schemaErrorHandler(err, req, res, next);
     }
     if (i >= stack.length) {
