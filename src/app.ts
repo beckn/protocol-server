@@ -78,7 +78,7 @@ const initializeExpress = async (successCallback: Function) => {
 
   // Error Handler.
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    console.log("In Error Handler---->middleware", err);
+    console.log(err);
     if (err instanceof Exception) {
       const errorData = {
         code: err.code,
@@ -117,8 +117,6 @@ const main = async () => {
   try {
     await ClientUtils.initializeConnection();
     await GatewayUtils.getInstance().initialize();
-    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
-    console.log("After Open API middleware");
     if (getConfig().responseCache.enabled) {
       await ResponseCache.getInstance().initialize();
     }
@@ -134,6 +132,7 @@ const main = async () => {
           getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
       );
     });
+    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());
