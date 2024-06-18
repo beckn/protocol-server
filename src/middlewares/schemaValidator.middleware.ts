@@ -174,7 +174,6 @@ const initializeOpenApiValidatorCache = async (
     }
 
     actions.slice(0, 2).forEach((action) => {
-      console.log("Action is:", action);
       const mockRequest = (body: any) => {
         const req = httpMocks.createRequest({
           method: "POST",
@@ -204,39 +203,28 @@ const initializeOpenApiValidatorCache = async (
         context: { action: `${action}` },
         message: {}
       });
-      console.log(`Mock created for action ${action} and domain ${specFile}`);
-      walkSubstack(
-        stack,
-        reqObj,
-        {},
-        () => {
-          return;
-        },
-        true
-      );
+
+      walkSubstack(stack, reqObj, {}, () => {
+        return;
+      });
     });
-  } catch (error: any) {
-    console.log(error.message);
-  }
+  } catch (error: any) {}
 };
 
 const walkSubstack = function (
   stack: any,
   req: any,
   res: any,
-  next: NextFunction,
-  showError = true
+  next: NextFunction
 ) {
   if (typeof stack === "function") {
     stack = [stack];
   }
   const walkStack = function (i: any, err?: any) {
-    if (err && showError) {
-      console.log(`Walk Stack Error at ${i}`);
+    if (err) {
       return schemaErrorHandler(err, req, res, next);
     }
     if (i >= stack.length) {
-      console.log("Going out of this walkstack");
       return next();
     }
     stack[i](req, res, walkStack.bind(null, i + 1));

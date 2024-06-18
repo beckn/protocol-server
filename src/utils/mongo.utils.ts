@@ -22,9 +22,7 @@ export class DBClient {
       this.db = this.client.db();
       this.isConnected = true;
       logger.info(`Mongo Client Connected For DB: ${this.db.databaseName}`);
-    } catch (error: any) {
-      console.log(error);
-    }
+    } catch (error: any) {}
   }
 
   public getDB(): Db {
