@@ -128,7 +128,7 @@ const main = async () => {
     await LookupCache.getInstance().initialize();
     await RequestCache.getInstance().initialize();
 
-    await initializeExpress(() => {
+    await initializeExpress(async () => {
       logger.info("Protocol Server Started Successfully");
       logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
       logger.info(
@@ -136,8 +136,9 @@ const main = async () => {
         getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
         getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
       );
+      await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+      console.log('Open API Validator Initialized');
     });
-    await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());
