@@ -2,18 +2,17 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'The branch to build')
-        string(name: 'DOCKERHUB_CREDENTIALS', defaultValue: 'dockerhub-credentials', description: 'Jenkins credentials ID for Docker Hub')
-        string(name: 'DOCKERHUB_REPO', defaultValue: 'your-dockerhub-repo', description: 'Docker Hub repository name')
+        string(name: 'BRANCH_NAME', defaultValue: '', description: 'The branch to build')
+        credentials(name: 'DOCKERHUB_CREDENTIALS', description: 'Jenkins credentials ID for Docker Hub')
+        string(name: 'DOCKERHUB_REPO', defaultValue: '', description: 'Docker Hub repository name')
     }
 
     environment {
-        DOCKERHUB_CREDENTIALS = "${params.DOCKERHUB_CREDENTIALS}"
         DOCKERHUB_REPO = "${params.DOCKERHUB_REPO}"
         BRANCH_NAME = "${params.BRANCH_NAME}"
     }
 
-   stages {
+    stages {
         stage('Checkout') {
             steps {
                 script {
@@ -35,8 +34,8 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh "echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin"
+                    withCredentials([usernamePassword(credentialsId: params.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
                     }
                 }
             }
