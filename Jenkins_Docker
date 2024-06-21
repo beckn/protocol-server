@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'BRANCH_NAME', defaultValue: "${params.BRANCH_NAME}", description: 'The branch to build')
-        credentials(name: 'DOCKERHUB_CREDENTIALS', defaultValue: "${params.DOCKERHUB_CREDENTIALS}", description: 'Jenkins credentials ID for Docker Hub')
-        string(name: 'DOCKERHUB_REPO', defaultValue: 'fidedocker/protocol-server', description: 'Docker Hub repository name')
-    }
-
     environment {
          PERSISTENT_BRANCH_NAME = "${params.BRANCH_NAME}"
         PERSISTENT_DOCKERHUB_REPO = "${params.DOCKERHUB_REPO}"
