@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BRANCH_NAME', defaultValue: '', description: 'The branch to build')
+        credentials(name: 'DOCKERHUB_CREDENTIALS', description: 'Jenkins credentials ID for Docker Hub')
+        string(name: 'DOCKERHUB_REPO', defaultValue: '', description: 'Docker Hub repository name')
+    }
+
+    environment {
+        DOCKERHUB_REPO = "${params.DOCKERHUB_REPO}"
+        BRANCH_NAME = "${params.BRANCH_NAME}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    // Checkout the specified branch
+                    git branch: "${BRANCH_NAME}", url: 'https://github.com/beckn/protocol-server.git'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image with the tag as the branch name
+                    sh "docker build -t ${DOCKERHUB_REPO}:${BRANCH_NAME} ."
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: params.DOCKERHUB_CREDENTIALS, usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
+                        sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Push the Docker image to Docker Hub
+                    sh "docker push ${DOCKERHUB_REPO}:${BRANCH_NAME}"
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Clean up Docker images to save space
+                sh "docker rmi ${DOCKERHUB_REPO}:${BRANCH_NAME} || true"
+            }
+        }
+        success {
+            echo 'Docker image has been successfully pushed to Docker Hub!'
+        }
+        failure {
+            echo 'Failed to push Docker image to Docker Hub.'
+        }
+    }
+}
