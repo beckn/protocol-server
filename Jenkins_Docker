@@ -8,8 +8,9 @@ pipeline {
     }
 
     environment {
-        DOCKERHUB_REPO = "${params.DOCKERHUB_REPO}"
-        BRANCH_NAME = "${params.BRANCH_NAME}"
+         PERSISTENT_BRANCH_NAME = "${params.BRANCH_NAME}"
+        PERSISTENT_DOCKERHUB_REPO = "${params.DOCKERHUB_REPO}"
+        PERSISTENT_DOCKERHUB_CREDENTIALS = "${params.DOCKERHUB_CREDENTIALS}"
     }
 
     stages {
