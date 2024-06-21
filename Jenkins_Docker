@@ -13,12 +13,12 @@ pipeline {
         BRANCH_NAME = "${params.BRANCH_NAME}"
     }
 
-    stages {
+   stages {
         stage('Checkout') {
             steps {
                 script {
                     // Checkout the specified branch
-                    git branch: "${BRANCH_NAME}"
+                    git branch: "${BRANCH_NAME}", url: 'https://github.com/beckn/protocol-server.git'
                 }
             }
         }
