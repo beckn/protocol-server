@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'DOCKER_HUB_CREDENTIALS_ID', defaultValue: '', description: 'Jenkins credentials ID for Docker Hub')
+        string(name: 'DOCKER_IMAGE_NAME', defaultValue: '', description: 'Docker image name (e.g., username/repository)')
+        string(name: 'DOCKER_IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag')
+    }
+    
+    environment {
+        DOCKER_HUB_CREDENTIALS_ID = "${params.DOCKER_HUB_CREDENTIALS_ID}"
+        DOCKER_IMAGE_NAME = "${params.DOCKER_IMAGE_NAME}"
+        DOCKER_IMAGE_TAG = "${params.DOCKER_IMAGE_TAG}"
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the repository
+                checkout scm
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image
+                    def imageName = "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    sh "docker build -t ${imageName} ."
+                }
+            }
+        }
+        
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Login to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: DOCKER_HUB_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+                    
+                    // Push the Docker image
+                    def imageName = "${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}"
+                    sh "docker push ${imageName}"
+                    
+                    // Logout from Docker Hub
+                    sh 'docker logout'
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up the Docker environment
+            sh 'docker system prune -f'
+        }
+    }
+}
