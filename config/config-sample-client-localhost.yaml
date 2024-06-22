@@ -111,3 +111,6 @@ app:
     # In minutes
     syncInterval: 30
     redis_db: 3
+  
+  useHMACForWebhook: false
+  sharedKeyForWebhookHMAC: ""

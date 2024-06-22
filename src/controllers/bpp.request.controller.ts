@@ -5,10 +5,8 @@ import * as AmqbLib from "amqplib";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
 import { GatewayUtils } from "../utils/gateway.utils";
-import { ActionUtils } from "../utils/actions.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
 import { parseRequestCache } from "../schemas/cache/request.cache.schema";
-import { getSubscriberDetails } from "../utils/lookup.utils";
 import { Locals } from "../interfaces/locals.interface";
 import moment from "moment";
 import { getConfig } from "../utils/config.utils";
@@ -19,6 +17,7 @@ import {
   createTelemetryEvent,
   processTelemetry
 } from "../utils/telemetry.utils";
+import { createBppWebhookAuthHeaderConfig } from "../utils/auth.utils";
 
 export const bppNetworkRequestHandler = async (
   req: Request,
@@ -92,7 +91,11 @@ export const bppNetworkRequestSettler = async (
         break;
       }
       case ClientConfigType.webhook: {
-        requestCallback(requestBody);
+        let axios_config = {};
+        if (getConfig().app.useHMACForWebhook) {
+          axios_config = await createBppWebhookAuthHeaderConfig(requestBody);
+        }
+        requestCallback(requestBody, axios_config);
         break;
       }
       case ClientConfigType.messageQueue: {

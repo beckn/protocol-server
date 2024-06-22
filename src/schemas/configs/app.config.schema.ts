@@ -54,7 +54,9 @@ export const appConfigSchema = z.object({
   mandateLayer2Config: z.boolean().optional(),
   unsolicitedWebhook: z.object({
     url: z.string().optional()
-  }).optional()
+  }).optional(),
+  useHMACForWebhook: z.boolean().optional(),
+  sharedKeyForWebhookHMAC: z.string().optional(),
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
