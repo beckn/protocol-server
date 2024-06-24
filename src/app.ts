@@ -3,7 +3,7 @@ import cors from "cors";
 import { Exception } from "./models/exception.model";
 import {
   BecknErrorDataType,
-  BecknErrorType,
+  BecknErrorType
 } from "./schemas/becknError.schema";
 import { LookupCache } from "./utils/cache/lookup.cache.utils";
 import { RequestCache } from "./utils/cache/request.cache.utils";
@@ -18,7 +18,7 @@ const app = Express();
 
 app.use(
   Express.json({
-    limit: "200kb",
+    limit: "200kb"
   })
 );
 
@@ -30,9 +30,14 @@ const initializeExpress = async (successCallback: Function) => {
       path: "/process"
     })
   );
-  app.get("/status", async (req: Request, res: Response, next: NextFunction) => {
-    res.status(200).send('Added logic to cache OpenAPI validator spec on app load');
-  });
+  app.get(
+    "/status",
+    async (req: Request, res: Response, next: NextFunction) => {
+      res
+        .status(200)
+        .send("Added logic to cache OpenAPI validator spec on app load");
+    }
+  );
 
   // Enabling Cors
   app.options(
@@ -41,13 +46,13 @@ const initializeExpress = async (successCallback: Function) => {
       origin: "*",
       optionsSuccessStatus: 200,
       credentials: true,
-      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
     })
   );
   app.use(
     cors({
       origin: "*",
-      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"],
+      methods: ["GET", "PUT", "POST", "PATCH", "DELETE", "OPTIONS"]
     })
   );
 
@@ -56,10 +61,10 @@ const initializeExpress = async (successCallback: Function) => {
     Express.json({
       verify: (req: Request, res: Response, buf: Buffer) => {
         res.locals = {
-          rawBody: buf.toString(),
+          rawBody: buf.toString()
         };
       },
-      limit: "200kb",
+      limit: "200kb"
     })
   );
 
@@ -89,24 +94,24 @@ const initializeExpress = async (successCallback: Function) => {
         code: err.code,
         message: err.message,
         data: err.errorData,
-        type: BecknErrorType.domainError,
+        type: BecknErrorType.domainError
       } as BecknErrorDataType;
       res.status(err.code).json({
         message: {
           ack: {
-            status: "NACK",
-          },
+            status: "NACK"
+          }
         },
-        error: errorData,
+        error: errorData
       });
     } else {
       res.status(err.code || 500).json({
         message: {
           ack: {
-            status: "NACK",
-          },
+            status: "NACK"
+          }
         },
-        error: err,
+        error: err
       });
     }
   });
@@ -133,12 +138,12 @@ const main = async () => {
       logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
       logger.info(
         "Gateway Type: " +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+          getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+          getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
       );
-      await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
-      console.log('Open API Validator Initialized');
     });
+    OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+    console.log("Open API Validator Initialized");
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());
