@@ -2,14 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    // Checkout the specified branch
-                    git branch: "${BRANCH_NAME}", url: 'https://github.com/beckn/protocol-server.git'
-                }
-            }
-        }
+
 
         stage('Build Docker Image') {
             steps {
