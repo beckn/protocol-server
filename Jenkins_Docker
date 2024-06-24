@@ -1,15 +1,15 @@
 pipeline {
     agent any
 
-    stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    // Checkout the specified branch
-                    git branch: "${BRANCH_NAME}", url: 'https://github.com/beckn/protocol-server.git'
-                }
-            }
-        }
+    // stages {
+    //     stage('Checkout') {
+    //         steps {
+    //             script {
+    //                 // Checkout the specified branch
+    //                 git branch: "${BRANCH_NAME}", url: 'https://github.com/beckn/protocol-server.git'
+    //             }
+    //         }
+    //     }
 
         stage('Build Docker Image') {
             steps {
@@ -36,9 +36,26 @@ pipeline {
                     // Push the Docker image to Docker Hub
                     sh "docker push ${DOCKERHUB_REPO}:${BRANCH_NAME}"
                 }
-            }
+            }    
         }
+
+        stage('Executing Shell Script On Server') {
+      steps {
+        script {
+          sshagent(credentials: ['"${credentials}"']) {
+            sh '''
+              ssh -t -t ${userName}@${hostIP} -o StrictHostKeyChecking=no << EOF
+              ${listOfCommands}
+              logout
+              EOF
+              '''
+          }
+        }
+      }
     }
+ }
+
+
 
     post {
         always {
@@ -55,4 +72,3 @@ pipeline {
         }
     }
 }
-// hi
