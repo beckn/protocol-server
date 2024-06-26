@@ -21,13 +21,13 @@ responseCache:
 # 2. webhook
 # 3. pubSub
 client:
-  synchronous:
+  synchronous: 
     mongoURL: "mongodb://127.0.0.1:27017/protocolserver-v2-response-cache"
 
   #webhook:
   #  url: "https://beckn.free.beeceptor.com/clientURL"
-
-  #messageQueue:
+  
+  #messageQueue: 
   #  amqpURL: "amqp://guest:guest@localhost:5672"
   #  incomingQueue: "protocol-server-incoming"
   #  outgoingQueue: "protocol-server-outgoing"
@@ -49,24 +49,24 @@ app:
   actions:
     requests:
       search:
-        ttl: "PT10S"
+        ttl : "PT10S"
       init:
-        ttl: "PT10S"
+        ttl : "PT10S"
       select:
-        ttl: "PT10S"
+        ttl : "PT10S"
       confirm:
-        ttl: "PT10S"
+        ttl : "PT10S"
       status:
-        ttl: "PT10S"
+        ttl : "PT10S"
       get_cancellation_reasons:
         ttl: "PT10S"
       get_rating_categories:
         ttl: "PT10S"
-
-    responses:
+    
+    responses: 
       on_search:
         ttl: "PT10S"
-
+      
       on_init:
         ttl: "PT10S"
       on_select:
@@ -79,7 +79,7 @@ app:
         ttl: "PT10S"
       rating_categories:
         ttl: "PT10S"
-
+  
   # Mandatory.
   privateKey: "private key"
   publicKey: "public key"
@@ -87,12 +87,12 @@ app:
   # Mandatory.
   subscriberId: "dev.bap.faiz.protocol-server.com.dsep:jobs.BAP"
   subscriberUri: "https://410e-45-248-79-20.ngrok.io/"
-
+  
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
   uniqueKey: "dev.bap.faiz.protocol-server.key"
-
+  
   # Mandatory.
   city: "std:080"
   country: "IND"
@@ -110,15 +110,3 @@ app:
     # In minutes
     syncInterval: 30
     redis_db: 3
-<<<<<<< HEAD
-
-  useLayer2Config: false
-  mandateLayer2Config: false
-
-  openAPIValidator:
-    cachedFileLimit: 5
-=======
-  
-  useHMACForWebhook: false
-  sharedKeyForWebhookHMAC: ""
->>>>>>> origin/auth_bpp_webhook

@@ -21,13 +21,13 @@ responseCache:
 # 2. webhook
 # 3. pubSub
 client:
-  synchronous:
+  synchronous: 
     mongoURL: "mongodb://tvast:password@localhost:27017/protocol_server-v2?authSource=admin"
 
   webhook:
     url: "https://beckn.free.beeceptor.com/clientURL"
-
-  messageQueue:
+  
+  messageQueue: 
     amqpUrl: "amqp://guest:guest@localhost:5672"
     request-queue: "bap-protocol-server"
     response-queue: "bap-protocol-client"
@@ -50,17 +50,17 @@ app:
   actions:
     requests:
       search:
-        ttl: "PT10S"
+        ttl : "PT10S"
       init:
-        ttl: "PT10S"
-
-    responses:
+        ttl : "PT10S"
+    
+    responses: 
       on_search:
         ttl: "PT10S"
-
+      
       on_init:
         ttl: "PT10S"
-
+  
   # Mandatory.
   privateKey: "your private key"
   publicKey: "your public key"
@@ -68,12 +68,12 @@ app:
   # Mandatory.
   subscriberId: "dev.bap.protocol-server.com"
   subscriberUri: "https://ayush.free.beeceptor.com/"
-
+  
   # Mandatory.
   registryUrl: https://registry.becknprotocol.io/subscribers
   auth: true
   uniqueKey: "dev.bap.protocol-server.key"
-
+  
   # Mandatory.
   city: "std:080"
   country: "IND"
@@ -91,15 +91,3 @@ app:
     # In minutes
     syncInterval: 30
     redis_db: 3
-<<<<<<< HEAD
-
-  useLayer2Config: false
-  mandateLayer2Config: false
-
-  openAPIValidator:
-    cachedFileLimit: 5
-=======
-  
-  useHMACForWebhook: false
-  sharedKeyForWebhookHMAC: ""
->>>>>>> origin/auth_bpp_webhook
