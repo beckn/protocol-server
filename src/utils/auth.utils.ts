@@ -70,9 +70,8 @@ export const createAuthorizationHeader = async (message: any) => {
     getConfig().app.privateKey || ""
   );
   const subscriber_id = getConfig().app.subscriberId;
-  const header = `Signature keyId="${subscriber_id}|${
-    getConfig().app.uniqueKey
-  }|ed25519",algorithm="ed25519",created="${created}",expires="${expires}",headers="(created) (expires) digest",signature="${signature}"`;
+  const header = `Signature keyId="${subscriber_id}|${getConfig().app.uniqueKey
+    }|ed25519",algorithm="ed25519",created="${created}",expires="${expires}",headers="(created) (expires) digest",signature="${signature}"`;
   return header;
 };
 
@@ -204,8 +203,30 @@ export const createAuthHeaderConfig = async (request: any) => {
     timeout: getConfig().app.httpTimeout
   };
   logger.info(
-    `Axios Config for Request from ${
-      getConfig().app.mode + " " + getConfig().app.gateway.mode
+    `Axios Config for Request from ${getConfig().app.mode + " " + getConfig().app.gateway.mode
+    }:==>\n${JSON.stringify(axios_config)}\n\n`
+  );
+  return axios_config;
+};
+
+const createBppWebhookAuthHeader = async (request: any) => {
+  const sodium = _sodium;
+  const key = getConfig().app.sharedKeyForWebhookHMAC || "";
+  const keyUint8Array = sodium.from_string(key);
+  const messageUint8Array = sodium.from_string(JSON.stringify(request));
+  const hmac = sodium.crypto_auth(messageUint8Array, keyUint8Array);
+  return sodium.to_hex(hmac);
+};
+
+export const createBppWebhookAuthHeaderConfig = async (request: any) => {
+  const header = await createBppWebhookAuthHeader(request);
+  const axios_config = {
+    headers: {
+      authorization: header
+    }
+  };
+  logger.info(
+    `Axios Config for Request from ${getConfig().app.mode + " " + getConfig().app.gateway.mode
     }:==>\n${JSON.stringify(axios_config)}\n\n`
   );
   return axios_config;

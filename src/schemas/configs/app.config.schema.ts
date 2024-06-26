@@ -55,9 +55,14 @@ export const appConfigSchema = z.object({
   unsolicitedWebhook: z.object({
     url: z.string().optional()
   }).optional(),
+<<<<<<< HEAD
   openAPIValidator: z.object({
     cachedFileLimit: z.number().optional()
   }).optional()
+=======
+  useHMACForWebhook: z.boolean().optional(),
+  sharedKeyForWebhookHMAC: z.string().optional(),
+>>>>>>> origin/auth_bpp_webhook
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;

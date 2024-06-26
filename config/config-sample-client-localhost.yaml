@@ -110,9 +110,15 @@ app:
     # In minutes
     syncInterval: 30
     redis_db: 3
+<<<<<<< HEAD
 
   useLayer2Config: false
   mandateLayer2Config: false
 
   openAPIValidator:
     cachedFileLimit: 5
+=======
+  
+  useHMACForWebhook: false
+  sharedKeyForWebhookHMAC: ""
+>>>>>>> origin/auth_bpp_webhook

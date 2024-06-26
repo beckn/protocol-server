@@ -1,8 +1,7 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { Exception, ExceptionType } from "../models/exception.model";
 import {
-  BecknErrorDataType,
-  becknErrorSchema
+  BecknErrorDataType
 } from "../schemas/becknError.schema";
 import { requestCallbackSchema } from "../schemas/callbacks/request.callback.schema";
 import { responseCallbackSchema } from "../schemas/callbacks/response.callback.schema";
@@ -10,11 +9,10 @@ import {
   ClientConfigType,
   WebhookClientConfigDataType
 } from "../schemas/configs/client.config.schema";
-import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "./config.utils";
 import logger from "./logger.utils";
 
-async function makeClientCallback(data: any) {
+async function makeClientCallback(data: any, axios_config?: AxiosRequestConfig) {
   try {
     if (getConfig().client.type != ClientConfigType.webhook) {
       throw new Exception(
@@ -30,7 +28,7 @@ async function makeClientCallback(data: any) {
     console.log(
       `TMTR - ${data?.context?.message_id} - ${data?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
-    const response = await axios.post(clientConnectionConfig.url, data);
+    const response = await axios.post(clientConnectionConfig.url, data, axios_config || {});
     logger.info(
       `Response from Webhook:==>\n ${JSON.stringify(
         response.data
@@ -88,10 +86,10 @@ export async function responseCallback(data: any) {
   }
 }
 
-export async function requestCallback(data: any) {
+export async function requestCallback(data: any, axios_config?: AxiosRequestConfig) {
   try {
     const callbackData = requestCallbackSchema.parse(data);
-    await makeClientCallback(callbackData);
+    await makeClientCallback(callbackData, axios_config);
   } catch (error) {
     if (error instanceof Exception) {
       throw error;
