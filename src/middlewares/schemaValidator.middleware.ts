@@ -50,11 +50,23 @@ export class OpenApiValidatorMiddleware {
 
   public async initOpenApiMiddleware(): Promise<void> {
     try {
-      const files = fs.readdirSync(specFolder);
-      const fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
+      let fileToCache = getConfig().app?.openAPIValidator?.initialFilesToCache;
+      let fileNames, noOfFileToCache = 0;
       const cachedFileLimit: number = OpenApiValidatorMiddleware.cachedFileLimit;
-      logger.info(`OpenAPIValidator Cache count ${cachedFileLimit}`);
-      for (let i = 0; (i < cachedFileLimit && fileNames[i]); i++) {
+      logger.info(`OpenAPIValidator Total Cache capacity ${cachedFileLimit}`);
+      if(fileToCache) {
+        fileNames = fileToCache.split(/\s*,\s*/).map(item => item.trim());
+        logger.info(`OpenAPIValidator Init no of files to cache:  ${fileNames?.length}`);
+        noOfFileToCache = fileNames.length;
+      } else {
+        const files = fs.readdirSync(specFolder);
+        fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
+        noOfFileToCache = Math.min(fileNames.length, 3); //If files to cache is not found in env then we will cache just three file
+      }
+      noOfFileToCache = Math.min(noOfFileToCache, cachedFileLimit);
+      console.log('Cache total files: ', noOfFileToCache);
+      
+      for (let i = 0; i < noOfFileToCache; i++) {
         const file = `${specFolder}/${fileNames[i]}`;
         if (!OpenApiValidatorMiddleware.cachedOpenApiValidator[file]) {
           logger.info(`Intially cache Not found loadApiSpec file. Loading.... ${file}`);

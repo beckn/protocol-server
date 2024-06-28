@@ -22,7 +22,7 @@ app.use(
   })
 );
 
-const initializeExpress = async (successCallback: Function) => {
+const initializeExpress = async () => {
   const app = Express();
 
   app.use(
@@ -114,7 +114,6 @@ const initializeExpress = async (successCallback: Function) => {
   const PORT: number = getConfig().server.port;
   app.listen(PORT, () => {
     logger.info("Protocol Server started on PORT : " + PORT);
-    successCallback();
   });
 };
 
@@ -128,16 +127,16 @@ const main = async () => {
     await LookupCache.getInstance().initialize();
     await RequestCache.getInstance().initialize();
 
-    await initializeExpress(() => {
-      logger.info("Protocol Server Started Successfully");
-      logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
-      logger.info(
-        "Gateway Type: " +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
-      );
-    });
+    await initializeExpress();
+    logger.info("Protocol Server Started Successfully");
+    logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
+    logger.info(
+      "Gateway Type: " +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+    );
     await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+    logger.info('Initialized openapi validator middleware')
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());

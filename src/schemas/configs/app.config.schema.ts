@@ -56,7 +56,8 @@ export const appConfigSchema = z.object({
     url: z.string().optional()
   }).optional(),
   openAPIValidator: z.object({
-    cachedFileLimit: z.number().optional()
+    cachedFileLimit: z.number().optional(),
+    initialFilesToCache: z.string().optional()
   }).optional()
 });
 
