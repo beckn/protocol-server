@@ -94,3 +94,10 @@ app:
   
   useHMACForWebhook: false
   sharedKeyForWebhookHMAC: ""
+
+  useLayer2Config: false
+  mandateLayer2Config: false
+
+  openAPIValidator:
+    cachedFileLimit: 5
+    initialFilesToCache: ""

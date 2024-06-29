@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response, Router } from "express";
+import fs from "fs";
+import path from "path";
 import {
   RequestActions,
-  ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
@@ -18,10 +19,8 @@ import { bapClientTriggerHandler } from "../controllers/bap.trigger.controller";
 import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller";
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
-import * as OpenApiValidator from "express-openapi-validator";
-import fs from "fs";
-import path from "path";
 import { LogLevelEnum } from "../utils/logger.utils";
+
 export const requestsRouter = Router();
 
 requestsRouter.get("/logs", (req, res) => {
@@ -68,7 +67,7 @@ if (
         `/${action}`,
         (req: Request, res: Response<{}, Locals>, next: NextFunction) => {
           console.log(
-            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
           );
           next();
         },
@@ -84,7 +83,7 @@ if (
         (req: any, res: Response<{}, Locals>, next: NextFunction) => {
           timestampAuthTracker.end = new Date().valueOf();
           console.log(
-            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} AUTH: ${timestampAuthTracker.end - timestampAuthTracker.start} ms`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} AUTH: ${timestampAuthTracker.end - timestampAuthTracker.start} ms`
           );
           next();
         },
@@ -96,7 +95,7 @@ if (
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.end = new Date().valueOf();
           console.log(
-            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} OPENAPI Val: ${timestampTracker.end - timestampTracker.start} ms`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} OPENAPI Val: ${timestampTracker.end - timestampTracker.start} ms`
           );
           next();
         },
@@ -140,7 +139,7 @@ if (
         `/${action}`,
         (req: any, res: Response<{}, Locals>, next: NextFunction) => {
           console.log(
-            `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
           );
           next();
         },
@@ -153,11 +152,7 @@ if (
         (req: any, res: Response<{}, Locals>, next: NextFunction) => {
           timestampAuthTracker.end = new Date().valueOf();
           console.log(
-            `############################################ \n ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } AUTH Validator started at: ${timestampAuthTracker.start} and ended at: ${timestampAuthTracker.end}.
-             Total difference is ${timestampAuthTracker.end - timestampAuthTracker.start} milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}\n ############################################`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} AUTH: ${timestampAuthTracker.end - timestampAuthTracker.start} ms`
           );
           next();
         },
@@ -169,11 +164,7 @@ if (
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.end = new Date().valueOf();
           console.log(
-            `############################################ ${getConfig().app.mode}-${getConfig().app.gateway.mode
-            } OPENAPI Validator started at: ${timestampTracker.start} and ended at: ${timestampTracker.end}.
-             Total difference is ${timestampTracker.end - timestampTracker.start} milliseconds,
-              message ID is ${req?.body?.context?.message_id}
-              action is ${req?.body?.context?.action}`
+            `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} OPENAPI Val: ${timestampTracker.end - timestampTracker.start} ms`
           );
           next();
         },
