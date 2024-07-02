@@ -20,7 +20,8 @@ import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller"
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import { LogLevelEnum } from "../utils/logger.utils";
-
+import { Validator } from "../middlewares/schemaValidator-test.middleware";
+const openApiValidator = Validator.getInstance(false).getValidationMiddleware();
 export const requestsRouter = Router();
 
 requestsRouter.get("/logs", (req, res) => {
@@ -91,7 +92,8 @@ if (
           timestampTracker.start = new Date().valueOf();
           next();
         },
-        openApiValidatorMiddleware,
+        //openApiValidatorMiddleware,
+        openApiValidator,
         async (req: Request, res: Response, next: NextFunction) => {
           timestampTracker.end = new Date().valueOf();
           console.log(
