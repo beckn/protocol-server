@@ -222,7 +222,7 @@ export const createBppWebhookAuthHeaderConfig = async (request: any) => {
   const header = await createBppWebhookAuthHeader(request);
   const axios_config = {
     headers: {
-      authorization: header
+      authorization: `HMAC-SHA-256 ${header}`
     }
   };
   logger.info(
