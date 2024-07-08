@@ -1,4 +1,5 @@
 import _sodium, { base64_variants } from "libsodium-wrappers";
+import * as crypto from 'crypto';
 import { writeFile } from "fs/promises";
 import logger from "./logger.utils";
 import { Request, Response } from "express";
@@ -210,12 +211,10 @@ export const createAuthHeaderConfig = async (request: any) => {
 };
 
 const createBppWebhookAuthHeader = async (request: any) => {
-  const sodium = _sodium;
   const key = getConfig().app.sharedKeyForWebhookHMAC || "";
-  const keyUint8Array = sodium.from_string(key);
-  const messageUint8Array = sodium.from_string(JSON.stringify(request));
-  const hmac = sodium.crypto_auth(messageUint8Array, keyUint8Array);
-  return sodium.to_hex(hmac);
+  const hmac = crypto.createHmac('sha256', key);
+  hmac.update(JSON.stringify(request));
+  return hmac.digest('hex');
 };
 
 export const createBppWebhookAuthHeaderConfig = async (request: any) => {

@@ -84,7 +84,7 @@ Message: {"context":{"domain":"retail","action":"search","bap_id":"retail.bap","
 
 Shared Key: juWDOTzzK7Eyrzm6hZwQmlJkolesm8x0
 
-HMAC: HMAC-SHA-256 8d2b129d83512b53ddd6e3657748a2e22cd05de3f7c4780cdf39da564a843884
+HMAC: HMAC-SHA-256 287662f35c63bb66710d96749ea87b5a8fa8073f919c8da628451a3c8567a1ff
 ```
 
 
