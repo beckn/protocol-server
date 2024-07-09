@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from "express";
+import * as AmqbLib from "amqplib";
+import moment from "moment";
 import { Locals } from "../interfaces/locals.interface";
 import {
-  RequestActions,
   ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
 import logger from "../utils/logger.utils";
-import * as AmqbLib from "amqplib";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { GatewayUtils } from "../utils/gateway.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
@@ -23,7 +23,6 @@ import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
-import moment from "moment";
 import { getSubscriberDetails } from "../utils/lookup.utils";
 import { customAttributes, telemetrySDK } from "../utils/telemetry.utils";
 
@@ -38,7 +37,7 @@ export const bppClientResponseHandler = async (
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
     next();
     console.log(
-      `TMTR - ${req?.body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -65,7 +64,7 @@ export const bppClientResponseSettler = async (
     const context = JSON.parse(JSON.stringify(responseBody.context));
     const message_id = responseBody.context.message_id;
     console.log(
-      `TMTR - ${context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${context?.message_id} - ${context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV ENTRY: ${new Date().valueOf()}`
     );
     const requestAction = ActionUtils.getCorrespondingRequestAction(
       responseBody.context.action

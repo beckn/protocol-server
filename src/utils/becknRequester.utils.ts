@@ -78,11 +78,11 @@ export async function callNetwork(
     );
     if (getConfig().app.mode.toLowerCase() === 'bap') {
       console.log(
-        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+        `TMTR - ${body?.context?.message_id} - ${body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
       );
     } else {
       console.log(
-        `TMTR - ${body?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
+        `TMTR - ${body?.context?.message_id} - ${body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
       );
     }
 

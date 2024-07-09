@@ -56,6 +56,39 @@ This is a Node.js application designed to function as an intermediary layer betw
 
 [URL for Webhook-Sandbox](https://github.com/beckn/beckn-sandbox-webhook)
 
+### Enabling HMAC Verification on BPP Client
+
+To enable HMAC verification on the BPP client, follow these steps:
+
+### Configuration
+
+- Set `useHMACForWebhook` to `true` in the `default.yaml` configuration file.
+- Set `sharedKeyForWebhookHMAC` to your shared key in the `default.yaml` configuration file. Ensure that the `sharedKeyForWebhookHMAC` is exactly 256 bits in length.
+
+### HMAC Verification
+
+- When HMAC verification is enabled and the configurations are set to valid values, the protocol server will include an authorization header containing the HMAC in its messages.
+- The BPP client can then use the shared key to verify these messages.
+
+### Example Configuration in `default.yaml`
+
+```yaml
+useHMACForWebhook: true
+sharedKeyForWebhookHMAC: <YOUR_SHARED_KEY>
+```
+
+### Example HMAC
+
+```
+Message: {"context":{"domain":"retail","action":"search","bap_id":"retail.bap","bap_uri":"https://retail.bap.com","bpp_id":"retail.bpp","bpp_uri":"https://retail.bpp.com","version":"1.1.0","transaction_id":"51e0cce4-5a20-418b-9f10-797031f3b868","message_id":"829b9ab9-0f1b-4177-95a7-987ac1ed8caa"},"message":{"intent":{"item":{"descriptor":{"code":"assembly"}}}}}
+
+Shared Key: juWDOTzzK7Eyrzm6hZwQmlJkolesm8x0
+
+HMAC: HMAC-SHA-256 287662f35c63bb66710d96749ea87b5a8fa8073f919c8da628451a3c8567a1ff
+```
+
+
+
 # Prerequisites
 
 To run the application, make sure you have the following installed:

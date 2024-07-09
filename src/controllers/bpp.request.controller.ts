@@ -1,21 +1,19 @@
 import { NextFunction, Request, Response } from "express";
+import * as AmqbLib from "amqplib";
+import moment from "moment";
 import { RequestActions } from "../schemas/configs/actions.app.config.schema";
 import logger from "../utils/logger.utils";
-import * as AmqbLib from "amqplib";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
 import { GatewayUtils } from "../utils/gateway.utils";
-import { ActionUtils } from "../utils/actions.utils";
 import { RequestCache } from "../utils/cache/request.cache.utils";
 import { parseRequestCache } from "../schemas/cache/request.cache.schema";
-import { getSubscriberDetails } from "../utils/lookup.utils";
 import { Locals } from "../interfaces/locals.interface";
-import moment from "moment";
 import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { requestCallback } from "../utils/callback.utils";
 import { telemetrySDK } from "../utils/telemetry.utils";
-
+import { createBppWebhookAuthHeaderConfig } from "../utils/auth.utils";
 
 export const bppNetworkRequestHandler = async (
   req: Request,
@@ -36,7 +34,7 @@ export const bppNetworkRequestHandler = async (
     );
     
     console.log(
-      `TMTR - ${req.body.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req.body.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
     );
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
 
@@ -70,7 +68,7 @@ export const bppNetworkRequestSettler = async (
   try {
     const requestBody = JSON.parse(msg?.content.toString()!);
     console.log(
-      `TMTR - ${requestBody?.context?.message_id} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${requestBody?.context?.message_id} - ${requestBody?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW ENTRY: ${new Date().valueOf()}`
     );
 
     switch (getConfig().client.type) {
@@ -83,7 +81,11 @@ export const bppNetworkRequestSettler = async (
         break;
       }
       case ClientConfigType.webhook: {
-        requestCallback(requestBody);
+        let axios_config = {};
+        if (getConfig().app.useHMACForWebhook) {
+          axios_config = await createBppWebhookAuthHeaderConfig(requestBody);
+        }
+        requestCallback(requestBody, axios_config);
         break;
       }
       case ClientConfigType.messageQueue: {

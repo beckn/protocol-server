@@ -1,4 +1,5 @@
 import _sodium, { base64_variants } from "libsodium-wrappers";
+import * as crypto from 'crypto';
 import { writeFile } from "fs/promises";
 import logger from "./logger.utils";
 import { Request, Response } from "express";
@@ -70,9 +71,8 @@ export const createAuthorizationHeader = async (message: any) => {
     getConfig().app.privateKey || ""
   );
   const subscriber_id = getConfig().app.subscriberId;
-  const header = `Signature keyId="${subscriber_id}|${
-    getConfig().app.uniqueKey
-  }|ed25519",algorithm="ed25519",created="${created}",expires="${expires}",headers="(created) (expires) digest",signature="${signature}"`;
+  const header = `Signature keyId="${subscriber_id}|${getConfig().app.uniqueKey
+    }|ed25519",algorithm="ed25519",created="${created}",expires="${expires}",headers="(created) (expires) digest",signature="${signature}"`;
   return header;
 };
 
@@ -204,8 +204,28 @@ export const createAuthHeaderConfig = async (request: any) => {
     timeout: getConfig().app.httpTimeout
   };
   logger.info(
-    `Axios Config for Request from ${
-      getConfig().app.mode + " " + getConfig().app.gateway.mode
+    `Axios Config for Request from ${getConfig().app.mode + " " + getConfig().app.gateway.mode
+    }:==>\n${JSON.stringify(axios_config)}\n\n`
+  );
+  return axios_config;
+};
+
+const createBppWebhookAuthHeader = async (request: any) => {
+  const key = getConfig().app.sharedKeyForWebhookHMAC || "";
+  const hmac = crypto.createHmac('sha256', key);
+  hmac.update(JSON.stringify(request));
+  return hmac.digest('hex');
+};
+
+export const createBppWebhookAuthHeaderConfig = async (request: any) => {
+  const header = await createBppWebhookAuthHeader(request);
+  const axios_config = {
+    headers: {
+      authorization: `HMAC-SHA-256 ${header}`
+    }
+  };
+  logger.info(
+    `Axios Config for Request from ${getConfig().app.mode + " " + getConfig().app.gateway.mode
     }:==>\n${JSON.stringify(axios_config)}\n\n`
   );
   return axios_config;
