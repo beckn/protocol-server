@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  mongo_db:
+    image: mongo
+    restart: unless-stopped
+    volumes:
+      - ./data/mongo_DB:/data/db
+
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=tvast
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=ps
+
+  redis_db:
+    image: redis:6.2.5-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis_DB:/data
+
+  queue_service:
+    image: rabbitmq:3.9.11-management-alpine
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      AMQP_URL: "amqp://queue_service?connection_attempts=3&retry_delay=5"
+      RABBITMQ_DEFAULT_USER: tvast
+      RABBITMQ_DEFAULT_PASS: password
