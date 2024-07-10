@@ -13,6 +13,7 @@ import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
 import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
+import { Validator } from "./middlewares/schemaValidator-test.middleware";
 
 const app = Express();
 
@@ -22,7 +23,7 @@ app.use(
   })
 );
 
-const initializeExpress = async (successCallback: Function) => {
+const initializeExpress = async () => {
   const app = Express();
 
   app.use(
@@ -119,7 +120,7 @@ const initializeExpress = async (successCallback: Function) => {
   const PORT: number = getConfig().server.port;
   app.listen(PORT, () => {
     logger.info("Protocol Server started on PORT : " + PORT);
-    successCallback();
+    //successCallback();
   });
 };
 
@@ -133,17 +134,18 @@ const main = async () => {
     await LookupCache.getInstance().initialize();
     await RequestCache.getInstance().initialize();
 
-    await initializeExpress(async () => {
-      logger.info("Protocol Server Started Successfully");
-      logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
-      logger.info(
-        "Gateway Type: " +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-          getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
-      );
-    });
-    OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
-    console.log("Open API Validator Initialized");
+    await initializeExpress();
+
+    logger.info("Protocol Server Started Successfully");
+    logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
+    logger.info(
+      "Gateway Type: " +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+    );
+    //await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+    await Validator.getInstance(false).initialize();
+    console.log('Open API Validator Initialized');
   } catch (err) {
     if (err instanceof Exception) {
       logger.error(err.toString());
