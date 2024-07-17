@@ -1,5 +1,5 @@
-cp ~/Dockerfile ~/default-bap-client.yml ~/default-bap-network.yml ~/protocol-server
-cd ~/protocol-server
+cp $HOME/Dockerfile $HOME/default-bap-client.yml $HOME/default-bap-network.yml $HOME/protocol-server
+cd $HOME/protocol-server
 
 sudo sudo docker build -t bap-client --build-arg default_yml=default-bap-client.yml --build-arg port=5001 .
 sudo sudo docker build -t bap-network --build-arg default_yml=default-bap-network.yml --build-arg port=5002 .
