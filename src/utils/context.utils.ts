@@ -2,7 +2,6 @@ import moment from "moment";
 import fs from "fs";
 import { v4 as uuid_v4 } from "uuid";
 import { Exception, ExceptionType } from "../models/exception.model";
-import { AppMode } from "../schemas/configs/app.config.schema";
 import { ActionUtils } from "./actions.utils";
 import { getConfig } from "./config.utils";
 import logger from "./logger.utils";
@@ -35,8 +34,7 @@ export const bapContextBuilder = async (
   }
 
   const rawdata: any = await fs.promises.readFile(
-    `schemas/context_${
-      context.version ? context.version : context.core_version
+    `schemas/context_${context.version ? context.version : context.core_version
     }.json`
   );
 

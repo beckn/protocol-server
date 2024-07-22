@@ -40,7 +40,7 @@ export const makeBecknRequest = async (
       };
     }
 
-    if (retry_count === 0) {
+    if (retry_count === 0 || response.status === 400) {
       return response;
     }
     console.log("Active Retry Attempt=======>====>", retry_count);
