@@ -16,6 +16,7 @@ import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getConfig } from "../utils/config.utils";
 import logger from "../utils/logger.utils";
+import { onAPI } from "../utils/telemetry.utils";
 
 export const responsesRouter = Router();
 

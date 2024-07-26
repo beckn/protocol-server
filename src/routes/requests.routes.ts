@@ -22,6 +22,7 @@ import { unConfigureActionHandler } from "../controllers/unconfigured.controller
 import { LogLevelEnum } from "../utils/logger.utils";
 
 export const requestsRouter = Router();
+import { onAPI } from "../utils/telemetry.utils";
 
 requestsRouter.get("/logs", (req, res) => {
   try {

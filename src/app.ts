@@ -12,6 +12,7 @@ import { ClientUtils } from "./utils/client.utils";
 import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
+import { getTelemetryConfig, telemetrySDK } from "./utils/telemetry.utils";
 import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
 
 const app = Express();
@@ -61,6 +62,9 @@ const initializeExpress = async () => {
       limit: "200kb",
     })
   );
+
+  // Initialize the Telemetry SDK
+  app.use(telemetrySDK.init(getTelemetryConfig()));  
 
   // Request Logger.
   app.use("/", async (req: Request, res: Response, next: NextFunction) => {
