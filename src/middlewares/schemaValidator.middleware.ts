@@ -16,8 +16,8 @@ import {
   RequestActions,
   ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
+import { validationFailHandler } from "../utils/validations.utils";
 
-const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 const specFolder = 'schemas';
 
 export class OpenApiValidatorMiddleware {
@@ -203,13 +203,33 @@ export const schemaErrorHandler = (
   if (err instanceof Exception) {
     next(err);
   } else {
+    if (getConfig().app.mode === AppMode.bpp) {
+      console.log('OpenApiValidator Error', err);
+      if (getConfig().app.gateway.mode === GatewayMode.client) {
+        req.body = {
+          ...req.body,
+          error: {
+            code: err.status + '',
+            path: err.path,
+            message: err.message
+          }
+        }
+        delete req.body?.message;
+        next();
+        return;
+      }
+
+      if (getConfig().app.gateway.mode === GatewayMode.network) {
+        validationFailHandler(req, err);
+      }
+    }
+    const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
     const errorData = new Exception(
       ExceptionType.OpenApiSchema_ParsingError,
       `OpenApiValidator Error at ${protocolServerLevel}`,
       err.status,
       err
     );
-
     next(errorData);
   }
 };

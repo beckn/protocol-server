@@ -29,7 +29,11 @@ export async function sendSyncResponses(
 
     let curr_timeStamp = Date.now();
 
-    if (action === "search") {
+    if (
+      action === "search" &&
+      !context?.bpp_id &&
+      !context.bpp_uri
+    ) {
       await sleep(waitTime);
     }
     let syncCacheData: SyncCacheDataType | null = null;
