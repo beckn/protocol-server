@@ -203,17 +203,14 @@ export const schemaErrorHandler = (
   if (err instanceof Exception) {
     next(err);
   } else {
-    console.log('OpenApiValidator Error', err);
-    req.body = {
-      ...req.body,
-      message: {},
-      error: {
-        code: err.status + '',
-        path: err.path,
-        message: err.message
-      }
-    }
-    next();
+    const errorData = new Exception(
+      ExceptionType.OpenApiSchema_ParsingError,
+      `OpenApiValidator Error at ${protocolServerLevel}`,
+      err.status,
+      err
+    );
+
+    next(errorData);
   }
 };
 
