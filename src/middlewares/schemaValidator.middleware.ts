@@ -216,12 +216,12 @@ export const schemaErrorHandler = (
         }
         delete req.body?.message;
         next();
-        return;
       }
 
       if (getConfig().app.gateway.mode === GatewayMode.network) {
         validationFailHandler(req, err);
       }
+      return;
     }
     const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
     const errorData = new Exception(
