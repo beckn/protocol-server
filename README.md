@@ -40,6 +40,33 @@ This server manages context building, validates request bodies based on the Stan
 
 This server forwards requests to the respective Participant or Beckn Gateway (BG). It validates incoming requests from Participants & BG according to the Standard Beckn Open API schema and verifies the signature sent from clients to ensure data integrity.
 
+### Asynchronous Mode Configuration
+
+The BAP client supports two modes of operation: Synchronous and Asynchronous, but it can only run in one mode at a time. This section outlines the steps required to configure the BAP client to operate in Asynchronous Mode. In Asynchronous Mode, the BAP client immediately responds with an acknowledgment (ACK) after receiving a request. The actual responses from the BPP are then sent asynchronously via a configured webhook.
+
+##### Configuration Steps
+
+To enable **Asynchronous Mode** for the BAP client, follow the steps below:
+
+1. **Locate the Configuration File**:
+   - Open the `config/default.yaml` file in your BAP client setup.
+
+2. **Set the Webhook URL**:
+   - Under the `client` node in the YAML file, add the `webhook` node with the URL where the responses should be sent.
+   
+   Example configuration:
+   ```yaml
+   client:
+     webhook: "https://your-webhook-url.com"
+    ```
+
+3. **Disable Synchronous mode**:
+   - Remove or comment out the synchronous node under the client section in the default.yaml file.
+
+4. **Save and Apply**:
+    - Save the default.yaml file and restart server. The BAP client will now operate in asynchronous mode using the specified webhook for response delivery.
+
+
 ## BPP Scenario
 
 ### Client-Facing Protocol Server
