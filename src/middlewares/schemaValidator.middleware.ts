@@ -200,6 +200,19 @@ export const schemaErrorHandler = (
   next: NextFunction
 ) => {
   logger.error('OpenApiValidator Error', err);
+  if (
+    getConfig().app.mode === AppMode.bap &&
+    getConfig().app.gateway.mode === GatewayMode.client
+  ){
+    const errorData = new Exception(
+      ExceptionType.OpenApiSchema_ParsingError,
+      `OpenApiValidator Error`,
+      500,
+      err
+    );
+    next(errorData);
+    return
+  }
   if (err instanceof Exception) {
     next(err);
   } else {
