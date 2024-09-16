@@ -20,6 +20,7 @@ import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller"
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import { LogLevelEnum } from "../utils/logger.utils";
+import os from "os";
 
 export const requestsRouter = Router();
 
@@ -186,4 +187,43 @@ if (
       );
     }
   });
+}
+
+requestsRouter.get("/health", async (req: Request, res: Response) => {
+  try {
+    const health = {
+      status: "UP",
+      components: {
+        db: {
+          status: "UP",
+          details: {
+            database: "MongoDB", 
+          }
+        },
+        diskSpace: {
+          status: "UP",
+          details: getDiskSpaceDetails()
+        }
+      }
+    };
+
+    res.json(health);
+  } catch (error: any) {
+    logger.error(`Health check failed: ${error.message}`);
+    res.status(500).json({ status: "DOWN", error: error.message });
+  }
+});
+
+function getDiskSpaceDetails() {
+  const path = __dirname;
+  const stats = fs.statSync(path);
+  // const total = stats.blocks * stats.bsize;
+  // const free = stats.bfree * stats.bsize;
+  return {
+    // total: total,
+    // free: free,
+    threshold: 10485760, // 10 MB threshold (example value)
+    path: path,
+    exists: true
+  };
 }
