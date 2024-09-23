@@ -13,6 +13,7 @@ import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
 import { OpenApiValidatorMiddleware } from "./middlewares/schemaValidator.middleware";
+import { Validator } from "./middlewares/schemaValidatorAjv.middleware";
 
 const app = Express();
 
@@ -135,6 +136,7 @@ const main = async () => {
       getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
     );
     await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
+    await Validator.getInstance(false).initialize()
     logger.info('Initialized openapi validator middleware');
   } catch (err) {
     if (err instanceof Exception) {

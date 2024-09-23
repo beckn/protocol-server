@@ -8,7 +8,7 @@ import { v4 as uuid_v4 } from "uuid";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
-import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
+import { OpenAPIV3 } from 'openapi-types';
 import logger from "../utils/logger.utils";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
@@ -16,8 +16,8 @@ import {
   RequestActions,
   ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
+import { Validator } from './schemaValidatorAjv.middleware';
 
-const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 const specFolder = 'schemas';
 
 export class OpenApiValidatorMiddleware {
@@ -72,6 +72,7 @@ export class OpenApiValidatorMiddleware {
           logger.info(`Intially cache Not found loadApiSpec file. Loading.... ${file}`);
           const apiSpec = this.getApiSpec(file);
           const requestHandler = OpenApiValidator.middleware({
+            // @ts-ignore
             apiSpec,
             validateRequests: true,
             validateResponses: false,
@@ -116,6 +117,7 @@ export class OpenApiValidatorMiddleware {
           apiSpec,
           count: 1,
           requestHandler: OpenApiValidator.middleware({
+            // @ts-ignore
             apiSpec,
             validateRequests: true,
             validateResponses: false,
@@ -278,6 +280,17 @@ export const openApiValidatorMiddleware = async (
       }
     }
   }
-  const openApiValidator = OpenApiValidatorMiddleware.getInstance().getOpenApiMiddleware(specFile);
-  walkSubstack([...openApiValidator], req, res, next);
+  const apiSpecYAML = fs.readFileSync(specFile, "utf8");
+  const apiSpec = YAML.parse(apiSpecYAML);
+  if (apiSpec.openapi === '3.1.0') {
+    const ajvValidatorInstance = Validator.getInstance(false);
+    const openApiValidator = ajvValidatorInstance.getValidationMiddleware();
+    openApiValidator(req, res, () => {
+      console.log('Validation Success');
+      next()
+    });
+  } else {
+    const openApiValidator = OpenApiValidatorMiddleware.getInstance().getOpenApiMiddleware(specFile);
+    walkSubstack([...openApiValidator], req, res, next);
+  }
 };
