@@ -52,6 +52,9 @@ export class RedisClient {
     }
     
     async setWithExpiry(key: string, value: string, expiry: number) : Promise<boolean> {
+        if (!Number.isInteger(expiry) || expiry <= 0) {
+            expiry = 400;
+        }
         if(this.cacheEnabled){
             return await this.redis!.set(key, value, "EX", expiry) === "OK";
         }

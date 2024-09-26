@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
-import * as OpenApiValidator from "express-openapi-validator";
+import OpenAPIBackend from "openapi-backend";
+import { Context, Document, Handler } from 'openapi-backend';
 import fs from "fs";
 import path from "path";
 import YAML from "yaml";
@@ -8,7 +9,6 @@ import { v4 as uuid_v4 } from "uuid";
 import { Exception, ExceptionType } from "../models/exception.model";
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from "../utils/config.utils";
-import { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 import logger from "../utils/logger.utils";
 import { AppMode } from "../schemas/configs/app.config.schema";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
@@ -17,6 +17,8 @@ import {
   ResponseActions
 } from "../schemas/configs/actions.app.config.schema";
 import { validationFailHandler } from "../utils/validations.utils";
+import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
+import addFormats from 'ajv-formats';
 
 const specFolder = 'schemas';
 
@@ -26,7 +28,8 @@ export class OpenApiValidatorMiddleware {
     [filename: string]: {
       count: number,
       requestHandler: express.RequestHandler[],
-      apiSpec: OpenAPIV3.Document
+      backend: OpenAPIBackend;
+      apiSpec: string
     }
   } = {};
   private static cachedFileLimit: number;
@@ -42,10 +45,9 @@ export class OpenApiValidatorMiddleware {
     return OpenApiValidatorMiddleware.instance;
   }
 
-  private getApiSpec(specFile: string): OpenAPIV3.Document {
-    const apiSpecYAML = fs.readFileSync(specFile, "utf8");
-    const apiSpec = YAML.parse(apiSpecYAML);
-    return apiSpec;
+  private getApiSpec(specFile: string): string {
+    // Simply return the file path instead of parsing it
+    return specFile;
   };
 
   public async initOpenApiMiddleware(): Promise<void> {
@@ -61,6 +63,7 @@ export class OpenApiValidatorMiddleware {
       } else {
         const files = fs.readdirSync(specFolder);
         fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
+        console.log(fileNames)
         noOfFileToCache = Math.min(fileNames.length, 3); //If files to cache is not found in env then we will cache just three file
       }
       noOfFileToCache = Math.min(noOfFileToCache, cachedFileLimit);
@@ -71,15 +74,74 @@ export class OpenApiValidatorMiddleware {
         if (!OpenApiValidatorMiddleware.cachedOpenApiValidator[file]) {
           logger.info(`Intially cache Not found loadApiSpec file. Loading.... ${file}`);
           const apiSpec = this.getApiSpec(file);
-          const requestHandler = OpenApiValidator.middleware({
-            apiSpec,
-            validateRequests: true,
-            validateResponses: false,
-            $refParser: {
-              mode: "dereference"
-            }
-          })
+          const commonResponseHandler: Handler<any, any, any, any, any, Document> = (
+            context: Context<any, any, any, any, any, Document>,
+            req: Request,
+            res: Response,
+            next: NextFunction
+          ) => {
+            // Validation or any processing logic
+            if (context.validation && context?.validation?.errors?.length) {
+              res.status(400).json({ error: context.validation.errors });
+            } else {
+              // Pass control to the next middleware indirectly, or handle the response
+              res.locals.validated = true; // Use res.locals or another mechanism to track validation
+            } // Pass control to the next middleware in the stack
+          };
+    
+          const backend = new OpenAPIBackend({
+            definition: apiSpec,
+            quick: true,
+            validate: true,
+            // ajvOpts: {
+            //   // Options passed directly to AJV
+            //   allErrors: true,
+            //   useDefaults: true,
+            //   formats: {
+            //     // Add custom formats if needed
+            //     uri: true,
+            //     uuid: true,
+            //     'date-time': true,
+            //     email: true,
+            //   },
+            // },
+            customizeAjv: (ajv) => {
+              addFormats(ajv); // Add default formats including "date", "date-time", etc.
+              return ajv; 
+            },
+            handlers: {
+              search: commonResponseHandler,
+              select: commonResponseHandler,
+              init: commonResponseHandler,
+              confirm: commonResponseHandler,
+              update: commonResponseHandler,
+              cancel: commonResponseHandler,
+              status: commonResponseHandler,
+              support: commonResponseHandler,
+              on_search: commonResponseHandler,
+              on_select: commonResponseHandler,
+              on_init: commonResponseHandler,
+              on_confirm: commonResponseHandler,
+              on_update: commonResponseHandler,
+              on_cancel: commonResponseHandler,
+              on_status: commonResponseHandler,
+              on_support: commonResponseHandler,
+          
+              // This handler catches validation failures
+              validationFail: (context, req, res) => {
+                res.status(400).json({ error: context.validation.errors });
+              },
+              // Handle unrecognized paths
+              notFound: (context, req, res) => res.status(404).json({ error: 'Not Found' }),
+            },
+          });
+
+          await backend.init();
+
+          const requestHandler = [this.createValidationMiddleware(backend)];
+
           OpenApiValidatorMiddleware.cachedOpenApiValidator[file] = {
+            backend,
             apiSpec,
             count: 0,
             requestHandler
@@ -94,15 +156,18 @@ export class OpenApiValidatorMiddleware {
 
   public getOpenApiMiddleware(specFile: string): express.RequestHandler[] {
     try {
-      let requestHandler: express.RequestHandler[];
+      let requestHandler: express.RequestHandler[]; // Declare variable
+  
       if (OpenApiValidatorMiddleware.cachedOpenApiValidator[specFile]) {
+        console.log("Inside Validator cache call");
         const cachedValidator = OpenApiValidatorMiddleware.cachedOpenApiValidator[specFile];
         cachedValidator.count = cachedValidator.count > 1000 ? cachedValidator.count : cachedValidator.count + 1;
         logger.info(`Cache found for spec ${specFile}`);
-        requestHandler = cachedValidator.requestHandler;
+        requestHandler = cachedValidator.requestHandler; // Assign to requestHandler
       } else {
         const cashedSpec = Object.entries(OpenApiValidatorMiddleware.cachedOpenApiValidator);
         const cachedFileLimit: number = OpenApiValidatorMiddleware.cachedFileLimit;
+  
         if (cashedSpec.length >= cachedFileLimit) {
           const specWithLeastCount = cashedSpec.reduce((minEntry, currentEntry) => {
             return currentEntry[1].count < minEntry[1].count ? currentEntry : minEntry;
@@ -112,34 +177,144 @@ export class OpenApiValidatorMiddleware {
         }
         logger.info(`Cache Not found loadApiSpec file. Loading.... ${specFile}`);
         const apiSpec = this.getApiSpec(specFile);
+
+        // Adjust your common response handler
+        const commonResponseHandler: Handler<any, any, any, any, any, Document> = (
+          context: Context<any, any, any, any, any, Document>,
+          req: Request,
+          res: Response,
+          next: NextFunction
+        ) => {
+          // Validation or any processing logic
+          if (context.validation && context?.validation?.errors?.length) {
+            res.status(400).json({ error: context.validation.errors });
+          } else {
+            // Pass control to the next middleware indirectly, or handle the response
+            res.locals.validated = true; // Use res.locals or another mechanism to track validation
+          } // Pass control to the next middleware in the stack
+        };
+  
+        const backend = new OpenAPIBackend({
+          definition: apiSpec,
+          quick: true,
+          validate: true,
+          // ajvOpts: {
+          //   // Options passed directly to AJV
+          //   allErrors: true,
+          //   useDefaults: true,
+          //   formats: {
+          //     // Add custom formats if needed
+          //     uri: true,
+          //     uuid: true,
+          //     'date-time': true,
+          //     email: true,
+          //   },
+          // },
+          customizeAjv: (ajv) => {
+            addFormats(ajv); // Add default formats including "date", "date-time", etc.
+            return ajv; 
+          },
+          handlers: {
+            search: commonResponseHandler,
+            select: commonResponseHandler,
+            init: commonResponseHandler,
+            confirm: commonResponseHandler,
+            update: commonResponseHandler,
+            cancel: commonResponseHandler,
+            status: commonResponseHandler,
+            support: commonResponseHandler,
+            on_search: commonResponseHandler,
+            on_select: commonResponseHandler,
+            on_init: commonResponseHandler,
+            on_confirm: commonResponseHandler,
+            on_update: commonResponseHandler,
+            on_cancel: commonResponseHandler,
+            on_status: commonResponseHandler,
+            on_support: commonResponseHandler,
+        
+            // This handler catches validation failures
+            validationFail: (context, req, res) => {
+              // const error = new Exception(
+              //   ExceptionType.OpenApiSchema_ParsingError,
+              //   `Validation failed`,
+              //   400,
+              //   context.validation.errors
+              // );
+              // next(error);
+              res.status(400).json({ error: context.validation.errors });
+            },
+            // Handle unrecognized paths
+            notFound: (context, req, res) => res.status(404).json({ error: 'Not Found' }),
+            // notFound: (context, req, res, next) => {
+            //   // Handle not found by calling next with an error
+            //   const error = new Exception(
+            //     ExceptionType.Resource_Not_Found,
+            //     `Not Found`,
+            //     404
+            //   );
+            //   next(error);
+            // },
+          },
+        });
+  
+        backend.init(); // Ensure backend is initialized properly
+  
+        requestHandler = [this.createValidationMiddleware(backend)]; // Assign correctly here
+  
         OpenApiValidatorMiddleware.cachedOpenApiValidator[specFile] = {
           apiSpec,
           count: 1,
-          requestHandler: OpenApiValidator.middleware({
-            apiSpec,
-            validateRequests: true,
-            validateResponses: false,
-            $refParser: {
-              mode: "dereference"
-            }
-          })
-        }
-        requestHandler = OpenApiValidatorMiddleware.cachedOpenApiValidator[specFile].requestHandler;
+          requestHandler,
+          backend,
+        };
       }
+  
       const cacheStats = Object.entries(OpenApiValidatorMiddleware.cachedOpenApiValidator).map((cache) => {
         return {
           count: cache[1].count,
-          specFile: cache[0]
-        }
+          specFile: cache[0],
+        };
       });
       console.table(cacheStats);
       return requestHandler;
     } catch (err) {
       logger.error('Error in getOpenApiMiddleware', err);
-      return []
+      return [];
+    }
+  }
+
+  // Custom Middleware creation with proper handling
+private createValidationMiddleware(backend: OpenAPIBackend): express.RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const context = await backend.handleRequest(
+        {
+          method: req.method,
+          path: req.path,
+          body: req.body,
+          query: req.query as any,
+          headers: req.headers as Record<string, string | string[]>,
+        },
+        req,
+        res
+      );
+
+      // Check if validation was successful or flagged in the response handler
+      if (res.locals.validated) {
+        next(); // Proceed to the next middleware
+      }
+    } catch (error) {
+      next(error); // Proper error handling
     }
   };
 }
+
+
+}
+
+
+
+
 
 const initializeOpenApiValidatorCache = async (stack: any) => {
   try {
@@ -199,12 +374,13 @@ export const schemaErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("Inside schemaErrorHandler")
   logger.error('OpenApiValidator Error', err);
   if (err instanceof Exception) {
     next(err);
   } else {
     if (getConfig().app.mode === AppMode.bpp) {
-      console.log('OpenApiValidator Error', err);
+      console.log('OpenApiValidator Error', err);``
       if (getConfig().app.gateway.mode === GatewayMode.client) {
         req.body = {
           ...req.body,
@@ -268,7 +444,8 @@ export const openApiValidatorMiddleware = async (
 
   if (getConfig().app.useLayer2Config) {
     let doesLayer2ConfigExist = false;
-    let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
+    let layer2ConfigFilename = `${(req?.body?.context?.domain).toLowerCase()}_${version}.yaml`;
+    console.log(layer2ConfigFilename)
     let specialCharsRe = /[:\/]/gi;
     layer2ConfigFilename = layer2ConfigFilename.replace(specialCharsRe, "_");
     try {
@@ -277,10 +454,12 @@ export const openApiValidatorMiddleware = async (
           `${path.join(path.resolve(__dirname, "../../"))}/${specFolder}`
         )
       ).includes(layer2ConfigFilename);
+      console.log("doesLayer2ConfigExist", doesLayer2ConfigExist)
     } catch (error) {
       doesLayer2ConfigExist = false;
     }
-    if (doesLayer2ConfigExist) specFile = `${specFolder}/${layer2ConfigFilename}`;
+    if (doesLayer2ConfigExist) {specFile = `${specFolder}/${layer2ConfigFilename}`;
+    console.log(specFile);}
     else {
       if (getConfig().app.mandateLayer2Config) {
         const message = `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`
