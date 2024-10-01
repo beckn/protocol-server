@@ -283,9 +283,9 @@ export const openApiValidatorMiddleware = async (
   const apiSpecYAML = fs.readFileSync(specFile, "utf8");
   const apiSpec = YAML.parse(apiSpecYAML);
   if (apiSpec.openapi === '3.1.0') {
-    const ajvValidatorInstance = Validator.getInstance(false);
+    const ajvValidatorInstance = Validator.getInstance();
     const openApiValidator = ajvValidatorInstance.getValidationMiddleware();
-    openApiValidator(req, res, () => {
+    (await openApiValidator)(req, res, () => {
       console.log('Validation Success');
       next()
     });

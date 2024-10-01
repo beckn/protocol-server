@@ -136,7 +136,7 @@ const main = async () => {
       getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
     );
     await OpenApiValidatorMiddleware.getInstance().initOpenApiMiddleware();
-    await Validator.getInstance(false).initialize()
+    await Validator.getInstance().initialize();
     logger.info('Initialized openapi validator middleware');
   } catch (err) {
     if (err instanceof Exception) {
