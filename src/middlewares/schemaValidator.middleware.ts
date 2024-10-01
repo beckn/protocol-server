@@ -250,7 +250,7 @@ export const openApiValidatorMiddleware = async (
     ? req?.body?.context?.core_version
     : req?.body?.context?.version;
   let specFile = `${specFolder}/core_${version}.yaml`;
-
+  let specFileName = `core_${version}.yaml`;
   if (getConfig().app.useLayer2Config) {
     let doesLayer2ConfigExist = false;
     let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
@@ -265,7 +265,10 @@ export const openApiValidatorMiddleware = async (
     } catch (error) {
       doesLayer2ConfigExist = false;
     }
-    if (doesLayer2ConfigExist) specFile = `${specFolder}/${layer2ConfigFilename}`;
+    if (doesLayer2ConfigExist) {
+      specFile = `${specFolder}/${layer2ConfigFilename}`;
+      specFileName = layer2ConfigFilename;
+    }
     else {
       if (getConfig().app.mandateLayer2Config) {
         const message = `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`
@@ -284,9 +287,9 @@ export const openApiValidatorMiddleware = async (
   const apiSpec = YAML.parse(apiSpecYAML);
   if (apiSpec.openapi === '3.1.0') {
     const ajvValidatorInstance = Validator.getInstance();
-    const openApiValidator = ajvValidatorInstance.getValidationMiddleware();
+    const openApiValidator = await ajvValidatorInstance.getValidationMiddleware(specFile, specFileName);
     (await openApiValidator)(req, res, () => {
-      console.log('Validation Success');
+      logger.info('Validation Success');
       next()
     });
   } else {

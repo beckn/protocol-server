@@ -9,7 +9,6 @@ import logger from '../utils/logger.utils';
 import { NextFunction, Request, Response } from 'express';
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from '../utils/config.utils';
-import { Exception, ExceptionType } from '../models/exception.model';
 const specFolder = 'schemas';
 export class Validator {
     private static instance: Validator;
@@ -23,7 +22,6 @@ export class Validator {
     }
 
     public static getInstance(): Validator {
-        
         if (!Validator.instance) {
             Validator.instance = new Validator();
         }
@@ -33,7 +31,6 @@ export class Validator {
     async initialize() {
         if (this.initialized) return;
         console.time('SchemaValidation');
-        console.log('Running in main thread...');
         await this.compileEachSpecFiles();
         console.timeEnd('SchemaValidation');
         this.initialized = true;
@@ -46,11 +43,11 @@ export class Validator {
     };
 
     async compileEachSpecFiles() {
-        const cachedFileLimit: number = 4;
+        const cachedFileLimit: number = getConfig().app?.openAPIValidator?.cachedFileLimit || 3;
+        logger.info(`OpenAPIValidator Cache count ${cachedFileLimit}`);
         const files = fs.readdirSync(specFolder);
         const fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
         logger.info(`OpenAPIValidator loaded spec files ${fileNames}`);
-        logger.info(`OpenAPIValidator Cache count ${cachedFileLimit}`);
         for (let i = 0; (i < cachedFileLimit && fileNames[i]); i++) {
             const file = `${specFolder}/${fileNames[i]}`;
 
@@ -61,18 +58,16 @@ export class Validator {
             dereferencedSpec = await $RefParser.dereference(this.getApiSpec(file), options) as OpenAPIV3.Document;
 
             try {
-
                 await this.compileSchemas(dereferencedSpec, fileNames[i]);
             } catch (error) {
-                console.log('Error derefencing doc: ', error);
+                logger.error(`Error derefencing doc: ${error}`);
             }
 
 
         }
-        console.log('Schema cache size: ', this.schemaCache.size);
+        logger.info(`Schema cache size: ${this.schemaCache.size}`);
         for (const [key, _] of this.schemaCache) {
             logger.info(`Set all cache for validation key and its value : ${key}`);
-            console.log(`Set all cache for validation key and its value : ${key}`);
         }
 
     }
@@ -127,7 +122,7 @@ export class Validator {
         });
     }
 
-    async getValidationMiddleware() {
+    async getValidationMiddleware(specFile: string, specFileName: string) {
         return async (req: Request,
             res: Response<{}, Locals>,
             next: NextFunction) => {
@@ -137,47 +132,9 @@ export class Validator {
             let domain = req?.body?.context?.domain;
             domain = domain.replace(/:/g, '_');
             const formattedVersion = `${domain.trim()}_${version.trim()}`;
-            console.log('Formatted version: ', formattedVersion);
+            logger.info(`Formatted version: ${formattedVersion}`);
             const action = `/${req?.body?.context?.action}`;
             const method = req.method.toLowerCase();
-            let specFile = `${specFolder}/core_${version}.yaml`;
-            let specFileName = `core_${version}.yaml`;
-            for (const [key, _] of this.schemaCache) {
-                //logger.info(`Set all cache for validation key and its value : ${key}`);
-                console.log(`Cache key: ${key}`);
-            }
-            if (getConfig().app.useLayer2Config) {
-                let doesLayer2ConfigExist = false;
-                let layer2ConfigFilename = `${req?.body?.context?.domain}_${version}.yaml`;
-                let specialCharsRe = /[:\/]/gi;
-                layer2ConfigFilename = layer2ConfigFilename.replace(specialCharsRe, "_");
-                try {
-                    doesLayer2ConfigExist = (
-                        await fs.promises.readdir(
-                            `${path.join(path.resolve(__dirname, "../../"))}/${specFolder}`
-                        )
-                    ).includes(layer2ConfigFilename);
-                } catch (error) {
-                    doesLayer2ConfigExist = false;
-                }
-                if (doesLayer2ConfigExist) {
-                    specFile = `${specFolder}/${layer2ConfigFilename}`;
-                    specFileName = layer2ConfigFilename;
-                }
-                else {
-                    if (getConfig().app.mandateLayer2Config) {
-                        const message = `Layer 2 config file ${layer2ConfigFilename} is not installed and it is marked as required in configuration`
-                        logger.error(message);
-                        return next(
-                            new Exception(
-                                ExceptionType.Config_AppConfig_Layer2_Missing,
-                                message,
-                                422
-                            )
-                        );
-                    }
-                }
-            }
             // Validate request body
             const requestBodyKey = `${formattedVersion}-${action}-${method}-requestBody`;
             logger.info(`requestBodyKey for incoming req: ${requestBodyKey}`)
@@ -187,9 +144,8 @@ export class Validator {
                     return res.status(400).json({ error: validateRequestBody.errors });
                 }
             } else {
-                console.log(`AGV Validation Cache miss for ${specFileName} and request body: ${requestBodyKey}`);
+                logger.info(`AGV Validation Cache miss for ${specFileName} and request body: ${requestBodyKey}`);
                 const apiSpecYAML = this.getApiSpec(specFile);
-                //parse and destructure the spec file
                 const options = {
                     continueOnError: true, // Continue dereferencing despite errors
                 };
@@ -199,7 +155,7 @@ export class Validator {
                 try {
                     await this.compileSchemas(dereferencedSpec, specFileName);
                 } catch (error) {
-                    console.log('Error derefencing doc: ', error);
+                    logger.error(`Error derefencing doc: ${error}`);
                 }
                 const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
                 if (!validateRequestBody(req.body)) {
@@ -215,22 +171,17 @@ export class Validator {
                     return res.status(400).json({ error: validateQueryParameters.errors });
                 }
             } else {
-                //compile schema
-                //Find the spec file
-                console.log(`AGV Validation Cache miss for ${specFileName} and query-param-key: ${queryParametersKey}`);
+                logger.info(`AGV Validation Cache miss for ${specFileName} and query-param-key: ${queryParametersKey}`);
                 const apiSpecYAML = this.getApiSpec(specFile);
-                //parse and destructure the spec file
                 const options = {
                     continueOnError: true, // Continue dereferencing despite errors
                 };
                 let dereferencedSpec: any;
-                dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;
-                //console.log('Dereferenced spec file: ', JSON.stringify(dereferencedSpec));
-    
+                dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;   
                 try {
                     await this.compileSchemas(dereferencedSpec, specFileName);
                 } catch (error) {
-                    console.log('Error derefencing doc: ', error);
+                    logger.error(`Error derefencing doc: ${error}`);
                 }
                 const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
                 if (!validateRequestBody(req.body)) {
@@ -246,22 +197,17 @@ export class Validator {
                     return res.status(400).json({ error: validateHeaders.errors });
                 }
             } else {
-                //compile schema
-                //Find the spec file
-                console.log(`AGV Validation Cache miss for ${specFileName} and header-key: ${headersKey}`);
+                logger.info(`AGV Validation Cache miss for ${specFileName} and header-key: ${headersKey}`);
                 const apiSpecYAML = this.getApiSpec(specFile);
-                //parse and destructure the spec file
                 const options = {
                     continueOnError: true, // Continue dereferencing despite errors
                 };
                 let dereferencedSpec: any;
                 dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;
-                //console.log('Dereferenced spec file: ', JSON.stringify(dereferencedSpec));
-    
                 try {
                     await this.compileSchemas(dereferencedSpec, specFileName);
                 } catch (error) {
-                    console.log('Error derefencing doc: ', error);
+                    logger.error(`Error derefencing doc: ${error}`);
                 }
                 const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
                 if (!validateRequestBody(req.body)) {
