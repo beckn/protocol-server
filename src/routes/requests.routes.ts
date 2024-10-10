@@ -20,6 +20,7 @@ import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller"
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import { LogLevelEnum } from "../utils/logger.utils";
+import os from "os";
 
 export const requestsRouter = Router();
 
@@ -186,4 +187,31 @@ if (
       );
     }
   });
+}
+
+requestsRouter.get("/health", async (req: Request, res: Response) => {
+  try {
+    const health = {
+      status: "up",
+      components: {
+        diskSpace: {
+          status: "up",
+          details: getDiskSpaceDetails()
+        }
+      }
+    };
+
+    res.json(health);
+  } catch (error: any) {
+    logger.error(`Health check failed: ${error.message}`);
+    res.status(500).json({ status: "down", error: error.message });
+  }
+});
+
+function getDiskSpaceDetails() {
+  const path = __dirname;
+  return {
+    path: path,
+    exists: true
+  };
 }
