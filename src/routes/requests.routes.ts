@@ -192,16 +192,10 @@ if (
 requestsRouter.get("/health", async (req: Request, res: Response) => {
   try {
     const health = {
-      status: "UP",
+      status: "up",
       components: {
-        db: {
-          status: "UP",
-          details: {
-            database: "MongoDB", 
-          }
-        },
         diskSpace: {
-          status: "UP",
+          status: "up",
           details: getDiskSpaceDetails()
         }
       }
@@ -210,19 +204,13 @@ requestsRouter.get("/health", async (req: Request, res: Response) => {
     res.json(health);
   } catch (error: any) {
     logger.error(`Health check failed: ${error.message}`);
-    res.status(500).json({ status: "DOWN", error: error.message });
+    res.status(500).json({ status: "down", error: error.message });
   }
 });
 
 function getDiskSpaceDetails() {
   const path = __dirname;
-  const stats = fs.statSync(path);
-  // const total = stats.blocks * stats.bsize;
-  // const free = stats.bfree * stats.bsize;
   return {
-    // total: total,
-    // free: free,
-    threshold: 10485760, // 10 MB threshold (example value)
     path: path,
     exists: true
   };
