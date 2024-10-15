@@ -20,7 +20,6 @@ import { bppNetworkRequestHandler } from "../controllers/bpp.request.controller"
 import { Locals } from "../interfaces/locals.interface";
 import { unConfigureActionHandler } from "../controllers/unconfigured.controller";
 import { LogLevelEnum } from "../utils/logger.utils";
-import os from "os";
 
 export const requestsRouter = Router();
 
