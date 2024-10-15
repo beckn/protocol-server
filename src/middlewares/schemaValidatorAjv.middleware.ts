@@ -9,16 +9,23 @@ import logger from '../utils/logger.utils';
 import { NextFunction, Request, Response } from 'express';
 import { Locals } from "../interfaces/locals.interface";
 import { getConfig } from '../utils/config.utils';
+import { parser, validator, ValidatorOptions } from '@exodus/schemasafe';
 const specFolder = 'schemas';
+type SchemaSafeValidator = (data: unknown) => boolean;
 export class Validator {
     private static instance: Validator;
     private ajv: Ajv;
-    private schemaCache: Map<string, ValidateFunction>;
+    private static schemaCache: {
+        [keyName: string]: {
+          count: number,
+          requestHandler: Function
+        }
+      } = {};
     private initialized: boolean = false;
     private constructor() {
         this.ajv = new Ajv({ allErrors: true, coerceTypes: true, useDefaults: true, strict: false });
         addFormats(this.ajv);
-        this.schemaCache = new Map<string, ValidateFunction>();
+        //this.schemaCache = new Map<string, Function>();
     }
 
     public static getInstance(): Validator {
@@ -43,177 +50,164 @@ export class Validator {
     };
 
     async compileEachSpecFiles() {
-        const cachedFileLimit: number = getConfig().app?.openAPIValidator?.cachedFileLimit || 3;
+        const cachedFileLimit: number = getConfig().app?.openAPIValidator?.cachedFileLimit || 7;
         logger.info(`OpenAPIValidator Cache count ${cachedFileLimit}`);
         const files = fs.readdirSync(specFolder);
         const fileNames = files.filter(file => fs.lstatSync(path.join(specFolder, file)).isFile() && (file.endsWith('.yaml') || file.endsWith('.yml')));
         logger.info(`OpenAPIValidator loaded spec files ${fileNames}`);
-        for (let i = 0; (i < cachedFileLimit && fileNames[i]); i++) {
+        let count = 0;
+        let i = 0;
+        logger.info(`Total file: ${fileNames.length}`);
+        
+        while (true) {
+            if (count == cachedFileLimit || i >= fileNames.length) {
+                break;
+            }
             const file = `${specFolder}/${fileNames[i]}`;
 
             const options = {
                 continueOnError: true, // Continue dereferencing despite errors
             };
             let dereferencedSpec: any;
-            dereferencedSpec = await $RefParser.dereference(this.getApiSpec(file), options) as OpenAPIV3.Document;
+            const spec = this.getApiSpec(file);
+
+            try {
+                dereferencedSpec = await $RefParser.dereference(spec, options) as OpenAPIV3.Document;
+            } catch (error) {
+                console.error('Dereferencing error:', error);
+            }
 
             try {
                 await this.compileSchemas(dereferencedSpec, fileNames[i]);
             } catch (error) {
                 logger.error(`Error derefencing doc: ${error}`);
             }
+            count++;
 
+            i++;
 
         }
-        logger.info(`Schema cache size: ${this.schemaCache.size}`);
-        for (const [key, _] of this.schemaCache) {
-            logger.info(`Set all cache for validation key and its value : ${key}`);
-        }
+        logger.info(`Schema cache size: ${Object.keys(Validator.schemaCache).length}`);
+        const cacheStats = Object.entries(Validator.schemaCache).map((cache) => {
+            return {
+              count: cache[1].count,
+              specFile: cache[0]
+            }
+          });
+          console.table(cacheStats);
 
     }
 
-    private async compileSchemas(spec: OpenAPIV3.Document, file: string) {
+    async compileSchemas(spec: OpenAPIV3.Document, file: string, schemaPath?: string | null | undefined, schemaMethod?: string | null | undefined) {
         const regex = /\.(yml|yaml)$/;
         const fileName = file.split(regex)[0];
         logger.info(`OpenAPIValidator compile schema fileName:  ${fileName}`);
-        Object.keys(spec.paths).forEach(path => {
+
+        for (const path of Object.keys(spec.paths)) {
             const methods: any = spec.paths[path];
-            Object.keys(methods).forEach(method => {
-                const operation = methods[method];
+            if (!schemaPath || schemaPath === path) {
+                for (const method of Object.keys(methods)) {
+                    if (!schemaMethod || schemaMethod === method) {
+                        const operation = methods[method];
+                        const key = `${fileName}-${path}-${method}`;
 
-                // Compile request body schema
-                const bodyKey = `${fileName}-${path}-${method}-requestBody`;
-                const requestBodySchema = operation.requestBody && (operation.requestBody as any).content['application/json'].schema;
-                if (!this.schemaCache.has(bodyKey) && requestBodySchema) {
-                    this.schemaCache.set(bodyKey, this.ajv.compile(requestBodySchema));
+                        const options: ValidatorOptions = {
+
+                            includeErrors: true, // Include errors in the output
+                            allErrors: true, // Report all validation errors
+                            contentValidation: true, // Validate content based on formats,
+                            //requireSchema: true,
+                            $schemaDefault: 'http://json-schema.org/draft/2020-12/schema', // Specify the schema version
+                        };
+                        if (!Validator.schemaCache[key]) {
+                            try {
+                                const parse = validator(operation.requestBody?.content['application/json']?.schema, options)
+                                Validator.schemaCache[key] = {
+                                    count: 0,
+                                    requestHandler: parse
+                                }
+                                logger.info(`Schema compiled and cached for ${key}`);
+                            } catch (error: any) {
+                                console.error(`Error compiling schema for ${key}: ${error.message}`);
+                            }
+                        }
+                    }
                 }
+            }
+        }
 
-                // Compile query parameters schema
-                const queryKey = `${fileName}-${path}-${method}-queryParameters`;
-                const queryParameters = (operation.parameters || []).filter((param: any) => param.in === 'query');
-                if (!this.schemaCache.has(queryKey) && queryParameters.length) {
-                    this.schemaCache.set(queryKey, this.ajv.compile({
-                        type: 'object', properties: queryParameters.reduce((acc: { [x: string]: any; }, param: { name: string | number; schema: any; }) => {
-                            acc[param.name] = param.schema;
-                            return acc;
-                        }, {} as any)
-                    }));
-                }
-
-                // Compile headers schema
-                const headers = (operation.parameters || []).filter((param: any) => param.in === 'header');
-                const headerKey = `${fileName}-${path}-${method}-headers`;
-                if (!this.schemaCache.has(headerKey) && headers.length) {
-                    this.schemaCache.set(headerKey, this.ajv.compile({
-                        type: 'object', properties: headers.reduce((acc: { [x: string]: any; }, param: { name: string | number; schema: any; }) => {
-                            acc[param.name] = param.schema;
-                            return acc;
-                        }, {} as any)
-                    }));
-                }
-
-                // Compile response schema
-                // const responseSchema = operation.responses && (operation.responses['200'] as any).content['application/json'].schema;
-                // if (responseSchema) {
-                //     const key = `${path}-${method}-response`;
-                //     this.schemaCache.set(key, this.ajv.compile(responseSchema));
-                // }
-            });
-        });
     }
 
+    deleteEmptyKeys(obj: any) {
+        // Recursively iterate through the object
+        for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            const value = obj[key];
+            if (typeof value === 'object' && value !== null) {
+                this.deleteEmptyKeys(value); 
+             
+            }
+            // If the value is undefined or null, delete the key
+            else if (value === undefined || value === null) {
+              delete obj[key];
+            }
+          }
+        }
+        return obj;
+      }
+
     async getValidationMiddleware(specFile: string, specFileName: string) {
-        return async (req: Request,
-            res: Response<{}, Locals>,
-            next: NextFunction) => {
-            let version = req?.body?.context?.core_version
-                ? req?.body?.context?.core_version
-                : req?.body?.context?.version;
-            let domain = req?.body?.context?.domain;
-            domain = domain.replace(/:/g, '_');
-            const formattedVersion = `${domain.trim()}_${version.trim()}`;
-            logger.info(`Formatted version: ${formattedVersion}`);
-            const action = `/${req?.body?.context?.action}`;
+        return async (req: any, res: any, next: any) => {
+            logger.info(`Spec file:  ${specFile}`);
+            const regex = /\.(yml|yaml)$/;
+            const fileName = specFileName.split(regex)[0];
+            logger.info(`File name: ${specFile}`);
+            const action = `/${req.body.context.action}`;
             const method = req.method.toLowerCase();
-            // Validate request body
-            const requestBodyKey = `${formattedVersion}-${action}-${method}-requestBody`;
-            logger.info(`requestBodyKey for incoming req: ${requestBodyKey}`)
-            if (this.schemaCache.has(requestBodyKey)) {
-                const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
-                if (!validateRequestBody(req.body)) {
-                    return res.status(400).json({ error: validateRequestBody.errors });
+            const requestKey = `${fileName}-${action}-${method}`;
+            this.deleteEmptyKeys(req.body);
+            const validateKey = Validator.schemaCache[requestKey];
+            if (validateKey) {
+                logger.info(`Schemasafe Validation Cache HIT for ${specFileName}`);
+                const validate: any = validateKey.requestHandler;
+                try {
+                    const validationResult = validate(req.body);
+                    if (!validationResult) {
+                        return res.status(400).json({ error: validate.errors });
+                    }
+                    validateKey.count = validateKey.count ? validateKey.count + 1 : 1;
+                    console.table([{key: requestKey, count: Validator.schemaCache[requestKey].count}]);
+                } catch (error) {
+                    return res.status(400).json({ error: 'Schema Validation Failed' });
                 }
             } else {
-                logger.info(`AGV Validation Cache miss for ${specFileName} and request body: ${requestBodyKey}`);
+                const cashedSpec = Object.entries(Validator.schemaCache);
+                let cachedFileLimit: number = getConfig().app?.openAPIValidator?.cachedFileLimit || 7;
+                cachedFileLimit = cachedFileLimit * 20;
+                if (cashedSpec.length >= cachedFileLimit) {
+                    const specWithLeastCount = cashedSpec.reduce((minEntry, currentEntry) => {
+                        return currentEntry[1].count < minEntry[1].count ? currentEntry : minEntry;
+                    }) || cashedSpec[0];
+                    logger.info(`Cache count reached limit. Deleting from cache.... ${specWithLeastCount[0]}`);
+                    delete Validator.schemaCache[specWithLeastCount[0]];
+                }
+                logger.info(`Schemasafe Validation Cache miss for ${specFileName}`);
                 const apiSpecYAML = this.getApiSpec(specFile);
-                const options = {
-                    continueOnError: true, // Continue dereferencing despite errors
-                };
-                let dereferencedSpec: any;
-                dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;
-    
-                try {
-                    await this.compileSchemas(dereferencedSpec, specFileName);
-                } catch (error) {
-                    logger.error(`Error derefencing doc: ${error}`);
-                }
-                const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
-                if (!validateRequestBody(req.body)) {
-                    return res.status(400).json({ error: validateRequestBody.errors });
-                }
-            }
+                const dereferencedSpec = await $RefParser.dereference(apiSpecYAML) as OpenAPIV3.Document;
 
-            //Validate query parameters
-            const queryParametersKey = `${formattedVersion}-${action}-${method}-queryParameters`;
-            if (this.schemaCache.has(queryParametersKey)) {
-                const validateQueryParameters: any = this.schemaCache.get(queryParametersKey);
-                if (!validateQueryParameters(req.query)) {
-                    return res.status(400).json({ error: validateQueryParameters.errors });
-                }
-            } else {
-                logger.info(`AGV Validation Cache miss for ${specFileName} and query-param-key: ${queryParametersKey}`);
-                const apiSpecYAML = this.getApiSpec(specFile);
-                const options = {
-                    continueOnError: true, // Continue dereferencing despite errors
-                };
-                let dereferencedSpec: any;
-                dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;   
                 try {
-                    await this.compileSchemas(dereferencedSpec, specFileName);
+                    await this.compileSchemas(dereferencedSpec, specFileName, action, method);
+                    const validateKey = Validator.schemaCache[requestKey];
+                    const validate: any = validateKey.requestHandler;
+                    const validationResult = validate(req.body);
+                    if (!validationResult) {
+                        return res.status(400).json({ error: validate.errors });
+                    }
+                    validateKey.count = validateKey.count ? validateKey.count + 1 : 1;
                 } catch (error) {
-                    logger.error(`Error derefencing doc: ${error}`);
+                    console.error(`Error compiling doc: ${error}`);
                 }
-                const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
-                if (!validateRequestBody(req.body)) {
-                    return res.status(400).json({ error: validateRequestBody.errors });
-                }
-            }
-
-            // Validate headers
-            const headersKey = `${formattedVersion}-${action}-${method}-headers`;
-            if (this.schemaCache.has(headersKey)) {
-                const validateHeaders: any = this.schemaCache.get(headersKey);
-                if (!validateHeaders(req.headers)) {
-                    return res.status(400).json({ error: validateHeaders.errors });
-                }
-            } else {
-                logger.info(`AGV Validation Cache miss for ${specFileName} and header-key: ${headersKey}`);
-                const apiSpecYAML = this.getApiSpec(specFile);
-                const options = {
-                    continueOnError: true, // Continue dereferencing despite errors
-                };
-                let dereferencedSpec: any;
-                dereferencedSpec = await $RefParser.dereference(apiSpecYAML, options) as OpenAPIV3.Document;
-                try {
-                    await this.compileSchemas(dereferencedSpec, specFileName);
-                } catch (error) {
-                    logger.error(`Error derefencing doc: ${error}`);
-                }
-                const validateRequestBody: any = this.schemaCache.get(requestBodyKey);
-                if (!validateRequestBody(req.body)) {
-                    return res.status(400).json({ error: validateRequestBody.errors });
-                }
-            }
+            }  
             next();
         };
     }

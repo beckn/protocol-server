@@ -298,15 +298,11 @@ export const openApiValidatorMiddleware = async (
   }
   const apiSpecYAML = fs.readFileSync(specFile, "utf8");
   const apiSpec = YAML.parse(apiSpecYAML);
-  if (apiSpec.openapi === '3.1.0') {
-    const ajvValidatorInstance = Validator.getInstance();
-    const openApiValidator = await ajvValidatorInstance.getValidationMiddleware(specFile, specFileName);
-    (await openApiValidator)(req, res, () => {
-      logger.info('Validation Success');
-      next()
-    });
-  } else {
-    const openApiValidator = OpenApiValidatorMiddleware.getInstance().getOpenApiMiddleware(specFile);
-    walkSubstack([...openApiValidator], req, res, next);
-  }
+  const ajvValidatorInstance = Validator.getInstance();
+  const openApiValidator = await ajvValidatorInstance.getValidationMiddleware(specFile, specFileName);
+  (await openApiValidator)(req, res, () => {
+    logger.info('Validation Success');
+    next()
+  });
+  
 };
