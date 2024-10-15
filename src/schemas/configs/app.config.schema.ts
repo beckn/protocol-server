@@ -59,7 +59,7 @@ export const appConfigSchema = z.object({
   sharedKeyForWebhookHMAC: z.string().optional(),
   openAPIValidator: z.object({
     cachedFileLimit: z.number().optional(),
-    initialFilesToCache: z.string().optional()
+    cacheSizeLimit: z.number().optional()
   }).optional()
 });
 

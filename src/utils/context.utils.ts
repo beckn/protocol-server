@@ -59,6 +59,12 @@ export const bapContextBuilder = async (
       bapContext
     )}\n`
   );
+  //remove all keys having null or undefined values for validation
+  for (const key in bapContext) {
+    if (bapContext[key] === undefined || bapContext[key] === null) {
+      delete bapContext[key];
+    }
+  }
   return bapContext;
 };
 
