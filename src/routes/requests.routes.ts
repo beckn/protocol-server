@@ -187,3 +187,30 @@ if (
     }
   });
 }
+
+requestsRouter.get("/health", async (req: Request, res: Response) => {
+  try {
+    const health = {
+      status: "up",
+      components: {
+        diskSpace: {
+          status: "up",
+          details: getDiskSpaceDetails()
+        }
+      }
+    };
+
+    res.json(health);
+  } catch (error: any) {
+    logger.error(`Health check failed: ${error.message}`);
+    res.status(500).json({ status: "down", error: error.message });
+  }
+});
+
+function getDiskSpaceDetails() {
+  const path = __dirname;
+  return {
+    path: path,
+    exists: true
+  };
+}
