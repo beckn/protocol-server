@@ -5,18 +5,20 @@ import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "./cache/sync.cache.utils";
 import { getConfig } from "./config.utils";
 import { SyncCacheDataType } from "../schemas/cache/sync.cache.schema";
+import eventBus from "./eventBus.utils";
+
 export async function sendSyncResponses(
   res: Response,
   message_id: string,
   action: RequestActions,
-  context: any
+  context: any,
 ) {
   try {
     if (getConfig().client.type != ClientConfigType.synchronous) {
       throw new Exception(
         ExceptionType.Client_InvalidCall,
         "Synchronous client is not configured.",
-        500
+        500,
       );
     }
 
@@ -27,49 +29,31 @@ export async function sendSyncResponses(
       ? getConfig().app.actions.requests[action]?.ttl!
       : 30 * 1000;
 
-    let curr_timeStamp = Date.now();
-
-    if (
-      action === "search" &&
-      !context?.bpp_id &&
-      !context.bpp_uri
-    ) {
-      await sleep(waitTime);
-    }
-    let syncCacheData: SyncCacheDataType | null = null;
-
-    do {
-      syncCacheData = await syncCache.getData(message_id, action);
-      if (!syncCacheData || !syncCacheData?.responses.length) {
-        await sleep(100);
-      }
-    } while (
-      (!syncCacheData || !syncCacheData?.responses.length) &&
-      Date.now() - curr_timeStamp < waitTime
-    );
-
-    if (!syncCacheData) {
-      throw new Exception(
-        ExceptionType.Client_SyncCacheDataNotFound,
-        `Sync cache data not found for message_id: ${message_id} and action: ${action}`,
-        404
+    if (action === "search" && !context?.bpp_id && !context.bpp_uri) {
+      console.time("onSearch Event Execution");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      eventBus.on(
+        "onSearch",
+        ({ message_id: msg_id, responseBody: response }) => {
+          console.log(
+            "On Search Response Event CB ======>",
+            JSON.stringify(response),
+          );
+          console.timeEnd("onSearch Event Execution");
+          console.log({ message_id, msg_id });
+          if (message_id == msg_id)
+            res.write(
+              JSON.stringify({
+                context,
+                responses: [response],
+              }) + "\n",
+            );
+        },
       );
+      setTimeout(() => {
+        res.end();
+      }, waitTime);
     }
-
-    if (syncCacheData.error) {
-      res.status(400).json({
-        context,
-        error: syncCacheData.error
-      });
-      return;
-    }
-    console.log(
-      `TMTR - ${context?.message_id} - ${context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
-    );
-    res.status(200).json({
-      context,
-      responses: syncCacheData.responses || []
-    });
   } catch (error) {
     if (error instanceof Exception) {
       throw error;
@@ -79,7 +63,7 @@ export async function sendSyncResponses(
       ExceptionType.Client_SendSyncReponsesFailed,
       "Send Synchronous Responses Failed.",
       500,
-      error
+      error,
     );
   }
 }
@@ -88,6 +72,6 @@ function sleep(ms: number) {
   return new Promise((resolve) =>
     setTimeout(() => {
       resolve("");
-    }, ms)
+    }, ms),
   );
 }

@@ -22,12 +22,13 @@ import {
   createTelemetryEvent,
   processTelemetry,
 } from "../utils/telemetry.utils";
+import eventBus from "../utils/eventBus.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
   res: Response<{}, Locals>,
   next: NextFunction,
-  action: ResponseActions
+  action: ResponseActions,
 ) => {
   try {
     const requestAction = ActionUtils.getCorrespondingRequestAction(action);
@@ -35,15 +36,15 @@ export const bapNetworkResponseHandler = async (
 
     const requestCache = await RequestCache.getInstance().check(
       message_id,
-      requestAction
+      requestAction,
     );
     if (requestCache) {
       const now = moment().valueOf();
       const { timestamp = 0, ttl = 0 } = requestCache as any;
-      if (((now - timestamp) / 1000) > ttl) {
+      if ((now - timestamp) / 1000 > ttl) {
         // Delayed message
         logger.info(
-          `\Delayed message received at BAP Network message id: ${message_id}\n\n`
+          `\Delayed message received at BAP Network message id: ${message_id}\n\n`,
         );
         acknowledgeNACK(res, req.body.context, {
           // TODO: change the error code.
@@ -57,8 +58,8 @@ export const bapNetworkResponseHandler = async (
 
     logger.info(
       `\nSending ACK to BPP for Context: ${JSON.stringify(
-        req.body.context
-      )}\n\n`
+        req.body.context,
+      )}\n\n`,
     );
     acknowledgeACK(res, req.body.context);
 
@@ -67,8 +68,11 @@ export const bapNetworkResponseHandler = async (
 
     await GatewayUtils.getInstance().sendToClientSideGateway(req.body);
     console.log(
-      `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } REV EXIT: ${new Date().valueOf()}`
+      `TMTR - ${req?.body?.context?.message_id} - ${
+        req?.body?.context?.action
+      } - ${getConfig().app.mode}-${
+        getConfig().app.gateway.mode
+      } REV EXIT: ${new Date().valueOf()}`,
     );
   } catch (err) {
     let exception: Exception | null = null;
@@ -77,10 +81,11 @@ export const bapNetworkResponseHandler = async (
     } else {
       exception = new Exception(
         ExceptionType.Response_Failed,
-        `BAP Response Failed at bapNetworkResponseHandler at ${getConfig().app.mode
+        `BAP Response Failed at bapNetworkResponseHandler at ${
+          getConfig().app.mode
         } ${getConfig().app.gateway.mode}`,
         500,
-        err
+        err,
       );
     }
 
@@ -89,33 +94,34 @@ export const bapNetworkResponseHandler = async (
 };
 
 export const bapNetworkResponseSettler = async (
-  message: AmqbLib.ConsumeMessage | null
+  message: AmqbLib.ConsumeMessage | null,
 ) => {
   try {
     logger.info(
-      "Protocol Client Server (Network Settler) recieving message from inbox queue"
+      "Protocol Client Server (Network Settler) recieving message from inbox queue",
     );
     let responseBody = JSON.parse(message?.content.toString()!);
     logger.info(
-      `Response from BPP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`
+      `Response from BPP NETWORK:\n ${JSON.stringify(responseBody)}\n\n`,
     );
     const message_id = responseBody.context.message_id;
     const action = ActionUtils.getCorrespondingRequestAction(
-      responseBody.context.action
+      responseBody.context.action,
     );
     console.log(
-      `TMTR - ${message_id} - ${action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode
-      } REV ENTRY: ${new Date().valueOf()}`
+      `TMTR - ${message_id} - ${action} - ${getConfig().app.mode}-${
+        getConfig().app.gateway.mode
+      } REV ENTRY: ${new Date().valueOf()}`,
     );
     const unsolicitedWebhookUrl = getConfig().app.unsolicitedWebhook?.url;
     const requestCache = await RequestCache.getInstance().check(
       message_id,
-      action
+      action,
     );
     if (!requestCache && unsolicitedWebhookUrl) {
       responseBody = {
         context: responseBody.context,
-        responses: [responseBody]
+        responses: [responseBody],
       };
       unsolicitedCallback(responseBody);
       return;
@@ -130,10 +136,12 @@ export const bapNetworkResponseSettler = async (
     }
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
+        if (action)
+          eventBus.emit("onSearch", { message_id, action, responseBody });
         await SyncCache.getInstance().insertResponse(
           message_id,
           action,
-          responseBody
+          responseBody,
         );
         break;
       }
@@ -155,7 +163,7 @@ export const bapNetworkResponseSettler = async (
         ExceptionType.Response_Failed,
         "BAP Response Failed at bapNetworkResponseSettler",
         500,
-        err
+        err,
       );
     }
 
