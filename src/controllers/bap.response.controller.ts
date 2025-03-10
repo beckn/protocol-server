@@ -22,6 +22,7 @@ import {
   createTelemetryEvent,
   processTelemetry,
 } from "../utils/telemetry.utils";
+import eventBus from "../utils/eventBus.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -130,11 +131,23 @@ export const bapNetworkResponseSettler = async (
     }
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
-        await SyncCache.getInstance().insertResponse(
-          message_id,
-          action,
-          responseBody
-        );
+        try {
+          if (action && getConfig()?.app?.streamOnSearch) {
+            console.log(`Streaming enabled. Emitting onSearch event for message_id: ${message_id}`);
+
+            eventBus.emit("onSearch", { message_id, action, responseBody });
+          } else {
+            console.log(`Streaming disabled. Inserting response into SyncCache for message_id: ${message_id}`);
+
+            await SyncCache.getInstance().insertResponse(
+              message_id,
+              action,
+              responseBody
+            );
+          }
+        } catch (error) {
+          console.error(`Error processing response for message_id: ${message_id}`, error);
+        }
         break;
       }
       case ClientConfigType.webhook: {
