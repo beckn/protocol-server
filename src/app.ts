@@ -15,6 +15,7 @@ import logger from "./utils/logger.utils";
 import { Validator } from "./middlewares/validator";
 import express from "express";
 import path from "path";
+import _sodium from "libsodium-wrappers";
 
 const app = Express();
 
@@ -80,6 +81,64 @@ const initializeExpress = async () => {
   const testRouter = require("./routes/test.routes").default;
   app.use("/test", testRouter);
 
+  app.post(
+    "/on_subscribe",
+    async (req: Request, res: Response) => {
+
+      console.log("Received request body:", req.body);
+
+      const challenge = req.body.challenge;
+      const subscriber_id = req.body.subscriber_id;
+      console.log("Extracted challenge:", challenge);
+      console.log("Extracted subscriber_id:", subscriber_id);
+
+      if (subscriber_id != getConfig().app.subscriberId) {
+        console.error("Subscriber ID mismatched. Expected:", getConfig().app.subscriberId, "Received:", subscriber_id);
+        return res.status(400).json({ message: "Subscriber id mismatched" });
+      }
+
+      await _sodium.ready;
+      const sodium = _sodium;
+
+      const privateKey = getConfig().app.privateKey;
+      console.log("Retrieved privateKey from config:", privateKey ? privateKey : "Not Found");
+
+      let privateKeyBase64 = privateKey;
+
+      // Check if the input is already Base64 (valid Base64 strings end with '=' or contain certain characters)
+      const base64Pattern = /^[A-Za-z0-9+/=]+$/;
+      if (base64Pattern.test(privateKey)) {
+        console.log("Private key is already in Base64 format.");
+      } else {
+        // Convert raw input (Hex, ASCII, etc.) to Base64
+        console.log("Converting private key to Uint8Array...");
+        const privateKeyUint8 = sodium.from_string(privateKey);
+        console.log("Converted privateKey to Uint8Array.");
+        privateKeyBase64 = sodium.to_base64(privateKeyUint8, sodium.base64_variants.ORIGINAL);
+        console.log("Converted privateKey to Base64:", privateKeyBase64);
+      }
+
+      // Convert private key from Base64 to Uint8Array
+      console.log("Decoding privateKey from Base64 to Uint8Array...");
+      const pvtKey = sodium.from_base64(
+        privateKeyBase64,
+        sodium.base64_variants.ORIGINAL
+      );
+      console.log("Private key successfully decoded.");
+
+      // Sign the message
+      console.log("Signing the challenge...");
+      const signedMessage = sodium.crypto_sign(challenge, pvtKey);
+      console.log("Challenge successfully signed.");
+
+      // Convert signed message to Base64 for easy storage/transmission
+      const signedChallenge = sodium.to_base64(signedMessage, sodium.base64_variants.ORIGINAL);
+      console.log("Signed challenge converted to Base64:", signedChallenge);
+
+      res.status(200).json({ answer: signedChallenge });
+    }
+  )
+
   // Requests Routing.
   const { requestsRouter } = require("./routes/requests.routes");
   app.use("/", requestsRouter);
@@ -139,8 +198,8 @@ const main = async () => {
     logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
     logger.info(
       "Gateway Type: " +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
     );
     await Validator.getInstance().initialize();
     logger.info("Initialized openapi validator middleware");
