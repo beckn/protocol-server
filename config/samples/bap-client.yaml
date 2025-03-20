@@ -1,18 +1,18 @@
 # Mandatory
 server:
-  port: BAP_CLIENT_PORT
+  port: 5001
 
 # Mandatory.
 cache:
-  host: "REDIS_URL"
+  host: "0.0.0.0"
   port: 6379
   ttl: "PT10M"
   # Optional. Default is 0.
-  db: 1
+  db: 0
 
 # Optional.
 responseCache:
-  mongoURL: "mongodb://MONGO_USERNAME:MONGO_PASSWORD@0.0.0.0:27017/MONGO_DB_NAME?authSource=admin"
+  mongoURL: "mongodb://tvast:password@0.0.0.0:27017/ps?authSource=admin"
   ttl: "PT10M"
 
 # Mandatory.
@@ -21,8 +21,8 @@ responseCache:
 # 2. webhook
 # 3. pubSub
 client:
-  synchronous: 
-    mongoURL: "mongodb://MONGO_USERNAME:MONGO_PASSWORD@MONOG_URL:27017/MONGO_DB_NAME?authSource=admin"
+  synchronous:
+    mongoURL: "mongodb://tvast:password@0.0.0.0:27017/ps?authSource=admin"
 
   #webhook:
   #  url: "https://beckn.free.beeceptor.com/clientURL"
@@ -43,7 +43,7 @@ app:
     mode: client
     inboxQueue: "inbox"
     outboxQueue: "outbox"
-    amqpURL: "amqp://RABBITMQ_USERNAME:RABBITMQ_PASSWORD@RABBITMQ_URL:5672"
+    amqpURL: "amqp://tvast:password@0.0.0.0:5672"
 
   # Mandatory.
   actions:
@@ -51,55 +51,55 @@ app:
       search:
         ttl : "PT15S"
       init:
-        ttl : "PT10S"
+        ttl : "PT15S"
       select:
-        ttl : "PT10S"
+        ttl : "PT15S"
       confirm:
-        ttl : "PT10S"
+        ttl : "PT15S"
       status:
-        ttl : "PT10S"
+        ttl : "PT15S"
       track:
-        ttl : "PT10S"
+        ttl : "PT15S"
       cancel:
-        ttl : "PT10S"
+        ttl : "PT15S"
       update:
-        ttl : "PT10S"
+        ttl : "PT15S"
       rating:
-        ttl : "PT10S"
+        ttl : "PT15S"
       support:
-        ttl : "PT10S"
+        ttl : "PT15S"
       get_cancellation_reasons:
-        ttl : "PT10S"
+        ttl : "PT15S"
       get_rating_categories:
-        ttl : "PT10S"
+        ttl : "PT15S"
       cancellation:
-        ttl : "PT10S"
+        ttl : "PT15S"
 
     responses: 
       on_search:
         ttl: "PT15S"
       on_init:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_select:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_confirm:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_status:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_track:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_cancel:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_update:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_rating:
-        ttl: "PT10S"
+        ttl: "PT15S"
       on_support:
-        ttl: "PT10S"
+        ttl: "PT15S"
       cancellation_reasons:
-        ttl: "PT10S"
+        ttl: "PT15S"
       rating_categories:
-        ttl: "PT10S"          
+        ttl: "PT15S"          
   
   # Mandatory.
   privateKey: "PRIVATE_KEY"
@@ -115,7 +115,7 @@ app:
   uniqueKey: "BAP_SUBSCRIBER_ID_KEY"
   
   # Mandatory.
-  city: "std:080"
+  city: "*"
   country: "IND"
 
   # Mandatory.
@@ -124,20 +124,20 @@ app:
   # Mandatory.
   httpTimeout: "PT3S"
   httpRetryCount: 2
+
   telemetry:
-    enabled: false
-    url: ""
+    network:
+      url: ""
+    raw:
+      url: ""  
     batchSize: 100
     # In minutes
-    syncInterval: 30
-    redis_db: 3
-  
-  useHMACForWebhook: false
-  sharedKeyForWebhookHMAC: ""
-
-  useLayer2Config: false
-  mandateLayer2Config: false
-
-  openAPIValidator:
-    cachedFileLimit: 5
-    initialFilesToCache: ""
+    syncInterval: 1
+    # Either can be LOCAL or REDIS
+    storageType: "LOCAL"
+    backupFilePath: "backups"
+    redis:
+      db: 4
+  service: 
+    name: "bap_client_service"
+    version: "1.0.0"

@@ -17,11 +17,7 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { responseCallback, unsolicitedCallback } from "../utils/callback.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry,
-} from "../utils/telemetry.utils";
+import { telemetrySDK } from "../utils/telemetry.utils";
 
 export const bapNetworkResponseHandler = async (
   req: Request,
@@ -70,6 +66,13 @@ export const bapNetworkResponseHandler = async (
       `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode
       } REV EXIT: ${new Date().valueOf()}`
     );
+    
+    const response = {
+      data: JSON.stringify({}),
+      status: res.status
+    };
+    // generate telemetry
+    telemetrySDK.onApi({})(req.body, response);
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
@@ -121,13 +124,6 @@ export const bapNetworkResponseSettler = async (
       return;
     }
 
-    // Generate telemetry if enabled
-    if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-      telemetryCache
-        .get("bap_response_settled")
-        ?.push(createTelemetryEvent({ context: responseBody.context }));
-      await processTelemetry();
-    }
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
         await SyncCache.getInstance().insertResponse(

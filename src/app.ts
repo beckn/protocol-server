@@ -13,6 +13,7 @@ import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
 import { Validator } from "./middlewares/validator";
+import { getTelemetryConfig, telemetrySDK } from "./utils/telemetry.utils";
 
 const app = Express();
 
@@ -61,6 +62,9 @@ const initializeExpress = async () => {
       limit: "200kb",
     })
   );
+
+  // Initialize the Telemetry SDK
+  app.use(telemetrySDK.init(getTelemetryConfig()));  
 
   // Request Logger.
   app.use("/", async (req: Request, res: Response, next: NextFunction) => {
