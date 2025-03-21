@@ -33,7 +33,7 @@ export class LookupCache {
             domain: (parameters.domain) ? parameters.domain : emptyPlaceHolder,
             subscriber_id: (parameters.subscriber_id) ? parameters.subscriber_id : emptyPlaceHolder,
             type: (parameters.type) ? parameters.type : emptyPlaceHolder,
-            unique_key_id: (parameters.unique_key_id) ? parameters.unique_key_id : emptyPlaceHolder,
+            ukId: (parameters.ukId) ? parameters.ukId : emptyPlaceHolder,
         }
 
         const queryString = JSON.stringify(queryObj);

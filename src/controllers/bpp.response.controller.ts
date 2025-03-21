@@ -22,13 +22,14 @@ import { getConfig } from "../utils/config.utils";
 import { ClientConfigType } from "../schemas/configs/client.config.schema";
 import { ActionUtils } from "../utils/actions.utils";
 import { acknowledgeACK } from "../utils/acknowledgement.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
+// import { telemetryCache } from "../schemas/cache/telemetry.cache";
+// import {
+//   createTelemetryEvent,
+//   processTelemetry
+// } from "../utils/telemetry.utils";
 import { GatewayMode } from "../schemas/configs/gateway.app.config.schema";
 import { getSubscriberDetails } from "../utils/lookup.utils";
+import { customAttributes, telemetrySDK } from "../utils/telemetry.utils";
 
 export const bppClientResponseHandler = async (
   req: Request,
@@ -39,6 +40,7 @@ export const bppClientResponseHandler = async (
   try {
     acknowledgeACK(res, req.body.context);
     await GatewayUtils.getInstance().sendToNetworkSideGateway(req.body);
+    next();
     console.log(
       `TMTR - ${req?.body?.context?.message_id} - ${req?.body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
     );
@@ -144,18 +146,21 @@ export const bppClientResponseSettler = async (
     ) {
       // Network Calls Succeeded.
       // Generate Telemetry if enabled
-      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-        console.log("121========>");
-        telemetryCache.get("bpp_client_settled")?.push(
-          createTelemetryEvent({
-            context: responseBody.context,
-            data: response
-          })
-        );
-        await processTelemetry();
-      }
-      return;
-    }
+    //   if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+    //     console.log("121========>");
+    //     telemetryCache.get("bpp_client_settled")?.push(
+    //       createTelemetryEvent({
+    //         context: responseBody.context,
+    //         data: response
+    //       })
+    //     );
+    //     await processTelemetry();
+    //   }
+    //   return;
+    // }
+    const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
+    const additionalCustomAttrs = customAttributes(responseBody, additionalCustomAttrsConfig);  
+    telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(responseBody, response);
 
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
@@ -183,6 +188,7 @@ export const bppClientResponseSettler = async (
         break;
       }
     }
+  }
   } catch (error) {
     let exception: Exception | null = null;
     if (error instanceof Exception) {

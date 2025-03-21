@@ -44,11 +44,27 @@ export const appConfigSchema = z.object({
   httpRetryCount: z.number(),
 
   telemetry: z.object({
-    enabled: z.boolean(),
-    url: z.string(),
+    network: z.object({
+      url: z.string()
+    }),
+    raw: z.object({
+      url: z.string()
+    }),
     batchSize: z.number(),
     syncInterval: z.number(),
-    redis_db: z.number()
+    storageType: z.string(),
+    backupFilePath: z.string(),
+    redis: z.object({
+      db: z.number()
+    }),
+    messageProperties: z.array(z.object({
+      key: z.string(),
+      path: z.string()
+    })).default([])
+  }),
+  service: z.object({
+    name: z.string(),
+    version: z.string()
   }),
   useLayer2Config: z.boolean().optional(),
   mandateLayer2Config: z.boolean().optional(),
