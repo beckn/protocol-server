@@ -60,7 +60,8 @@ export const appConfigSchema = z.object({
   openAPIValidator: z.object({
     cachedFileLimit: z.number().optional(),
     cacheSizeLimit: z.number().optional()
-  }).optional()
+  }).optional(),
+  streamOnSearch: z.boolean().optional()
 });
 
 export type AppConfigDataType = z.infer<typeof appConfigSchema>;
