@@ -140,7 +140,7 @@ export const bapNetworkResponseSettler = async (
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
         try {
-          if (action && getConfig()?.app?.streamOnSearch) {
+          if (action && action == "search" && getConfig()?.app?.streamOnSearch) {
             console.log(`Streaming enabled. Emitting onSearch event for message_id: ${message_id}`);
 
             eventBus.emit("onSearch", { message_id, action, responseBody });
