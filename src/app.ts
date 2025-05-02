@@ -13,6 +13,7 @@ import { getConfig } from "./utils/config.utils";
 import { GatewayUtils } from "./utils/gateway.utils";
 import logger from "./utils/logger.utils";
 import { Validator } from "./middlewares/validator";
+import { getTelemetryConfig, telemetrySDK } from "./utils/telemetry.utils";
 import express from "express";
 import path from "path";
 import _sodium from "libsodium-wrappers";
@@ -70,6 +71,8 @@ const initializeExpress = async () => {
       limit: "200kb"
     })
   );
+
+  app.use(telemetrySDK.init(getTelemetryConfig()));
 
   // Request Logger.
   app.use("/", async (req: Request, res: Response, next: NextFunction) => {
@@ -237,8 +240,8 @@ const main = async () => {
     logger.info("Mode: " + getConfig().app.mode.toLocaleUpperCase());
     logger.info(
       "Gateway Type: " +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
-        getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(0, 1) +
+      getConfig().app.gateway.mode.toLocaleUpperCase().substring(1)
     );
     await Validator.getInstance().initialize();
     logger.info("Initialized openapi validator middleware");

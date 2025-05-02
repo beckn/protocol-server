@@ -22,11 +22,13 @@ import { callNetwork } from "../utils/becknRequester.utils";
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SyncCache } from "../utils/cache/sync.cache.utils";
 import { errorCallback } from "../utils/callback.utils";
-import { telemetryCache } from "../schemas/cache/telemetry.cache";
-import {
-  createTelemetryEvent,
-  processTelemetry
-} from "../utils/telemetry.utils";
+// import { telemetryCache } from "../schemas/cache/telemetry.cache";
+// import {
+//   createTelemetryEvent,
+//   processTelemetry
+// } from "../utils/telemetry.utils";
+
+import { customAttributes, telemetrySDK } from "../utils/telemetry.utils";
 
 const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
 
@@ -162,18 +164,22 @@ export const bapClientTriggerSettler = async (
       response.status == 206
     ) {
       // Network Calls Succeeded.
-      // Generate Telemetry if enabled
-      if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
-        telemetryCache.get("bap_client_settled")?.push(
-          createTelemetryEvent({
-            context: requestBody.context,
-            data: response
-          })
-        );
-        await processTelemetry();
-      }
-      return;
-    }
+      // OLD Generate Telemetry if enabled
+      // if (getConfig().app.telemetry.enabled && getConfig().app.telemetry.url) {
+      //   telemetryCache.get("bap_client_settled")?.push(
+      //     createTelemetryEvent({
+      //       context: requestBody.context,
+      //       data: response
+      //     })
+      //   );
+      //   await processTelemetry();
+      // }
+    //   return;
+    // }
+
+    const additionalCustomAttrsConfig = getConfig().app.telemetry.messageProperties;
+    const additionalCustomAttrs = customAttributes(requestBody, additionalCustomAttrsConfig);  
+    telemetrySDK.onApi({ data: { attributes: { "http.status.code": response.status, ...additionalCustomAttrs } } })(requestBody, response);
 
     switch (getConfig().client.type) {
       case ClientConfigType.synchronous: {
@@ -208,6 +214,7 @@ export const bapClientTriggerSettler = async (
     }
 
     return;
+  }
   } catch (err) {
     let exception: Exception | null = null;
     if (err instanceof Exception) {
