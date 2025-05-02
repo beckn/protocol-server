@@ -77,13 +77,13 @@ export const registryLookup = async (lookupParameter: LookupParameter) => {
 
 export async function getSubscriberDetails(
   subscriber_id: string,
-  unique_key_id?: string
+  ukId?: string
 ) {
   const protocolServerLevel = `${getConfig().app.mode.toUpperCase()}-${getConfig().app.gateway.mode.toUpperCase()}`;
   try {
     const subsribers = await registryLookup({
       subscriber_id: subscriber_id,
-      unique_key_id: unique_key_id
+      ukId: ukId
     });
 
     if (subsribers!.length == 0) {
@@ -92,7 +92,7 @@ export async function getSubscriberDetails(
         `No subscriber found at ${protocolServerLevel} for payload===> ${JSON.stringify(
           {
             subscriber_id: subscriber_id,
-            unique_key_id: unique_key_id
+            ukId: ukId
           }
         )}`,
         404
