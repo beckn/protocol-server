@@ -121,3 +121,5 @@ app:
   openAPIValidator:
     cachedFileLimit: 5
     initialFilesToCache: ""
+
+  streamOnSearch: true
