@@ -181,6 +181,27 @@ const initializeExpress = async () => {
     res.status(200).json(response);
   });
 
+  // Add health check endpoint
+  app.get('/health', async (req, res) => {
+    try {
+      const results = await Promise.all([
+        ClientUtils.checkConnection(),
+        GatewayUtils.getInstance().checkConnection(), 
+        RequestCache.getInstance().checkConnection(),
+        LookupCache.getInstance().checkConnection()
+      ]);
+      
+      if (results.every(result => result === true)) {
+        res.status(200).json({status: 'ok'});
+      } else {
+        res.status(503).json({status: 'error', message: 'One or more services are unavailable'});
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      res.status(503).json({status: 'error', message: errorMessage});
+    }
+  });
+
   // Requests Routing.
   const { requestsRouter } = require("./routes/requests.routes");
   app.use("/", requestsRouter);

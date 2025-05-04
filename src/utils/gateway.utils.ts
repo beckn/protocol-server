@@ -73,4 +73,12 @@ export class GatewayUtils{
         
         await this.mqClient.publishMessage(getConfig().app.gateway.outboxQueue, data);
     }
+
+    public async checkConnection(): Promise<boolean> {
+        try {
+            return this.mqClient.isConnected;
+        } catch (error) {
+            return false; 
+        }
+    }
 }

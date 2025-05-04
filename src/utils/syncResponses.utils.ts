@@ -46,22 +46,28 @@ export async function sendSyncResponses(
       await sleep(waitTime);
     }
     let syncCacheData: SyncCacheDataType | null = null;
+    const startTime = Date.now();
+    const maxWaitTime = getConfig().app.actions.requests[action]?.ttl
+      ? getConfig().app.actions.requests[action]?.ttl!
+      : 30 * 1000;
 
     do {
       syncCacheData = await syncCache.getData(message_id, action);
+      
       if (!syncCacheData || !syncCacheData?.responses.length) {
+        const elapsedTime = Date.now() - startTime;
+        if (elapsedTime >= maxWaitTime) {
+          break; // Break if max wait time exceeded
+        }
         await sleep(100);
       }
-    } while (
-      (!syncCacheData || !syncCacheData?.responses.length) &&
-      Date.now() - curr_timeStamp < waitTime
-    );
+    } while (!syncCacheData || !syncCacheData?.responses.length);
 
     if (!syncCacheData) {
       throw new Exception(
         ExceptionType.Client_SyncCacheDataNotFound,
-        `Sync cache data not found for message_id: ${message_id} and action: ${action}`,
-        404
+        `Response timeout for message_id: ${message_id}, action: ${action}`,
+        504 // Gateway Timeout
       );
     }
 
