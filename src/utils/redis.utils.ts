@@ -69,6 +69,15 @@ export class RedisClient {
         }
     }
 
+    public async ping(): Promise<boolean> {
+        try {
+            await this.redis!.ping();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     // getKeys(pattern: string = "*", count = 100) {
     //     const stream = this.redis?.scanStream({
     //         match: pattern,

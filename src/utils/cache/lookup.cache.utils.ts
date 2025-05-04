@@ -93,4 +93,12 @@ export class LookupCache {
         console.log("Lookup Cache Cleared...");
         return redisResponse;
     }
+
+    public async checkConnection(): Promise<boolean> {
+        try {
+            return await this.redisClient.ping();
+        } catch (error) {
+            return false;
+        }
+    }
 }

@@ -53,9 +53,21 @@ export class RequestCache {
         return redisResponse;
     }
 
-
     public async clear(): Promise<boolean> {
         const redisResponse = await this.redisClient.flushDB();
         return redisResponse;
+    }
+
+    public async checkConnection(): Promise<boolean> {
+        try {
+            await this.redisClient.ping();
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    public async get(message_id: string): Promise<any> {
+        return await this.redisClient.get(message_id);
     }
 }
