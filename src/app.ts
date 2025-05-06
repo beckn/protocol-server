@@ -95,7 +95,7 @@ const initializeExpress = async () => {
       return res.status(400).json(response);
     }
 
-    const { challenge, subscriber_id } = req.body;
+    const { challenge } = req.body;
 
     if (!challenge || typeof challenge !== "string") {
       const response = { message: "Missing or invalid challenge" };
@@ -103,24 +103,7 @@ const initializeExpress = async () => {
       return res.status(400).json(response);
     }
 
-    if (!subscriber_id || typeof subscriber_id !== "string") {
-      const response = { message: "Missing or invalid subscriber_id" };
-      console.log("Sending error response:", response);
-      return res.status(400).json(response);
-    }
-
     console.log("Extracted challenge:", challenge);
-    console.log("Extracted subscriber_id:", subscriber_id);
-
-    if (subscriber_id != getConfig().app.subscriberId) {
-      console.error(
-        "Subscriber ID mismatched. Expected:",
-        getConfig().app.subscriberId,
-        "Received:",
-        subscriber_id
-      );
-      return res.status(400).json({ message: "Subscriber id mismatched" });
-    }
 
     await _sodium.ready;
     const sodium = _sodium;
