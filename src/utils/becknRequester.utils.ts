@@ -1,10 +1,15 @@
 const axiosCall = require("axios").default;
 import axios from "axios";
+import moment from 'moment';
+import { Exception, ExceptionType } from '../models/exception.model';
 import { BecknResponse } from "../schemas/becknResponse.schema";
 import { SubscriberDetail } from "../schemas/subscriberDetails.schema";
 import { getConfig } from "./config.utils";
 import logger from "./logger.utils";
 import { combineURLs } from "./lookup.utils";
+
+// Add sleep utility
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const makeBecknRequest = async (
   subscriberUrl: string,
@@ -67,51 +72,38 @@ export async function callNetwork(
     };
   }
 
+  let lastError;
   for (let i = 0; i < subscribers.length; i++) {
-    logger.info(`Attempt Number: ${i + 1} \nAction : ${action}`);
+    logger.info(`Attempt Number: ${i + 1} \nAction : ${action}`); 
     logger.info(`sending Response to BAP: ${subscribers[i].subscriber_url}`);
-    logger.info(`Response Body: ${JSON.stringify(body)}`);
-    console.log(
-      "\nHTTP Retry Count=====>=====>",
-      getConfig().app.httpRetryCount,
-      "\n"
-    );
-    if (getConfig().app.mode.toLowerCase() === 'bap') {
-      console.log(
-        `TMTR - ${body?.context?.message_id} - ${body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} FORW EXIT: ${new Date().valueOf()}`
-      );
-    } else {
-      console.log(
-        `TMTR - ${body?.context?.message_id} - ${body?.context?.action} - ${getConfig().app.mode}-${getConfig().app.gateway.mode} REV EXIT: ${new Date().valueOf()}`
-      );
-    }
+    
+    const maxRetries = getConfig().app.httpRetryCount;
+    const timeout = moment.duration(getConfig().app.httpTimeout).asMilliseconds();
 
-    const response = await makeBecknRequest(
-      subscribers[i].subscriber_url,
-      body,
-      axios_config,
-      getConfig().app.httpRetryCount,
-      action
-    );
-    if (
-      response.status == 200 ||
-      response.status == 201 ||
-      response.status == 202 ||
-      response.status == 204
-    ) {
-      logger.info(
-        `Result : Request Successful \nStatus: ${response.status} \nData : ${response.data} \nSubscriber URL: ${subscribers[i].subscriber_url}`
-      );
-      return response;
+    // Add retry loop
+    for(let retry = 0; retry < maxRetries; retry++) {
+      try {
+        const response = await axios.post(subscribers[i].subscriber_url, body, {
+          ...axios_config,
+          timeout: timeout
+        });
+        
+        return {
+          data: response.data,
+          status: response.status
+        };
+      } catch (err) {
+        lastError = err;
+        logger.error(`Request failed, attempt ${retry+1}/${maxRetries}`);
+        await sleep(100 * Math.pow(2, retry)); // Exponential backoff
+      }
     }
-
-    logger.error(
-      `Result : Failed call to Subscriber: ${subscribers[i].subscriber_url}, \nStatus: ${response.status}, \nData: ${response.data}`
-    );
   }
 
-  return {
-    data: "No Response",
-    status: 500
-  };
+  throw new Exception(
+    ExceptionType.Network_RequestFailed, 
+    "Network request failed after all retries",
+    500,
+    lastError
+  );
 }

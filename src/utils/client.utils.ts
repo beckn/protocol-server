@@ -19,4 +19,13 @@ export class ClientUtils{
             }
         }
     }
+
+    public static async checkConnection(): Promise<boolean> {
+        try {
+            // Add basic connection check logic
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
 }

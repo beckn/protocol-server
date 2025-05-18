@@ -80,6 +80,8 @@ export enum ExceptionType {
     Response_Failed = "Response_Failed",
 
     OpenApiSchema_ParsingError = "OpenApiSchema_ParsingError",
+
+    Network_RequestFailed = "Network request failed",
 }
 
 export class Exception extends Error {
